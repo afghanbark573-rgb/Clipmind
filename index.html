@@ -249,7 +249,7 @@ $('analyze').onclick=async()=>{
    $('fastRead').classList.remove('hidden');
   }catch(extractorError){
    console.warn('Fast extractor unavailable:',extractorError);
-   aiStatus('Speech model ready, but fast extraction could not load. You can use the real-time fallback.');
+   aiStatus('Speech model ready, but fast extraction could not load. Technical error: '+(extractorError?.message||String(extractorError))+' You can use the real-time fallback.');
   }
   $('startRead').classList.remove('hidden');
  }catch(e){
