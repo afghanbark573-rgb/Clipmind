@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101827">
-<title>ClipMind v0.7.3</title>
+<title>ClipMind v0.7.5</title>
 <style>
 :root{color-scheme:dark;--bg:#0c1220;--card:#151f31;--line:#2a3850;--muted:#a7b3c7;--accent:#a5b4fc;--good:#8de0b6}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f5f7fb;font:15px system-ui,-apple-system,Segoe UI,sans-serif}
@@ -46,7 +46,7 @@ footer{text-align:center;color:#6f7e96;font-size:11px;padding:18px}
 <body>
 <header><div class="logo">▶</div><div><strong>ClipMind</strong><small>Your private video clip studio</small></div></header>
 <main>
-<div class="kicker">PERSONAL VIDEO TOOL · V0.7.3 SMARTER HIGHLIGHT FILTERING</div>
+<div class="kicker">PERSONAL VIDEO TOOL · V0.7.5 DUPLICATE-AWARE HIGHLIGHT FILTERING</div>
 <h1>Find moments worth clipping.</h1>
 <p class="sub">Choose a video, let the on-device speech model transcribe it, then review suggested moments. Your video and transcript stay in this browser session.</p>
 
@@ -106,6 +106,168 @@ footer{text-align:center;color:#6f7e96;font-size:11px;padding:18px}
 <summary style="font-size:13px;color:#cbd5e1">View full transcript</summary>
 <div class="transcript-heading">FULL RECOGNIZED TEXT</div>
 <div id="transcriptFull" class="transcript-full">The full recognized text will appear here.</div>
+<div class="transcript-heading">TIMESTAMPED SEGMENTS</div>
+<p class="transcript-note">Tap a timestamp to jump to that moment. Timestamped segments may be sparser than the full text when the speech model does not return a time for every phrase.</p>
+<div id="transcript" class="transcript"></div>
+</details>
+</section>
+
+<section class="card">
+<h2>3. Create your clips</h2><p class="help">Choose an AI suggestion above and select one or more for batch export, or enter timestamps here for a single clip. Exports run one at a time.</p>
+<div class="row">
+<label class="field">START (min:sec)<input id="start" type="text" inputmode="numeric" autocomplete="off" placeholder="00:00" value="00:00" aria-label="Clip start time in minutes and seconds"></label>
+<label class="field">END (min:sec)<input id="end" type="text" inputmode="numeric" autocomplete="off" placeholder="00:30" value="00:30" aria-label="Clip end time in minutes and seconds"></label>
+</div>
+<p class="help" style="margin-top:8px">Type four digits like a digital clock: <b>0125</b> becomes <b>01:25</b>. The colon is added automatically.</p>
+<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">
+<button class="secondary preset" data-sec="15" style="width:auto">15 sec</button>
+<button class="secondary preset" data-sec="30" style="width:auto">30 sec</button>
+<button class="secondary preset" data-sec="45" style="width:auto">45 sec</button>
+<button class="secondary preset" data-sec="60" style="width:auto">60 sec</button>
+</div>
+<p class="help" style="margin-top:13px">Output shape</p>
+<div class="segment">
+<label><input type="radio" name="shape" value="vertical" checked> 9:16 Vertical</label>
+<label><input type="radio" name="shape" value="original"> Original</label>
+</div>
+<button id="create" class="primary" disabled>Create clip</button>
+<progress id="exportProgress" class="hidden" value="0" max="100"></progress>
+<p id="exportStatus" class="status">Select a video first.</p>
+<div id="clipOutputs" aria-live="polite"></div>
+</section>
+<div class="card note"><b>Important:</b> Fast extraction uses FFmpeg WebAssembly, which may download a large engine the first time. It is usually faster than real-time playback, but speed depends on the video format and phone. If direct extraction fails, use the real-time fallback. You can inspect only a chosen time range instead of the whole video. Very long selected ranges can still use substantial phone memory. Highlight ranking is based on transcript clues, not full visual understanding, and does not guarantee viral moments. Keep Chrome open while processing.</div>
+</main><footer>ClipMind · v0.7.5 · Duplicate-aware highlight filtering</footer>
+
+<script type="module">
+const $=id=>document.getElementById(id);
+const file=$('file'), video=$('preview');
+let objectUrl='',duration=0,baseName='clipmind',transcriber=null,transcriberModel='',transcriptChunks=[],selectedFile=null,ffmpeg=null,ffmpegReady=false,ffmpegLogText='',lastFilteredDuplicates=0;
+const aiStatus=t=>{
+ $('aiStatus').textContent=t;
+ const history=$('aiHistory');
+ if(!history)return;
+ const last=history.lastElementChild;
+ if(last&&last.textContent===t)return;
+ if(history.children.length===1&&history.firstElementChild.textContent==='Waiting to start.')history.innerHTML='';
+ const item=document.createElement('li');item.textContent=t;history.appendChild(item);
+ while(history.children.length>8)history.removeChild(history.firstElementChild);
+};
+function progressUI(label,pct,note=''){
+ const bar=$('aiProgress'),head=$('aiProgressHead');
+ bar.classList.remove('hidden');head.classList.remove('hidden');$('aiProgressNote').classList.remove('hidden');
+ $('aiProgressLabel').textContent=label;
+ if(Number.isFinite(pct)){
+  const n=Math.max(0,Math.min(100,pct));bar.value=n;$('aiProgressPct').textContent=Math.round(n)+'%';
+ }else{
+  bar.removeAttribute('value');$('aiProgressPct').textContent='Working…';
+ }
+ $('aiProgressNote').textContent=note||'Progress is measured for the current stage. It is not an ETA.';
+}
+function progressReset(){progressUI('Waiting to start',0,'Progress is measured for the current stage; no time estimate is guessed.');}
+const exportStatus=t=>$('exportStatus').textContent=t;
+function fmt(s){s=Math.max(0,Number(s)||0);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0')}
+function parseClipTime(value){
+ const v=String(value||'').trim();
+ const m=v.match(/^(\d+):([0-5]?\d)$/);
+ if(m)return Number(m[1])*60+Number(m[2]);
+ if(/^\d+$/.test(v)){
+  if(v.length<=2)return Number(v);
+  return Number(v.slice(0,-2))*60+Number(v.slice(-2));
+ }
+ return NaN;
+}
+function formatClockInput(el){
+ const raw=String(el.value||'');
+ const caret=el.selectionStart==null?raw.length:el.selectionStart;
+ const digitsBefore=raw.slice(0,caret).replace(/\D/g,'').length;
+ const digits=raw.replace(/\D/g,'').slice(0,4);
+ const minuteDigits=Math.max(0,digits.length-2);
+ const formatted=digits.length>2?digits.slice(0,minuteDigits)+':'+digits.slice(-2):digits;
+ el.value=formatted;
+ const pos=Math.min(formatted.length,digitsBefore+(digitsBefore>minuteDigits&&digits.length>2?1:0));
+ try{el.setSelectionRange(pos,pos);}catch(e){}
+}
+['start','end','analysisStart','analysisEnd'].forEach(id=>{
+ const el=$(id);
+ el.addEventListener('input',()=>formatClockInput(el));
+});
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('choose').onclick=()=>file.click();
+file.onchange=()=>{
+ const f=file.files?.[0];if(!f)return;selectedFile=f;
+ if(typeof outputUrls!=='undefined'){outputUrls.forEach(url=>URL.revokeObjectURL(url));outputUrls.clear();}
+ $('clipOutputs').innerHTML='';window.clipMindSuggestions=[];$('batchControls').style.display='none';
+ if(!f.type.startsWith('video/')){exportStatus('That file does not look like a video.');return;}
+ if(objectUrl)URL.revokeObjectURL(objectUrl);
+ objectUrl=URL.createObjectURL(f);baseName=f.name.replace(/\.[^.]+$/,'')||'clipmind';
+ video.src=objectUrl;video.classList.remove('hidden');
+ $('meta').textContent=f.name+' · '+(f.size/1048576).toFixed(1)+' MB';$('meta').classList.remove('hidden');
+ $('duration').textContent='Loading video details…';$('analyze').disabled=true;$('create').disabled=true;
+ $('results').innerHTML='';$('transcriptBox').classList.add('hidden');transcriptChunks=[];$('aiHistory').innerHTML='<li>New video selected.</li>'; $('fastRead').classList.add('hidden');$('startRead').classList.add('hidden');
+ video.onloadedmetadata=()=>{
+  duration=video.duration;$('duration').textContent='Video length: '+fmt(duration)+' · '+video.videoWidth+'×'+video.videoHeight;
+  $('start').value=fmt(0);$('end').value=fmt(Math.min(30,duration));
+  $('analysisStart').value=fmt(0);$('analysisEnd').value=fmt(duration);
+  $('analyze').disabled=false;$('create').disabled=false;aiStatus('Video ready. Tap Find highlights with AI.');
+  exportStatus('Video ready. You can create a manual clip or run AI first.');
+ };
+ video.onerror=()=>{$('duration').textContent='Could not read this video. Try an MP4 in the latest Chrome.'};
+};
+
+async function loadModel(){
+ const chosenLanguage=$('language').value;
+ const englishChoice=$('englishModel')?.value||'base';
+ const model=chosenLanguage==='english'?(englishChoice==='tiny'?'onnx-community/whisper-tiny.en':'onnx-community/whisper-base.en'):'onnx-community/whisper-tiny';
+ if(transcriber&&transcriberModel===model)return transcriber;
+ transcriber=null;transcriberModel='';
+ const modelLabel=chosenLanguage==='english'?(englishChoice==='tiny'?'English Whisper Tiny':'English Whisper Base'):'multilingual Whisper Tiny';
+ aiStatus('Loading '+modelLabel+'… first use needs internet.');
+ const mod=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2');
+ const {pipeline,env}=mod;
+ env.allowLocalModels=false;env.useBrowserCache=true;
+ const progress_callback=p=>{
+  if(p.status==='progress'&&p.total){
+   const pct=Math.round((p.loaded||0)/p.total*100);
+   progressUI('Downloading '+modelLabel,pct,'This percentage is for the model file currently downloading.');
+   aiStatus('Downloading '+modelLabel+': '+pct+'% of current file');
+  } else if(p.status==='done') {progressUI('Model file ready',100,'Model download step completed.');aiStatus('Speech model files ready.');}
+ };
+ // Diagnostic build: use the WASM backend to compare recognition quality
+ // against the previous WebGPU run on this Android device.
+ aiStatus('Loading '+modelLabel+' in compatibility (WASM) mode…');
+ progressUI('Loading speech model',null,'The model is being initialized. If files are downloaded, their individual download percentages will be shown.');
+ transcriber=await pipeline('automatic-speech-recognition',model,{
+  dtype:'q8',
+  device:'wasm',
+  progress_callback
+ });
+ transcriberModel=model;
+ aiStatus(modelLabel+' ready · WASM compatibility mode (GPU bypassed for diagnosis).');
+ return transcriber;
+}
+let webAudioContext=null;
+let ffmpegLoadPromise=null;
+async function loadFastExtractor(){
+ if(ffmpegReady&&ffmpeg)return ffmpeg;
+ if(ffmpegLoadPromise)return ffmpegLoadPromise;
+ ffmpegLoadPromise=(async()=>{
+  let instance=null,timer=null;
+  try{
+   aiStatus('Loading fast audio extractor… first use downloads the FFmpeg engine.');
+   progressUI('Loading FFmpeg audio engine',null,'Preparing the audio engine. If loading stalls, ClipMind will stop waiting and allow a retry.');
+   const {FFmpeg}=await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js');
+   instance=new FFmpeg();
+   ffmpeg=instance;
+   ffmpegReady=false;
+   ffmpeg.on('log',({message})=>{
+    if(message){
+     ffmpegLogText=(ffmpegLogText+'\n'+message).slice(-200000);
+     if(/time=/.test(message))aiStatus('Extracting audio directly… '+message.match(/time=\S+/)?.[0]);
+    }
+   });
+   ffmpeg.on('progress',({progress})=>{
+    if(Number.isFinite(progress))progressUI('Extracting audio',Math.max(0,Math.min(99,progress*100)),'Fast extraction progress reported by FFmpeg.');
+   });here.</div>
 <div class="transcript-heading">TIMESTAMPED SEGMENTS</div>
 <p class="transcript-note">Tap a timestamp to jump to that moment. Timestamped segments may be sparser than the full text when the speech model does not return a time for every phrase.</p>
 <div id="transcript" class="transcript"></div>
