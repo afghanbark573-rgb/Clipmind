@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<title>ClipMind v0.7.6</title>
+<style>
+:root{color-scheme:dark;--bg:#0c1220;--card:#151f31;--line:#2a3850;--muted:#a7b3c7;--accent:#a5b4fc;--good:#8de0b6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f5f7fb;font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:11px}
+.logo{width:38px;height:38px;border-radius:12px;background:var(--accent);color:#101827;display:grid;place-items:center;font-weight:900}
+header strong{font-size:18px}header small{display:block;color:var(--muted);font-size:11px}
+main{max-width:660px;margin:auto;padding:20px 14px 40px}
+.kicker{color:var(--accent);font-size:10px;font-weight:800;letter-spacing:1.5px}
+h1{font-size:29px;line-height:1.12;margin:8px 0}.sub{color:var(--muted);line-height:1.5;margin:8px 0 19px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:15px;margin:13px 0}
+h2{font-size:16px;margin:0 0 5px}.help{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 13px}
+.pick{width:100%;border:1px dashed #667799;background:#1b2940;color:white;border-radius:13px;padding:18px 12px;font-size:15px;font-weight:700;min-height:68px}
+#file{position:absolute;left:-9999px;width:1px;height:1px}
+#preview{width:100%;max-height:340px;background:#05070c;border-radius:12px;margin-top:13px}
+.hidden{display:none!important}.meta,.status{font-size:12px;color:var(--muted);line-height:1.5;margin:10px 2px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label.field{font-size:12px;color:#c7d0df}
+input[type=number],input[type=text],select{width:100%;margin-top:7px;padding:12px;border-radius:10px;border:1px solid #40506b;background:#0c1525;color:white;font-size:16px;min-height:46px}
+.primary{width:100%;padding:14px;border:0;border-radius:12px;background:var(--accent);color:#101827;font-size:15px;font-weight:800;margin-top:12px}
+.secondary{width:100%;padding:12px;border:1px solid #52627e;border-radius:11px;background:#24324a;color:#f4f6ff;font-weight:700;margin-top:9px}
+button:disabled{opacity:.45}.segment{display:flex;gap:8px}.segment label{flex:1;border:1px solid #40506b;border-radius:10px;padding:11px;font-size:12px}.segment input{accent-color:var(--accent)}
+progress{width:100%;height:12px;margin-top:7px;accent-color:var(--accent);display:block}
+.progress-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-size:12px;color:#cbd5e1}
+#aiProgressLabel{font-weight:700}#aiProgressPct{font-variant-numeric:tabular-nums;color:var(--good);white-space:nowrap}
+.progress-note{font-size:11px;color:var(--muted);line-height:1.4;margin:5px 1px 0}
+#aiStatus{font-size:14px;color:#f5f7fb;font-weight:700;background:#0c1525;border:1px solid #40506b;border-radius:10px;padding:12px;margin-top:10px;min-height:48px}
+#aiHistory{margin:8px 0 0;padding:9px 12px 9px 28px;background:#101a2a;border-radius:10px;color:#a7b3c7;font-size:11px;line-height:1.55}
+#aiHistory li{padding:2px 0}
+.download{display:block;text-align:center;background:#244638;border:1px solid #3a735b;border-radius:11px;color:#d2ffe8;text-decoration:none;font-weight:700;padding:13px;margin-top:13px}
+.note{font-size:12px;color:var(--muted);line-height:1.55}
+#results{display:grid;gap:9px;margin-top:12px}
+.suggestion{border:1px solid #40506b;border-radius:12px;padding:12px;background:#101a2a}
+.suggestion strong{font-size:13px}.suggestion p{font-size:12px;color:#c2cde0;line-height:1.45;margin:7px 0}
+.suggestion button{background:#2c3b58;color:white;border:1px solid #52627e;border-radius:9px;padding:9px 11px;font-weight:700}.suggestion-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px}.suggestion-select{display:flex;align-items:center;gap:7px;font-size:12px;color:#d5deec}.suggestion-select input{width:18px;height:18px;accent-color:var(--accent)}.clip-output{border:1px solid #40506b;border-radius:12px;background:#101a2a;padding:12px;margin-top:10px}.clip-output video{width:100%;max-height:280px;background:#05070c;border-radius:9px}.clip-output strong{display:block;font-size:13px;margin-bottom:7px}.clip-output .download{margin-top:8px}.batch-row{display:flex;gap:8px;flex-wrap:wrap}.batch-row button{flex:1;min-width:130px}
+.tag{font-size:10px;color:var(--good);font-weight:800;letter-spacing:.6px}
+.transcript{max-height:280px;overflow:auto;font-size:12px;line-height:1.65;color:#d5deec;background:#0c1525;padding:11px;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere}.transcript-line{display:block;margin:0 0 7px}.transcript-heading{font-size:11px;color:#a5b4fc;font-weight:800;letter-spacing:.5px;margin:10px 0 6px}.transcript-note{font-size:11px;color:#9eabc0;line-height:1.45;margin:5px 0 9px}.transcript-full{max-height:220px;overflow:auto;border:1px solid #2a3850;border-radius:9px;padding:10px;background:#101a2a;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.transcript-jump{border:1px solid #52627e;border-radius:6px;background:#24324a;color:#c7d2fe;padding:3px 6px;margin-right:6px;font:700 11px system-ui;cursor:pointer}.transcript-jump:active{background:#405579}
+footer{text-align:center;color:#6f7e96;font-size:11px;padding:18px}
+</style></head>
+<body>
+<header><div class="logo">▶</div><div><strong>ClipMind</strong><small>Your private video clip studio</small></div></header>
+<main>
+<div class="kicker">PERSONAL VIDEO TOOL · V0.7.6 SPEECH RECOVERY & DIVERSE HIGHLIGHTS</div>
+<h1>Find moments worth clipping.</h1>
+<p class="sub">Choose a video, let the on-device speech model transcribe it, then review suggested moments. Your video and transcript stay in this browser session.</p>
+
+<section class="card">
+<h2>1. Choose your video</h2><p class="help">Works with English, Hindi, Dari/Persian, Arabic, and many other spoken languages. Clear audio gives the best results.</p>
+<input id="file" type="file" accept="video/*">
+<button class="pick" id="choose">＋ &nbsp; Select video</button>
+<div id="meta" class="meta hidden"></div>
+<video id="preview" class="hidden" controls playsinline preload="metadata"></video>
+<p id="duration" class="status">No video selected.</p>
+</section>
+
+<section class="card">
+<h2>2. AI highlight finder</h2>
+<p class="help">Choose which part of the video to inspect. By default, ClipMind checks the whole video. There is no fixed time limit, but shorter ranges finish sooner and use less phone memory.</p>
+<div class="row">
+<label class="field">INSPECT FROM<input id="analysisStart" type="text" inputmode="numeric" autocomplete="off" placeholder="00:00" value="00:00" aria-label="Inspection start time"></label>
+<label class="field">INSPECT TO<input id="analysisEnd" type="text" inputmode="numeric" autocomplete="off" placeholder="01:19" value="01:19" aria-label="Inspection end time"></label>
+</div>
+<label class="field" style="display:block;margin-top:12px">SPOKEN LANGUAGE
+<select id="language" aria-label="Spoken language">
+<option value="english" selected>English</option>
+<option value="auto">Auto detect (may be less reliable)</option>
+<option value="hindi">Hindi</option>
+<option value="persian">Dari / Persian</option>
+<option value="arabic">Arabic</option>
+<option value="pashto">Pashto</option>
+<option value="urdu">Urdu</option>
+<option value="french">French</option>
+<option value="spanish">Spanish</option>
+<option value="german">German</option>
+<option value="russian">Russian</option>
+<option value="turkish">Turkish</option>
+<option value="chinese">Chinese</option>
+<option value="japanese">Japanese</option>
+<option value="other">Other / Auto detect</option>
+</select>
+</label>
+<p class="help" style="margin-top:7px">Choose the main spoken language to reduce language mix-ups and help Whisper transcribe more efficiently. Select Auto detect if you are unsure.</p>
+<label class="field" style="display:block;margin-top:12px">ENGLISH RECOGNITION MODEL
+<select id="englishModel" aria-label="English recognition model">
+<option value="base" selected>Whisper Base · better accuracy, slower</option>
+<option value="tiny">Whisper Tiny · faster, lighter</option>
+</select></label>
+<p class="help" style="margin-top:7px">Base is an accuracy experiment for English. It downloads a larger model and may take longer on your phone. Tiny remains available if Base is too slow.</p>
+<button id="analyze" class="primary" disabled>✨ Prepare AI tools</button>
+<button id="fastRead" class="secondary hidden">⚡ Extract audio and find highlights</button>
+<button id="startRead" class="secondary hidden">▶ Use real-time fallback instead</button>
+<div class="progress-head hidden" id="aiProgressHead"><span id="aiProgressLabel">Waiting for analysis</span><strong id="aiProgressPct">0%</strong></div>
+<progress id="aiProgress" class="hidden" value="0" max="100" aria-label="Current processing stage progress"></progress>
+<p id="aiProgressNote" class="progress-note hidden">Percentages describe the current stage, not an estimated time remaining.</p>
+<p id="aiStatus" class="status" role="status" aria-live="polite">Select a video to begin.</p>
+<details id="aiHistoryBox" style="margin-top:8px"><summary style="font-size:12px;color:#cbd5e1">Recent progress steps</summary><ol id="aiHistory"><li>Waiting to start.</li></ol></details>
+<details id="audioDiagnostics" style="margin-top:8px"><summary style="font-size:12px;color:#cbd5e1">Audio & transcription diagnostics</summary><pre id="audioDiagnosticsText" style="white-space:pre-wrap;overflow-wrap:anywhere;color:#a7b3c7;background:#101a2a;padding:10px;border-radius:9px;font-size:11px;line-height:1.5">Diagnostics will appear after an analysis attempt.</pre></details>
+<div id="results"></div>
+<div class="batch-row" id="batchControls" style="margin-top:10px;display:none"><button id="createSelected" class="primary" type="button">Create selected clips</button><button id="selectAll" class="secondary" type="button">Select all</button></div>
+<details id="transcriptBox" class="hidden" style="margin-top:13px">
+<summary style="font-size:13px;color:#cbd5e1">View full transcript</summary>
+<div class="transcript-heading">FULL RECOGNIZED TEXT</div>
+<div id="transcriptFull" class="transcript-full">The full recognized text will appear here.</div>
+<div class="transcript-heading">TIMESTAMPED SEGMENTS</div>
+<p class="transcript-note">Tap a timestamp to jump to that moment. Timestamped segments may be sparser than the full text when the speech model does not return a time for every phrase.</p>
+<div id="transcript" class="transcript"></div>
+</details>
+</section>
+
+<section class="card">
+<h2>3. Create your clips</h2><p class="help">Choose an AI suggestion above and select one or more for batch export, or enter timestamps here for a single clip. Exports run one at a time.</p>
+<div class="row">
+<label class="field">START (min:sec)<input id="start" type="text" inputmode="numeric" autocomplete="off" placeholder="00:00" value="00:00" aria-label="Clip start time in minutes and seconds"></label>
+<label class="field">END (min:sec)<input id="end" type="text" inputmode="numeric" autocomplete="off" placeholder="00:30" value="00:30" aria-label="Clip end time in minutes and seconds"></label>
+</div>
+<p class="help" style="margin-top:8px">Type four digits like a digital clock: <b>0125</b> becomes <b>01:25</b>. The colon is added automatically.</p>
+<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">
+<button class="secondary preset" data-sec="15" style="width:auto">15 sec</button>
+<button class="secondary preset" data-sec="30" style="width:auto">30 sec</button>
+<button class="secondary preset" data-sec="45" style="width:auto">45 sec</button>
+<button class="secondary preset" data-sec="60" style="width:auto">60 sec</button>
+</div>
+<p class="help" style="margin-top:13px">Output shape</p>
+<div class="segment">
+<label><input type="radio" name="shape" value="vertical" checked> 9:16 Vertical</label>
+<label><input type="radio" name="shape" value="original"> Original</label>
+</div>
+<button id="create" class="primary" disabled>Create clip</button>
+<progress id="exportProgress" class="hidden" value="0" max="100"></progress>
+<p id="exportStatus" class="status">Select a video first.</p>
+<div id="clipOutputs" aria-live="polite"></div>
+</section>
+<div class="card note"><b>Important:</b> Fast extraction uses FFmpeg WebAssembly, which may download a large engine the first time. It is usually faster than real-time playback, but speed depends on the video format and phone. If direct extraction fails, use the real-time fallback. You can inspect only a chosen time range instead of the whole video. Very long selected ranges can still use substantial phone memory. Highlight ranking is based on transcript clues, not full visual understanding, and does not guarantee viral moments. Keep Chrome open while processing.</div>
+</main><footer>ClipMind · v0.7.6 · Speech recovery & diverse highlights</footer>
+
+<script type="module">
+const $=id=>document.getElementById(id);
+const file=$('file'), video=$('preview');
+let objectUrl='',duration=0,baseName='clipmind',transcriber=null,transcriberModel='',transcriptChunks=[],selectedFile=null,ffmpeg=null,ffmpegReady=false,ffmpegLogText='';
+const aiStatus=t=>{
+ $('aiStatus').textContent=t;
+ const history=$('aiHistory');
+ if(!history)return;
+ const last=history.lastElementChild;
+ if(last&&last.textContent===t)return;
+ if(history.children.length===1&&history.firstElementChild.textContent==='Waiting to start.')history.innerHTML='';
+ const item=document.createElement('li');item.textContent=t;history.appendChild(item);
+ while(history.children.length>8)history.removeChild(history.firstElementChild);
+};
+function progressUI(label,pct,note=''){
+ const bar=$('aiProgress'),head=$('aiProgressHead');
+ bar.classList.remove('hidden');head.classList.remove('hidden');$('aiProgressNote').classList.remove('hidden');
+ $('aiProgressLabel').textContent=label;
+ if(Number.isFinite(pct)){
+  const n=Math.max(0,Math.min(100,pct));bar.value=n;$('aiProgressPct').textContent=Math.round(n)+'%';
+ }else{
+  bar.removeAttribute('value');$('aiProgressPct').textContent='Working…';
+ }
+ $('aiProgressNote').textContent=note||'Progress is measured for the current stage. It is not an ETA.';
+}
+function progressReset(){progressUI('Waiting to start',0,'Progress is measured for the current stage; no time estimate is guessed.');}
+const exportStatus=t=>$('exportStatus').textContent=t;
+function fmt(s){s=Math.max(0,Number(s)||0);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0')}
+function parseClipTime(value){
+ const v=String(value||'').trim();
+ const m=v.match(/^(\d+):([0-5]?\d)$/);
+ if(m)return Number(m[1])*60+Number(m[2]);
+ if(/^\d+$/.test(v)){
+  if(v.length<=2)return Number(v);
+  return Number(v.slice(0,-2))*60+Number(v.slice(-2));
+ }
+ return NaN;
+}
+function formatClockInput(el){
+ const raw=String(el.value||'');
+ const caret=el.selectionStart==null?raw.length:el.selectionStart;
+ const digitsBefore=raw.slice(0,caret).replace(/\D/g,'').length;
+ const digits=raw.replace(/\D/g,'').slice(0,4);
+ const minuteDigits=Math.max(0,digits.length-2);
+ const formatted=digits.length>2?digits.slice(0,minuteDigits)+':'+digits.slice(-2):digits;
+ el.value=formatted;
+ const pos=Math.min(formatted.length,digitsBefore+(digitsBefore>minuteDigits&&digits.length>2?1:0));
+ try{el.setSelectionRange(pos,pos);}catch(e){}
+}
+['start','end','analysisStart','analysisEnd'].forEach(id=>{
+ const el=$(id);
+ el.addEventListener('input',()=>formatClockInput(el));
+});
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('choose').onclick=()=>file.click();
+file.onchange=()=>{
+ const f=file.files?.[0];if(!f)return;selectedFile=f;
+ if(typeof outputUrls!=='undefined'){outputUrls.forEach(url=>URL.revokeObjectURL(url));outputUrls.clear();}
+ $('clipOutputs').innerHTML='';window.clipMindSuggestions=[];$('batchControls').style.display='none';
+ if(!f.type.startsWith('video/')){exportStatus('That file does not look like a video.');return;}
+ if(objectUrl)URL.revokeObjectURL(objectUrl);
+ objectUrl=URL.createObjectURL(f);baseName=f.name.replace(/\.[^.]+$/,'')||'clipmind';
+ video.src=objectUrl;video.classList.remove('hidden');
+ $('meta').textContent=f.name+' · '+(f.size/1048576).toFixed(1)+' MB';$('meta').classList.remove('hidden');
+ $('duration').textContent='Loading video details…';$('analyze').disabled=true;$('create').disabled=true;
+ $('results').innerHTML='';$('transcriptBox').classList.add('hidden');transcriptChunks=[];$('aiHistory').innerHTML='<li>New video selected.</li>'; $('fastRead').classList.add('hidden');$('startRead').classList.add('hidden');
+ video.onloadedmetadata=()=>{
+  duration=video.duration;$('duration').textContent='Video length: '+fmt(duration)+' · '+video.videoWidth+'×'+video.videoHeight;
+  $('start').value=fmt(0);$('end').value=fmt(Math.min(30,duration));
+  $('analysisStart').value=fmt(0);$('analysisEnd').value=fmt(duration);
+  $('analyze').disabled=false;$('create').disabled=false;aiStatus('Video ready. Tap Find highlights with AI.');
+  exportStatus('Video ready. You can create a manual clip or run AI first.');
+ };
+ video.onerror=()=>{$('duration').textContent='Could not read this video. Try an MP4 in the latest Chrome.'};
+};
+
+async function loadModel(){
+ const chosenLanguage=$('language').value;
+ const englishChoice=$('englishModel')?.value||'base';
+ const model=chosenLanguage==='english'?(englishChoice==='tiny'?'onnx-community/whisper-tiny.en':'onnx-community/whisper-base.en'):'onnx-community/whisper-tiny';
+ if(transcriber&&transcriberModel===model)return transcriber;
+ transcriber=null;transcriberModel='';
+ const modelLabel=chosenLanguage==='english'?(englishChoice==='tiny'?'English Whisper Tiny':'English Whisper Base'):'multilingual Whisper Tiny';
+ aiStatus('Loading '+modelLabel+'… first use needs internet.');
+ const mod=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2');
+ const {pipeline,env}=mod;
+ env.allowLocalModels=false;env.useBrowserCache=true;
+ const progress_callback=p=>{
+  if(p.status==='progress'&&p.total){
+   const pct=Math.round((p.loaded||0)/p.total*100);
+   progressUI('Downloading '+modelLabel,pct,'This percentage is for the model file currently downloading.');
+   aiStatus('Downloading '+modelLabel+': '+pct+'% of current file');
+  } else if(p.status==='done') {progressUI('Model file ready',100,'Model download step completed.');aiStatus('Speech model files ready.');}
+ };
+ // Diagnostic build: use the WASM backend to compare recognition quality
+ // against the previous WebGPU run on this Android device.
+ aiStatus('Loading '+modelLabel+' in compatibility (WASM) mode…');
+ progressUI('Loading speech model',null,'The model is being initialized. If files are downloaded, their individual download percentages will be shown.');
+ transcriber=await pipeline('automatic-speech-recognition',model,{
+  dtype:'q8',
+  device:'wasm',
+  progress_callback
+ });
+ transcriberModel=model;
+ aiStatus(modelLabel+' ready · WASM compatibility mode (GPU bypassed for diagnosis).');
+ return transcriber;
+}
+let webAudioContext=null;
+let ffmpegLoadPromise=null;
+async function loadFastExtractor(){
+ if(ffmpegReady&&ffmpeg)return ffmpeg;
+ if(ffmpegLoadPromise)return ffmpegLoadPromise;
+ ffmpegLoadPromise=(async()=>{
+  let instance=null,timer=null;
+  try{
+   aiStatus('Loading fast audio extractor… first use downloads the FFmpeg engine.');
+   progressUI('Loading FFmpeg audio engine',null,'Preparing the audio engine. If loading stalls, ClipMind will stop waiting and allow a retry.');
+   const {FFmpeg}=await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js');
+   instance=new FFmpeg();
+   ffmpeg=instance;
+   ffmpegReady=false;
+   ffmpeg.on('log',({message})=>{
+    if(message){
+     ffmpegLogText=(ffmpegLogText+'\n'+message).slice(-200000);
+     if(/time=/.test(message))aiStatus('Extracting audio directly… '+message.match(/time=\S+/)?.[0]);
+    }
+   });
+   ffmpeg.on('progress',({progress})=>{
+    if(Number.isFinite(progress))progressUI('Extracting audio',Math.max(0,Math.min(99,progress*100)),'Fast extraction progress reported by FFmpeg.');
+   });
+   const base='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
+   const classWorkerURL=new URL('./ffmpeg/worker.js',window.location.href).href;
+   await Promise.race([
+    instance.load({classWorkerURL,coreURL:base+'/ffmpeg-core.js',wasmURL:base+'/ffmpeg-core.wasm'}),
+    new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('FFmpeg took too long to initialize. Check your connection, then tap Prepare AI tools to retry.')),120000);})
+   ]);
+   ffmpegReady=true;
+   aiStatus('Fast audio extractor ready.');
+   return instance;
+  }catch(error){
+   if(instance){
+    try{instance.terminate();}catch(_){}
+   }
+   if(ffmpeg===instance)ffmpeg=null;
+   ffmpegReady=false;
+   throw error instanceof Error?error:new Error('FFmpeg could not be initialized.');
+  }finally{
+   if(timer)clearTimeout(timer);
+   ffmpegLoadPromise=null;
+  }
+ })();
+ return ffmpegLoadPromise;
+}
+async function extractAudioDirectly(from,to){
+ if(!selectedFile)throw new Error('Select a video first.');
+ if(selectedFile.size>500*1024*1024)throw new Error('This prototype limits direct extraction to video files under 500 MB. Try a shorter or smaller video, or use the real-time fallback.');
+ const engine=await loadFastExtractor();
+ const inputName='clipmind-input.'+((selectedFile.name.split('.').pop()||'mp4').toLowerCase().replace(/[^a-z0-9]/g,'')||'mp4');
+ const outputName='clipmind-audio.wav';
+ aiStatus('Preparing the selected video section for fast extraction…');
+ await engine.writeFile(inputName,new Uint8Array(await selectedFile.arrayBuffer()));
+ try{
+  ffmpegLogText='';
+  aiStatus('Checking the selected section for an audio track…');
+  const code=await engine.exec(['-ss',String(from),'-i',inputName,'-t',String(to-from),'-vn','-ac','1','-ar','16000','-c:a','pcm_s16le','-f','wav',outputName]);
+  const hasAudioStream=/\bAudio:\s*[A-Za-z0-9]/i.test(ffmpegLogText);
+  if(!hasAudioStream){
+   throw new Error('This video has no audio track. ClipMind needs a video with sound to transcribe and find spoken highlights. Please choose a video that contains audio.');
+  }
+  if(code!==0)throw new Error('The extractor could not decode this video’s audio. Try the real-time fallback.');
+  const data=await engine.readFile(outputName);
+  if(!data||!data.length)throw new Error('An audio track was found, but no audio could be extracted from this range. Try another section.');
+  return new Blob([data],{type:'audio/wav'});
+ }finally{
+  try{await engine.deleteFile(inputName);}catch(e){}
+  try{await engine.deleteFile(outputName);}catch(e){}
+ }
+}
+function getAudioStreamFromVideo(){
+ const capture=video.captureStream||video.mozCaptureStream;
+ if(capture){
+  const stream=capture.call(video);
+  if(stream.getAudioTracks().length) return stream;
+ }
+ const AC=window.AudioContext||window.webkitAudioContext;
+ if(!AC) throw new Error('This browser cannot capture video audio.');
+ if(!webAudioContext){
+  webAudioContext=new AC();
+  const sourceNode=webAudioContext.createMediaElementSource(video);
+  const destination=webAudioContext.createMediaStreamDestination();
+  sourceNode.connect(destination);
+  sourceNode.connect(webAudioContext.destination);
+  video.__clipMindAudioDestination=destination;
+ }
+ return video.__clipMindAudioDestination.stream;
+}
+async function recordVideoAudio(from,to){
+ if(video.readyState<2) throw new Error('Wait until the video preview has loaded.');
+ const stream=getAudioStreamFromVideo();
+ const tracks=stream.getAudioTracks();
+ if(!tracks.length) throw new Error('No audio track was found. Check that the selected video has sound.');
+ const audioStream=new MediaStream(tracks);
+ const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(x=>MediaRecorder.isTypeSupported(x))||'';
+ const recorder=new MediaRecorder(audioStream,mime?{mimeType:mime}:{});
+ const chunks=[];
+ const stopped=new Promise((resolve,reject)=>{
+  recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+  recorder.onerror=()=>reject(new Error('Audio recording failed in this browser.'));
+  recorder.onstop=()=>resolve(new Blob(chunks,{type:recorder.mimeType||'audio/webm'}));
+ });
+ video.pause();
+ if(Math.abs(video.currentTime-from)>.05){
+  await new Promise((resolve,reject)=>{
+   const timer=setTimeout(()=>reject(new Error('Could not seek to the selected inspection start.')),10000);
+   video.addEventListener('seeked',()=>{clearTimeout(timer);resolve();},{once:true});
+   video.currentTime=from;
+  });
+ }
+ const resumePromise=webAudioContext?webAudioContext.resume():Promise.resolve();
+ progressUI('Starting real-time audio capture',null,'Preparing playback and audio recording. The percentage will begin when the selected video section starts playing.');
+ recorder.start(1000);
+ try{
+  await resumePromise;
+  await video.play();
+  aiStatus('Real-time fallback: reading the selected video section…');
+  await new Promise((resolve,reject)=>{
+   let lastShown=-1;
+   const check=()=>{
+    const covered=Math.max(0,Math.min(100,((video.currentTime-from)/(to-from))*100));
+    const wholePercent=Math.floor(covered);
+    if(wholePercent!==lastShown){lastShown=wholePercent;progressUI('Capturing audio · real-time playback',covered,'This shows how much of the selected video section has played and been captured.');}
+    if(video.currentTime>=to||video.ended){progressUI('Audio capture complete',100,'The selected audio section has been captured.');video.pause();resolve();return;}
+    if(video.error){reject(new Error('The video failed during playback.'));return;}
+    requestAnimationFrame(check);
+   };
+   check();
+  });
+ }catch(e){
+  if(recorder.state==='recording')recorder.stop();
+  throw new Error('Chrome could not capture the selected section. '+(e?.message||'Try the fast extraction button.'));
+ }
+ if(recorder.state==='recording')recorder.stop();
+ return await stopped;
+}
+async function to16k(blob){
+ const AC=window.AudioContext||window.webkitAudioContext;
+ const Offline=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+ if(!AC||!Offline)throw new Error('This browser does not support audio processing.');
+ if(!blob||!blob.size)throw new Error('The audio capture is empty (0 bytes).');
+ const ctx=new AC();let buf;
+ try{buf=await ctx.decodeAudioData(await blob.arrayBuffer());}finally{await ctx.close();}
+ if(!buf||!Number.isFinite(buf.duration)||buf.duration<=0)throw new Error('The browser decoded an empty or invalid audio recording.');
+ const targetLen=Math.max(1,Math.ceil(buf.duration*16000));
+ const offline=new Offline(1,targetLen,16000),source=offline.createBufferSource();
+ source.buffer=buf;source.connect(offline.destination);source.start(0);
+ const rendered=await offline.startRendering(),out=new Float32Array(rendered.getChannelData(0));
+ let mean=0;for(let i=0;i<out.length;i++)mean+=out[i];mean/=Math.max(1,out.length);
+ let peak=0,sumSquares=0;
+ for(let i=0;i<out.length;i++){out[i]-=mean;const v=Math.abs(out[i]);if(v>peak)peak=v;sumSquares+=out[i]*out[i];}
+ const rms=Math.sqrt(sumSquares/Math.max(1,out.length));
+ if(peak<0.001)throw new Error('The extracted audio is nearly silent. Check the video audio track or choose another section.');
+ if(peak>0&&peak<0.25){const gain=Math.min(8,0.90/peak);for(let i=0;i<out.length;i++)out[i]*=gain;}
+ return {samples:out,diagnostics:{blobBytes:blob.size,mime:blob.type||'unknown',decodedDuration:buf.duration,sourceSampleRate:buf.sampleRate,sourceChannels:buf.numberOfChannels,resampledSamples:out.length,resampledDuration:out.length/16000,peakBeforeGain:peak,rmsBeforeGain:rms}};
+}
+
+$('analyze').onclick=async()=>{
+ if(!duration)return;
+ $('analyze').disabled=true;$('results').innerHTML='';
+ progressReset();$('aiProgress').classList.remove('hidden');
+ $('transcriptBox').classList.add('hidden');$('startRead').classList.add('hidden');$('fastRead').classList.add('hidden');
+ try{
+  aiStatus('Preparing the on-device speech model… first use needs internet.');
+  await loadModel();
+  aiStatus('Speech model ready. Preparing the fast audio extractor…');
+  try{
+   await loadFastExtractor();
+   aiStatus('Both AI tools are ready. Tap Extract audio and find highlights.');$('analyze').textContent='✨ AI tools ready';
+   $('fastRead').classList.remove('hidden');
+  }catch(extractorError){
+   console.warn('Fast extractor unavailable:',extractorError);
+   aiStatus('Speech model ready, but fast extraction could not load. Technical error: '+(extractorError?.message||String(extractorError))+' You can use the real-time fallback.');
+  }
+  $('startRead').classList.remove('hidden');
+ }catch(e){
+  console.error(e);aiStatus('Could not load AI tools: '+(e?.message||String(e))+' Check internet, then tap Retry AI tools.');
+  $('analyze').textContent='↻ Retry AI tools';
+ }finally{$('analyze').disabled=false;}
+};
+function getInspectionRange(){
+ const from=parseClipTime($('analysisStart').value),to=parseClipTime($('analysisEnd').value);
+ if(!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<=from||to>duration){
+  throw new Error('Enter a valid inspection range. The end must be after the start and within the video.');
+ }
+ return {from,to};
+}
+async function transcribeBlob(audioBlob,rangeStart,rangeEnd,captureMethod='unknown'){
+ const diag=[];
+ const writeDiagnostics=()=>{const el=$('audioDiagnosticsText');if(el)el.textContent=diag.join('\\n');};
+ diag.push('Capture method: '+captureMethod,'Requested range: '+fmt(rangeStart)+'–'+fmt(rangeEnd)+' ('+(rangeEnd-rangeStart).toFixed(2)+' seconds)','Captured blob: '+(audioBlob?.size||0)+' bytes · '+(audioBlob?.type||'unknown MIME'));
+ writeDiagnostics();
+ aiStatus('Audio captured. Checking its duration and signal before speech recognition…');
+ progressUI('Preparing audio',null,'Checking the captured recording, decoding it, and resampling it to 16 kHz.');
+ const prepared=await to16k(audioBlob),audio=prepared.samples,d=prepared.diagnostics;
+ diag.push('Decoded duration: '+d.decodedDuration.toFixed(2)+' seconds','Original audio: '+d.sourceSampleRate+' Hz · '+d.sourceChannels+' channel(s)','Whisper input: '+d.resampledSamples+' samples at 16,000 Hz ('+d.resampledDuration.toFixed(2)+' seconds)','Signal: peak '+d.peakBeforeGain.toFixed(5)+' · RMS '+d.rmsBeforeGain.toFixed(5)+' (before quiet-audio gain)');
+ const durationDifference=Math.abs(d.decodedDuration-(rangeEnd-rangeStart));
+ diag.push('Duration difference from requested range: '+durationDifference.toFixed(2)+' seconds');writeDiagnostics();
+ if(d.decodedDuration<(rangeEnd-rangeStart)*0.75)throw new Error('The captured recording is much shorter than the requested section ('+d.decodedDuration.toFixed(1)+'s captured vs '+(rangeEnd-rangeStart).toFixed(1)+'s requested). Diagnostics are available below.');
+ const chosenLanguage=$('language').value,languageLabel=$('language').selectedOptions[0]?.textContent||'Auto detect';
+ const segmentSeconds=15,segmentCount=Math.ceil(audio.length/(segmentSeconds*16000));
+ const allChunks=[],recognizedParts=[],emptySegments=[];
+ const addTimedChunks=(chunks,offset,limitStart=0,limitEnd=audio.length/16000)=>{
+  for(const c of chunks){
+   const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);
+   let st=ts?ts[0]:(Number.isFinite(c.start)?c.start:null),en=ts?ts[1]:(Number.isFinite(c.end)?c.end:null);
+   if(Number.isFinite(st))st=Math.max(0,st)+offset;
+   if(Number.isFinite(en))en=Math.max(0,en)+offset;
+   if(Number.isFinite(st)&&Number.isFinite(en)&&(en<limitStart||st>limitEnd))continue;
+   allChunks.push({...c,timestamp:[st,en]});
+  }
+ };
+ const signalStats=(samples)=>{
+  let peak=0,sum=0;for(let i=0;i<samples.length;i++){const v=Math.abs(samples[i]);if(v>peak)peak=v;sum+=samples[i]*samples[i];}
+  return {peak,rms:Math.sqrt(sum/Math.max(1,samples.length))};
+ };
+ aiStatus('Transcribing '+fmt(rangeStart)+'–'+fmt(rangeEnd)+' · '+languageLabel+' in '+segmentCount+' short sections…');
+ diag.push('Recognition strategy: '+segmentSeconds+'-second independent sections, followed by a longer-context retry for empty sections.','Primary model: '+(chosenLanguage==='english'?'English model':'Multilingual model')+' · WASM/CPU');writeDiagnostics();
+ for(let i=0;i<segmentCount;i++){
+  const sampleStart=i*segmentSeconds*16000,sampleEnd=Math.min(audio.length,(i+1)*segmentSeconds*16000),segment=audio.subarray(sampleStart,sampleEnd);
+  const segStart=sampleStart/16000,segEnd=sampleEnd/16000,stats=signalStats(segment);
+  const options={sampling_rate:16000,return_timestamps:true,num_beams:1,do_sample:false,max_new_tokens:192,repetition_penalty:1.05};
+  if(chosenLanguage!=='english'){options.task='transcribe';if(chosenLanguage!=='auto'&&chosenLanguage!=='other')options.language=chosenLanguage;}
+  progressUI('Transcribing section '+(i+1)+' of '+segmentCount,null,'Each short section is recognized independently; empty sections will receive a second attempt with longer audio context.');
+  aiStatus('Whisper section '+(i+1)+'/'+segmentCount+' · '+fmt(rangeStart+segStart)+'–'+fmt(rangeStart+segEnd));
+  const output=await transcriber(segment,options),sectionText=(output?.text||'').trim(),sectionChunks=Array.isArray(output?.chunks)?output.chunks:[];
+  if(sectionText)recognizedParts.push({start:segStart,text:sectionText});
+  if(!sectionText&&!sectionChunks.length)emptySegments.push({start:segStart,end:segEnd,index:i});
+  addTimedChunks(sectionChunks,segStart);
+  diag.push('Section '+(i+1)+' ('+fmt(rangeStart+segStart)+'–'+fmt(rangeStart+segEnd)+'): '+(sectionText.length?sectionText.length+' text characters':'EMPTY')+' · '+sectionChunks.length+' timestamp chunk(s) · signal peak '+stats.peak.toFixed(4)+' / RMS '+stats.rms.toFixed(4));writeDiagnostics();
+  progressUI('Transcribing section '+(i+1)+' of '+segmentCount,((i+1)/segmentCount)*85,'Completed '+(i+1)+' of '+segmentCount+' first-pass recognition sections.');
+ }
+ // Retry adjacent empty sections with up to 30 seconds of context. Whisper can
+ // miss speech in short isolated windows even when the waveform is healthy.
+ const retryGroups=[];
+ for(const miss of emptySegments){
+  const last=retryGroups[retryGroups.length-1];
+  if(last&&miss.start<=last.end+0.1){last.end=Math.max(last.end,miss.end);last.misses.push(miss);}
+  else retryGroups.push({start:miss.start,end:miss.end,misses:[miss]});
+ }
+ const recoveredIndexes=new Set();
+ for(let r=0;r<retryGroups.length;r++){
+  const group=retryGroups[r],audioDuration=audio.length/16000;
+  const contextStart=Math.max(0,group.start-15);
+  const contextEnd=Math.min(audioDuration,Math.max(group.end,contextStart+30));
+  const fromSample=Math.floor(contextStart*16000),toSample=Math.min(audio.length,Math.ceil(contextEnd*16000));
+  const context=audio.subarray(fromSample,toSample),contextDuration=context.length/16000;
+  const retryOptions={sampling_rate:16000,return_timestamps:true,num_beams:3,do_sample:false,max_new_tokens:256,repetition_penalty:1.05};
+  if(chosenLanguage!=='english'){retryOptions.task='transcribe';if(chosenLanguage!=='auto'&&chosenLanguage!=='other')retryOptions.language=chosenLanguage;}
+  diag.push('RETRY '+(r+1)+'/'+retryGroups.length+': empty range '+fmt(rangeStart+group.start)+'–'+fmt(rangeStart+group.end)+' using '+contextDuration.toFixed(2)+'s context ('+fmt(rangeStart+contextStart)+'–'+fmt(rangeStart+contextEnd)+'), beam search 3.');writeDiagnostics();
+  progressUI('Retrying missing speech '+(r+1)+' of '+retryGroups.length,85+(r/retryGroups.length)*12,'Using a longer context window and a more thorough decoding pass.');
+  aiStatus('Recovering missing speech · '+fmt(rangeStart+group.start)+'–'+fmt(rangeStart+group.end));
+  try{
+   const retryOutput=await transcriber(context,retryOptions);
+   const retryText=(retryOutput?.text||'').trim(),retryChunks=Array.isArray(retryOutput?.chunks)?retryOutput.chunks:[];
+   if(retryText)recognizedParts.push({start:contextStart,text:retryText});
+   addTimedChunks(retryChunks,contextStart,group.start,group.end);
+   for(const miss of group.misses){
+    const hasChunk=allChunks.some(c=>{const ts=c.timestamp||[];return Number.isFinite(ts[0])&&Number.isFinite(ts[1])&&ts[1]>miss.start&&ts[0]<miss.end;});
+    if(hasChunk||retryText)recoveredIndexes.add(miss.index);
+   }
+   diag.push('Retry result: '+(retryText?retryText.length+' text characters':'no text')+' · '+retryChunks.length+' timestamp chunk(s).');
+  }catch(retryError){diag.push('Retry failed: '+(retryError?.message||String(retryError)));}
+  writeDiagnostics();
+ }
+ const remainingEmpty=emptySegments.filter(x=>!recoveredIndexes.has(x.index));
+ const fullText=recognizedParts.sort((a,b)=>a.start-b.start).map(x=>x.text).join(' ').trim();transcriptChunks=allChunks;
+ renderTranscript(allChunks,fullText,rangeStart);$('transcriptBox').classList.remove('hidden');
+ const suggestions=makeSuggestions(allChunks,fullText,rangeEnd-rangeStart).map(g=>({...g,start:Math.max(rangeStart,Math.min(rangeEnd,g.start+rangeStart)),end:Math.max(rangeStart,Math.min(rangeEnd,g.end+rangeStart))})).filter(g=>g.end>g.start);
+ showSuggestions(suggestions);
+ diag.push('TOTAL: '+fullText.length+' transcript characters · '+allChunks.length+' timestamp chunks · '+remainingEmpty.length+' unrecovered section(s)');
+ if(remainingEmpty.length)diag.push('Still empty after retry: '+remainingEmpty.map(x=>fmt(rangeStart+x.start)+'–'+fmt(rangeStart+x.end)).join(', '));
+ else if(emptySegments.length)diag.push('All initially empty sections returned text or timestamped speech on retry.');
+ writeDiagnostics();
+ if(!fullText&&!allChunks.length){aiStatus('Whisper returned no speech in any section. Audio diagnostics are available below; analysis is NOT marked complete.');progressUI('Recognition returned no transcript',null,'Audio was captured and processed, but Whisper returned no text. Check the diagnostics below.');}
+ else if(remainingEmpty.length){aiStatus('Partial transcript: '+fullText.length+' characters. '+remainingEmpty.length+' section(s) remained empty after recovery attempts; check diagnostics below.');progressUI('Partial transcript · unrecovered section(s)',100,'Some sections still returned no recognition after the longer-context retry.');}
+ else{aiStatus('Transcription finished for '+fmt(rangeStart)+'–'+fmt(rangeEnd)+'. Found '+allChunks.length+' timestamp chunks. Review the transcript and suggested moments below.');progressUI('Transcription complete',100,'All independent sections returned text or timestamped speech chunks.');}
+}
+$('fastRead').onclick=async()=>{
+ if(!transcriber||!duration)return;
+ $('fastRead').disabled=true;$('startRead').disabled=true;progressReset();
+ try{
+  const {from,to}=getInspectionRange();
+  const audioBlob=await extractAudioDirectly(from,to);
+  await transcribeBlob(audioBlob,from,to,'FFmpeg fast extraction');
+ }catch(e){
+  console.error(e);aiStatus('Fast extraction or transcription failed: '+(e?.message||String(e))+' You can try the real-time fallback below.');
+ }finally{$('fastRead').disabled=false;$('startRead').disabled=false;}
+};
+$('startRead').onclick=async()=>{
+ if(!transcriber||!duration)return;
+ $('startRead').disabled=true;$('fastRead').disabled=true;progressReset();
+ try{
+  const {from,to}=getInspectionRange();
+  const audioBlob=await recordVideoAudio(from,to);
+  await transcribeBlob(audioBlob,from,to,'Real-time MediaRecorder fallback');
+ }catch(e){
+  console.error(e);aiStatus('Audio analysis failed: '+(e?.message||String(e))+' Try a shorter section or clear speech.');
+ }finally{$('startRead').disabled=false;$('fastRead').disabled=false;}
+};
+function renderTranscript(chunks,fullText,rangeStart){
+ const host=$('transcript');host.innerHTML='';
+ $('transcriptFull').textContent=(fullText||'').trim()||'No speech was recognized.';
+ const usable=(chunks||[]).map(c=>{
+  const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);
+  const start=ts?ts[0]:(Number.isFinite(c.start)?c.start:null);
+  return {text:(c.text||'').trim(),start};
+ }).filter(c=>c.text);
+ if(!usable.length){host.textContent='No timestamped segments were returned for this transcript.';return;}
+ usable.forEach(c=>{
+  const line=document.createElement('div');line.className='transcript-line';
+  if(Number.isFinite(c.start)){
+   const jump=document.createElement('button');jump.type='button';jump.className='transcript-jump';
+   jump.textContent=fmt(rangeStart+c.start);jump.setAttribute('aria-label','Jump to '+fmt(rangeStart+c.start));
+   jump.onclick=()=>{
+    video.currentTime=Math.max(0,Math.min(duration,rangeStart+c.start));
+    video.scrollIntoView({behavior:'smooth',block:'center'});
+   };
+   line.appendChild(jump);
+  }
+  line.appendChild(document.createTextNode(c.text));host.appendChild(line);
+ });
+}
+
+function makeSuggestions(chunks,fullText,total){
+ const valid=(chunks||[]).map(c=>{
+  const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);
+  const start=ts?ts[0]:(Number.isFinite(c.start)?c.start:null);
+  const end=ts?ts[1]:(Number.isFinite(c.end)?c.end:null);
+  return {text:(c.text||'').trim(),start,end};
+ }).filter(c=>c.text&&Number.isFinite(c.start)&&Number.isFinite(c.end)&&c.end>c.start)
+  .sort((a,b)=>a.start-b.start);
+
+ // Build overlapping, timestamp-grounded windows instead of only a few large,
+ // non-overlapping groups. This gives the ranker several chances to find the
+ // strongest passage in each part of the video without inventing timestamps.
+ const candidates=[];
+ if(valid.length){
+  for(let i=0;i<valid.length;i++){
+   const window=[];let rawEnd=valid[i].end;
+   for(let j=i;j<valid.length;j++){
+    const c=valid[j];
+    if(j>i&&c.start-rawEnd>3.0)break;
+    if(j>i&&c.start-valid[i].start>18)break;
+    window.push(c);
+    rawEnd=Math.max(rawEnd,c.end);
+    if(rawEnd-valid[i].start>20)break;
+
+    // Preserve the recognized words and their original timestamp window.
+    // Repetition can be part of natural timing, humour, emphasis, or dialogue.
+    const text=window.map(part=>part.text).join(' ').trim();
+    const end=rawEnd;
+    const span=end-valid[i].start;
+    const words=text.split(/\s+/).filter(Boolean).length;
+    if(span>=6&&span<=20&&text.length>=28&&words>=6){
+     candidates.push({start:valid[i].start,end,text});
+    }
+   }
+  }
+ }else if(fullText){
+  // Last-resort approximation only when Whisper supplied no timestamped chunks.
+  // Keep this fallback explicit; real chunk timestamps always take priority.
+  const sentences=fullText.match(/[^.!?]+[.!?]?/g)||[fullText];
+  const weights=sentences.map(x=>Math.max(1,x.trim().split(/\s+/).length));
+  const totalWeight=weights.reduce((a,b)=>a+b,0)||1;
+  let cursor=0;
+  const timed=sentences.map((sentence,i)=>{
+   const start=cursor;cursor+=weights[i]/totalWeight*total;
+   return {start,end:cursor,text:sentence.trim()};
+  });
+  for(let i=0;i<timed.length;i++){
+   let text='',end=timed[i].end;
+   for(let j=i;j<timed.length;j++){
+    text+=(text?' ':'')+timed[j].text;end=timed[j].end;
+    const span=end-timed[i].start;
+    if(span>20)break;
+    if(span>=6&&text.length>=28&&text.split(/\s+/).length>=6)
+     candidates.push({start:timed[i].start,end,text});
+   }
+  }
+ }
+
+ // Keep natural repetitions intact. Candidate diversity is handled by
+ // timestamp overlap below, not by deleting repeated dialogue from the text.
+ const ranked=candidates.map(g=>{
+  const text=g.text.trim();
+  const duration=g.end-g.start;
+  const words=text.split(/\s+/).filter(Boolean).length;
+  const sentenceCount=(text.match(/[.!?](?:["'’”)]*)?(?=\s|$)/g)||[]).length;
+  const ending=/[.!?]["'’”)]*$/.test(text);
+  const score=scoreText(text,duration)
+   +(ending?0.65:-0.25)
+   +(sentenceCount>=2?0.45:0)
+   +(words>=10?0.35:0);
+  return {...g,text,score};
+ }).filter(g=>{
+  const span=g.end-g.start;
+  return span>=6&&span<=20&&g.text.length>=28;
+ });
+
+ // Rank first, then remove duplicate suggestions using both timing and speech.
+ // Natural repeated words are never edited or removed from a candidate's text.
+ ranked.sort((a,b)=>b.score-a.score);
+ const chosen=[];
+ for(const g of ranked){
+  const duplicate=chosen.some(x=>areDuplicateSuggestions(g,x));
+  if(!duplicate)chosen.push(g);
+  if(chosen.length>=8)break;
+ }
+ return chosen.sort((a,b)=>a.start-b.start);
+}
+function speechTokens(text){
+ return String(text||'').toLowerCase().replace(/[’]/g,"'").match(/[a-z0-9]+(?:'[a-z0-9]+)?/g)||[];
+}
+function longestCommonContiguous(a,b){
+ let previous=new Uint16Array(b.length+1),best=0;
+ for(let i=1;i<=a.length;i++){
+  const current=new Uint16Array(b.length+1);
+  for(let j=1;j<=b.length;j++){
+   if(a[i-1]===b[j-1]){
+    current[j]=previous[j-1]+1;
+    if(current[j]>best)best=current[j];
+   }
+  }
+  previous=current;
+ }
+ return best;
+}
+function suffixPrefixMatch(earlier,later){
+ let best=0;
+ const limit=Math.min(earlier.length,later.length);
+ for(let n=1;n<=limit;n++){
+  let same=true;
+  for(let k=0;k<n;k++){
+   if(earlier[earlier.length-n+k]!==later[k]){same=false;break;}
+  }
+  if(same)best=n;
+ }
+ return best;
+}
+function hasSubstantialTextOverlap(candidate,chosen){
+ const a=speechTokens(candidate.text),b=speechTokens(chosen.text);
+ if(a.length<8||b.length<8)return false;
+ // Only compare nearby windows; a recurring catchphrase much later in a video
+ // can be a genuinely separate moment rather than a duplicate clip.
+ const gap=Math.max(0,Math.max(candidate.start,chosen.start)-Math.min(candidate.end,chosen.end));
+ if(gap>5)return false;
+ const earlier=candidate.start<=chosen.start?a:b;
+ const later=candidate.start<=chosen.start?b:a;
+ const shared=Math.max(longestCommonContiguous(a,b),suffixPrefixMatch(earlier,later));
+ if(shared<8||shared/Math.min(a.length,b.length)<0.30)return false;
+ // A shared sentence should not erase a clip that also contains its own
+ // meaningful dialogue. Ignore common function words when measuring novelty.
+ const stopWords=new Set('a an the and or but if then than so as at by for from in into of on onto to up with about after before between during over under again also just still very really maybe you your yours we our us they them their he she it its i me my mine is am are was were be been being do does did done have has had can could would should will may might must what when where why how who which this that these those okay ok yeah uh um erm like'.split(/\s+/));
+ const chosenVocabulary=new Set(b.filter(word=>!stopWords.has(word)));
+ const novelVocabulary=new Set(a.filter(word=>!stopWords.has(word)&&!chosenVocabulary.has(word)));
+ return novelVocabulary.size<4;
+}
+function areDuplicateSuggestions(candidate,chosen){
+ const intersection=Math.max(0,Math.min(candidate.end,chosen.end)-Math.max(candidate.start,chosen.start));
+ const shorter=Math.min(candidate.end-candidate.start,chosen.end-chosen.start)||1;
+ // Filter substantial overlap so adjacent clips do not repeat the same passage.
+ // Natural repeated words inside an individual suggestion remain untouched.
+ const nearIdenticalTiming=intersection>=3.0&&intersection/shorter>=0.45;
+ return nearIdenticalTiming||hasSubstantialTextOverlap(candidate,chosen);
+}
+function scoreText(t,duration){
+ const s=String(t||'').toLowerCase();
+ const words=s.split(/\s+/).filter(Boolean);
+ if(!words.length)return -10;
+ let n=Math.min(3.5,words.length/12);
+ const patterns=[
+  [/\b(what if|what would|why|how|have you ever|did you know|can you imagine)\b/g,1.25],
+  [/\b(actually|the reason|because|it turns out|the truth|the point|the key|here is why)\b/g,1.15],
+  [/\b(but|however|instead|although|even though|on the other hand)\b/g,.65],
+  [/\b(wow|whoa|really|seriously|no way|unbelievable|funny|hilarious|surprising|unexpected)\b/g,.8],
+  [/\b(important|remember|mistake|problem|solution|secret|lesson|realize|realized)\b/g,.65],
+  [/[!?]/g,.25]
+ ];
+ for(const [re,w] of patterns)n+=(s.match(re)||[]).length*w;
+ const filler=(s.match(/\b(uh|um|erm|you know|like|sort of|kind of)\b/g)||[]).length;
+ n-=Math.min(2,filler*.18);
+ if(words.length<8)n-=1.0;
+ if(duration<8)n-=.5;
+ if(duration>18)n-=.25;
+ return n;
+}
+function showSuggestions(items){
+ const host=$('results');host.innerHTML='';
+ window.clipMindSuggestions=items;
+ $('selectAll').textContent='Select all';
+ $('batchControls').style.display='none';
+ if(!items.length){host.innerHTML='<p class="status">No timestamped highlights found. You can still set the clip times manually below.</p>';return;}
+ const note=document.createElement('p');
+ note.className='status';
+ note.textContent='Nearby suggestions that repeat the same spoken passage are filtered out; natural repetitions inside each highlight are kept.';
+ host.appendChild(note);
+ items.forEach((g,i)=>{
+  const div=document.createElement('div');div.className='suggestion';
+  const tag=document.createElement('div');tag.className='tag';tag.textContent='SUGGESTION '+(i+1)+' · SCORE '+g.score.toFixed(1);
+  const times=document.createElement('strong');times.textContent=fmt(g.start)+' – '+fmt(g.end);
+  const para=document.createElement('p');para.textContent=g.text.slice(0,330)+(g.text.length>330?'…':'');
+  const actions=document.createElement('div');actions.className='suggestion-actions';
+  const selectLabel=document.createElement('label');selectLabel.className='suggestion-select';
+  const check=document.createElement('input');check.type='checkbox';check.className='suggestion-check';check.dataset.index=String(i);
+  const labelText=document.createElement('span');labelText.textContent='Include in batch';selectLabel.append(check,labelText);
+  const use=document.createElement('button');use.type='button';use.textContent='Use timestamps';
+  use.onclick=()=>{$('start').value=fmt(g.start);$('end').value=fmt(g.end);exportStatus('AI suggestion selected. Choose output shape and create your clip.');$('start').scrollIntoView({behavior:'smooth',block:'center'});};
+  actions.append(selectLabel,use);div.append(tag,times,para,actions);host.appendChild(div);
+ });
+ $('batchControls').style.display='flex';
+}
+
+document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{
+ if(!duration)return;const parsed=parseClipTime($('start').value);
+ const s=Number.isFinite(parsed)?Math.max(0,parsed):0;
+ $('end').value=fmt(Math.min(duration,s+Number(b.dataset.sec)));
+});
+
+let activeExport=false;
+const outputUrls=new Set();
+function addClipOutput(blob,from,to,index,shape){
+ const url=URL.createObjectURL(blob);outputUrls.add(url);
+ const ext=blob.type.includes('mp4')?'mp4':'webm';
+ const card=document.createElement('div');card.className='clip-output';
+ const heading=document.createElement('strong');heading.textContent='Clip '+index+' · '+fmt(from)+'–'+fmt(to)+' · '+(blob.size/1048576).toFixed(1)+' MB';
+ const player=document.createElement('video');player.controls=true;player.playsInline=true;player.preload='metadata';player.src=url;
+ const link=document.createElement('a');link.className='download';link.href=url;link.download=baseName+'-clip-'+String(index).padStart(2,'0')+'.'+ext;link.textContent='Download clip · '+ext.toUpperCase();
+ card.append(heading,player,link);$('clipOutputs').appendChild(card);
+}
+function seekVideo(time){
+ return new Promise((resolve,reject)=>{
+  if(Math.abs(video.currentTime-time)<.05){resolve();return;}
+  let settled=false;
+  const finish=(err)=>{if(settled)return;settled=true;clearTimeout(timer);video.removeEventListener('seeked',onSeek);video.removeEventListener('error',onError);err?reject(err):resolve();};
+  const onSeek=()=>finish();const onError=()=>finish(new Error('The video could not seek to the requested timestamp.'));
+  const timer=setTimeout(()=>finish(new Error('Seeking timed out. Try selecting a nearby timestamp.')),12000);
+  video.addEventListener('seeked',onSeek,{once:true});video.addEventListener('error',onError,{once:true});
+  try{video.currentTime=time;}catch(e){finish(e);}
+ });
+}
+async function exportClip(from,to,vertical,onProgress){
+ if(video.readyState<2||!video.videoWidth||!video.videoHeight)throw new Error('Wait until the video preview has loaded.');
+ if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream)throw new Error('This browser does not support video export. Update Chrome and try again.');
+ const canvas=document.createElement('canvas');canvas.width=vertical?720:video.videoWidth;canvas.height=vertical?1280:video.videoHeight;
+ const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Could not prepare the video canvas.');
+ const canvasStream=canvas.captureStream(30);let audioStream=null,recorder=null,raf=0,watchdog=0,settled=false;
+ try{
+  if(typeof video.captureStream==='function'){
+   audioStream=video.captureStream();
+   audioStream.getAudioTracks().forEach(track=>canvasStream.addTrack(track));
+  }
+  const mime=['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';
+  recorder=new MediaRecorder(canvasStream,mime?{mimeType:mime}:{});
+  const chunks=[];
+  const result=new Promise((resolve,reject)=>{
+   const cleanup=()=>{
+    if(raf)cancelAnimationFrame(raf);if(watchdog)clearTimeout(watchdog);
+    try{video.pause();}catch(e){}
+    canvasStream.getTracks().forEach(t=>{try{t.stop()}catch(e){}});
+    if(audioStream)audioStream.getTracks().forEach(t=>{try{t.stop()}catch(e){}});
+   };
+   const finish=(err)=>{if(settled)return;settled=true;if(err&&recorder.state==='recording'){try{recorder.stop()}catch(_){}}cleanup();if(err)reject(err);else{const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});if(!blob.size)reject(new Error('The browser produced an empty clip. Try again or use a shorter section.'));else resolve(blob);}};
+   recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+   recorder.onerror=()=>finish(new Error('The browser reported a recording error. Try a shorter clip.'));
+   recorder.onstop=()=>finish();
+   const draw=()=>{
+    if(settled||recorder.state!=='recording')return;
+    try{
+     if(vertical){const sw=Math.min(video.videoWidth,video.videoHeight*9/16),sh=sw*16/9;ctx.drawImage(video,(video.videoWidth-sw)/2,(video.videoHeight-sh)/2,sw,sh,0,0,canvas.width,canvas.height);}
+     else ctx.drawImage(video,0,0,canvas.width,canvas.height);
+    }catch(e){finish(new Error('A video frame could not be processed.')) ;return;}
+    const pct=Math.max(0,Math.min(100,(video.currentTime-from)/(to-from)*100));onProgress(pct);
+    if(video.currentTime>=to-.025){video.pause();try{recorder.stop()}catch(e){finish(e)}return;}
+    raf=requestAnimationFrame(draw);
+   };
+   (async()=>{
+    try{
+     video.pause();await seekVideo(from);
+     // Draw a valid first frame before recording begins.
+     if(vertical){const sw=Math.min(video.videoWidth,video.videoHeight*9/16),sh=sw*16/9;ctx.drawImage(video,(video.videoWidth-sw)/2,(video.videoHeight-sh)/2,sw,sh,0,0,canvas.width,canvas.height);}
+     else ctx.drawImage(video,0,0,canvas.width,canvas.height);
+     recorder.start(250);
+     await video.play();
+     raf=requestAnimationFrame(draw);
+     watchdog=setTimeout(()=>finish(new Error('Export stopped responding. Try a shorter clip and keep Chrome in the foreground.')),Math.max(25000,(to-from)*4000));
+    }catch(e){if(recorder.state==='recording'){try{recorder.stop()}catch(_){}}finish(e instanceof Error?e:new Error('Could not start video playback.'));}
+   })();
+  });
+  return await result;
+ }catch(e){
+  if(recorder&&recorder.state==='recording'){try{recorder.stop()}catch(_){}}
+  canvasStream.getTracks().forEach(t=>{try{t.stop()}catch(_){}});
+  if(audioStream)audioStream.getTracks().forEach(t=>{try{t.stop()}catch(_){}});
+  throw e;
+ }
+}
+function setExportBusy(busy){activeExport=busy;$('create').disabled=busy;$('createSelected').disabled=busy;$('selectAll').disabled=busy;}
+async function runExports(clips){
+ if(activeExport)return;
+ if(!clips.length){exportStatus('Select at least one AI suggestion first.');return;}
+ const vertical=document.querySelector('input[name="shape"]:checked').value==='vertical';
+ setExportBusy(true);outputUrls.forEach(url=>URL.revokeObjectURL(url));outputUrls.clear();$('clipOutputs').innerHTML='';$('exportProgress').classList.remove('hidden');$('exportProgress').value=0;
+ let completed=0;
+ try{
+  for(let i=0;i<clips.length;i++){
+   const clip=clips[i];
+   if(!Number.isFinite(clip.start)||!Number.isFinite(clip.end)||clip.start<0||clip.end<=clip.start||clip.end>duration)throw new Error('Clip '+(i+1)+' has invalid timestamps.');
+   exportStatus('Creating clip '+(i+1)+' of '+clips.length+' · '+fmt(clip.start)+'–'+fmt(clip.end)+'. Keep Chrome open.');
+   const blob=await exportClip(clip.start,clip.end,vertical,p=>{$('exportProgress').value=(i+p/100)/clips.length*100;});
+   completed++;addClipOutput(blob,clip.start,clip.end,completed,vertical?'vertical':'original');
+  }
+  $('exportProgress').value=100;exportStatus('Finished! '+completed+' clip'+(completed===1?'':'s')+' ready to preview and download.');
+ }catch(e){exportStatus('Stopped after '+completed+' clip'+(completed===1?'':'s')+': '+(e.message||'Export failed')+' Any completed clips are still available below.');}
+ finally{setExportBusy(false);}
+}
+$('create').onclick=()=>{
+ const from=parseClipTime($('start').value),to=parseClipTime($('end').value);
+ if(!duration||!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<=from||to>duration){exportStatus('Enter valid timestamps. End must be after start and within the video.');return;}
+ runExports([{start:from,end:to}]);
+};
+$('createSelected').onclick=()=>{
+ const checks=[...document.querySelectorAll('.suggestion-check:checked')];
+ const clips=checks.map(c=>{const g=window.clipMindSuggestions?.[Number(c.dataset.index)];return g?{start:g.start,end:g.end}:null;}).filter(Boolean);
+ runExports(clips);
+};
+$('selectAll').onclick=()=>{
+ const checks=[...document.querySelectorAll('.suggestion-check')];const all=checks.length&&checks.every(c=>c.checked);
+ checks.forEach(c=>c.checked=!all);$('selectAll').textContent=all?'Select all':'Clear selection';
+};
+
+</script>
+</body></html>
