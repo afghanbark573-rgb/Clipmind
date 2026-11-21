@@ -380,7 +380,7 @@ button,input,select{font:inherit}button{touch-action:manipulation}
 #analysisDisclosures .disclosure-content{position:static!important;inset:auto!important;display:block;width:100%;max-width:100%;max-height:none!important;min-width:0;box-sizing:border-box;overflow:visible!important;overscroll-behavior:auto;padding:11px;background:#242424;border:0;border-top:1px solid #414141;border-radius:0;box-shadow:none}
 #analysisDisclosures .disclosure-content>*{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
 #analysisDisclosures .disclosure-content #aiHistory{display:block;max-height:none;overflow:visible;white-space:normal;padding-left:22px}
-#analysisDisclosures .disclosure-content #audioDiagnosticsText{display:block;width:100%;max-height:none;overflow:visible;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
+#analysisDisclosures .disclosure-content #audioDiagnosticsText{display:block;width:100%;max-height:none!important;overflow:visible!important;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
 #analysisDisclosures .disclosure-content .transcript-full,#analysisDisclosures .disclosure-content .transcript{display:block;width:100%;max-width:100%;max-height:none;overflow:visible;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
 #analysisDisclosures .disclosure-content .transcript-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 #analysisDisclosures .disclosure-content .transcript-tools>*{min-width:0;max-width:100%}
@@ -733,17 +733,18 @@ function currentVideoSecond(){
 }
 $('setStartNow').addEventListener('click',()=>{
  const now=currentVideoSecond();if(now===null){exportStatus('Select a video and wait for it to finish loading first.');return;}
+ if(now>=duration-.05){exportStatus('The playhead is at the end of the video. Move it earlier to set a valid start.');return;}
  const end=parseClipTime($('end').value);
  setClockValue('start',now);
- if(!Number.isFinite(end)||end<=now){if(duration>now)setClockValue('end',duration);else{exportStatus('The playhead is at the end of the video. Move it earlier to set a valid start.');return;}}
+ if(!Number.isFinite(end)||end<=now)setClockValue('end',duration);
  exportStatus('Clip start set to '+fmt(now)+' from the video playhead.');
 });
 $('setEndNow').addEventListener('click',()=>{
  const now=currentVideoSecond();if(now===null){exportStatus('Select a video and wait for it to finish loading first.');return;}
- const start=parseClipTime($('start').value);
- if(Number.isFinite(start)&&now<=start&&now>0)setClockValue('start',0);
- setClockValue('end',now);
  if(now<=0){exportStatus('Move the video playhead forward before setting the clip end.');return;}
+ const start=parseClipTime($('start').value);
+ if(Number.isFinite(start)&&now<=start)setClockValue('start',0);
+ setClockValue('end',now);
  exportStatus('Clip end set to '+fmt(now)+' from the video playhead.');
 });
 $('resetClipTimes').addEventListener('click',()=>{
