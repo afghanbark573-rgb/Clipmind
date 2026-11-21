@@ -184,10 +184,6 @@ button,input,select{font:inherit}button{touch-action:manipulation}
 .highlight-carousel{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 12px;scroll-snap-type:x mandatory;scroll-padding:2px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;}
 .highlight-carousel::-webkit-scrollbar{height:5px}.highlight-carousel::-webkit-scrollbar-thumb{background:#555;border-radius:8px}
 .suggestion{flex:0 0 min(86vw,360px);min-width:0;scroll-snap-align:start;padding:12px;background:#242424;border-color:#484848}
-.suggestion-summary{list-style:none;cursor:pointer;display:block;min-width:0}
-.suggestion-summary::-webkit-details-marker{display:none}
-.suggestion-summary:after{content:'＋ Open details';display:block;color:#f59e45;font-size:10px;font-weight:750;margin-top:8px}
-.suggestion-details[open]>.suggestion-summary:after{content:'− Close details'}
 .suggestion-topline{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:7px}
 .suggestion-summary .tag{min-width:0}.suggestion-summary .moment-type{margin-left:5px}
 .suggestion-heading{font-size:14px;font-weight:800;line-height:1.35;overflow-wrap:anywhere;margin:0 0 7px}
@@ -199,7 +195,14 @@ button,input,select{font:inherit}button{touch-action:manipulation}
 .suggestion-body>p:not(.suggestion-reason){font-size:12px;color:#cfcfcf;line-height:1.5}
 .suggestion-details[open] .suggestion-body{animation:highlightReveal .14s ease-out}
 @keyframes highlightReveal{from{opacity:.65;transform:translateY(-2px)}to{opacity:1;transform:translateY(0)}}
-@media(min-width:700px){.highlight-carousel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible;padding:2px}.suggestion{width:auto;min-width:0;flex:auto;scroll-snap-align:none}}
+.highlight-details-toggle{width:100%;margin-top:2px;text-align:center;font-weight:800}
+.highlight-details-panel{display:grid;gap:10px;padding-top:4px}
+.highlight-details-heading{font-size:15px;margin:4px 2px;color:#f5f5f5}
+.highlight-detail-card{width:100%;min-width:0}
+.highlight-compact-card{display:flex;flex-direction:column;gap:7px;min-height:205px}
+.highlight-compact-card .suggestion-heading{font-size:15px;margin:0}
+.highlight-excerpt{font-size:11px;line-height:1.45;color:#cfcfcf;margin:2px 0;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.highlight-card-hint{font-size:10px;color:#f59e45;margin:auto 0 0;line-height:1.4}
 @media(max-width:360px){.transcription-clock{gap:6px}.clock-metric{padding:9px}.clock-metric strong{font-size:18px}.suggestion{flex-basis:88vw}}
 
 </style></head>
@@ -2374,25 +2377,37 @@ function showSuggestions(items){
  $('selectAll').textContent='Select all';$('batchControls').style.display='none';
  if(!items.length){host.innerHTML='<p class="status">No reliable timestamped highlights were available. ClipMind will not estimate clip times from transcript length. You can still review the transcript and set clip times manually below.</p>';return;}
  const note=document.createElement('p');note.className='status highlight-note';
- note.textContent='Swipe through the highlights. Tap a card to open its explanation, transcript and editing controls. Review boundaries before exporting; repeated speech remains at its original timestamps.';
+ note.textContent='Swipe horizontally to browse highlights. Open the single details panel below to review explanations, passages and editing controls for every highlight.';
  host.appendChild(note);
  const carousel=document.createElement('div');carousel.className='highlight-carousel';carousel.setAttribute('aria-label','Suggested highlights. Swipe horizontally on mobile.');
+ const toggle=document.createElement('button');toggle.type='button';toggle.className='secondary highlight-details-toggle';toggle.textContent='View all highlights & details ('+items.length+')';
+ toggle.setAttribute('aria-expanded','false');
+ const panel=document.createElement('section');panel.className='highlight-details-panel hidden';panel.setAttribute('aria-label','All highlight details');
+ const detailHeading=document.createElement('h3');detailHeading.className='highlight-details-heading';detailHeading.textContent='All highlights & details';
+ panel.appendChild(detailHeading);
  items.forEach((g,i)=>{
   const story=highlightStory(g.text);
   g.suggestedStart=Number.isFinite(g.suggestedStart)?g.suggestedStart:g.start;
   g.suggestedEnd=Number.isFinite(g.suggestedEnd)?g.suggestedEnd:g.end;g.story=story;
-  const div=document.createElement('article');div.className='suggestion';
+  const card=document.createElement('article');card.className='suggestion highlight-compact-card';
   const top=document.createElement('div');top.className='suggestion-topline';
   const tag=document.createElement('div');tag.className='tag';tag.textContent='HIGHLIGHT '+String(i+1).padStart(2,'0');
   const type=document.createElement('span');type.className='moment-type';type.textContent=story.type;tag.appendChild(type);
   const selectLabel=document.createElement('label');selectLabel.className='suggestion-batch';
   const check=document.createElement('input');check.type='checkbox';check.className='suggestion-check';check.dataset.index=String(i);check.setAttribute('aria-label','Include highlight '+(i+1)+' in batch');
   const batchText=document.createElement('span');batchText.textContent='Batch';selectLabel.append(check,batchText);top.append(tag,selectLabel);
-  const details=document.createElement('details');details.className='suggestion-details';
-  const summary=document.createElement('summary');summary.className='suggestion-summary';
   const title=document.createElement('div');title.className='suggestion-heading';title.textContent=story.title;
   const meta=document.createElement('div');meta.className='suggestion-meta';meta.textContent=fmt(g.start)+' – '+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';
-  summary.append(title,meta);
+  const excerpt=document.createElement('p');excerpt.className='highlight-excerpt';excerpt.textContent=g.text;
+  const hint=document.createElement('p');hint.className='highlight-card-hint';hint.textContent='Full explanation, passage and editing controls are in the details panel below.';
+  card.append(top,title,meta,excerpt,hint);carousel.appendChild(card);
+
+  const div=document.createElement('article');div.className='suggestion highlight-detail-card';
+  const detailTop=document.createElement('div');detailTop.className='suggestion-topline';
+  const detailTag=document.createElement('div');detailTag.className='tag';detailTag.textContent='HIGHLIGHT '+String(i+1).padStart(2,'0');
+  const detailType=document.createElement('span');detailType.className='moment-type';detailType.textContent=story.type;detailTag.appendChild(detailType);detailTop.appendChild(detailTag);
+  const heading=document.createElement('div');heading.className='suggestion-heading';heading.textContent=story.title;
+  const detailMeta=document.createElement('div');detailMeta.className='suggestion-meta';detailMeta.textContent=fmt(g.start)+' – '+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';
   const body=document.createElement('div');body.className='suggestion-body';
   const reason=document.createElement('p');reason.className='suggestion-reason';reason.textContent='Why it stands out: '+story.reason;
   const para=document.createElement('p');para.textContent=g.text;
@@ -2411,10 +2426,14 @@ function showSuggestions(items){
    g.start=from;g.end=to;startInput.value=fmt(from);endInput.value=fmt(to);durationText.textContent='Clip length: '+Math.round(to-from)+' sec';
    const relevant=(transcriptChunks||[]).map(c=>{const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);return {start:transcriptRangeStart+(ts?ts[0]:c.start),end:transcriptRangeStart+(ts?ts[1]:c.end),text:(c.text||'').trim()};}).filter(c=>c.text&&Number.isFinite(c.start)&&Number.isFinite(c.end)&&c.end>from&&c.start<to);
    if(relevant.length)para.textContent=relevant.map(c=>c.text).join(' ');
-   meta.textContent=fmt(g.start)+' – '+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';return true;
+   meta.textContent=fmt(g.start)+' – '+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';
+   detailMeta.textContent=meta.textContent;
+   const compactMeta=card.querySelector('.suggestion-meta');if(compactMeta)compactMeta.textContent=meta.textContent;
+   const compactExcerpt=card.querySelector('.highlight-excerpt');if(compactExcerpt)compactExcerpt.textContent=para.textContent;
+   return true;
   };
   [startInput,endInput].forEach(input=>{
-   input.addEventListener('input',()=>{const from=parseClipTime(startInput.value),to=parseClipTime(endInput.value);if(Number.isFinite(from)&&Number.isFinite(to)&&from>=0&&to>from&&to<=duration){g.start=from;g.end=to;durationText.textContent='Clip length: '+Math.round(to-from)+' sec';meta.textContent=fmt(from)+' – '+fmt(to)+' · '+Math.round(to-from)+' sec';}});
+   input.addEventListener('input',()=>{const from=parseClipTime(startInput.value),to=parseClipTime(endInput.value);if(Number.isFinite(from)&&Number.isFinite(to)&&from>=0&&to>from&&to<=duration){g.start=from;g.end=to;durationText.textContent='Clip length: '+Math.round(to-from)+' sec';detailMeta.textContent=fmt(from)+' – '+fmt(to)+' · '+Math.round(to-from)+' sec';const cm=card.querySelector('.suggestion-meta');if(cm)cm.textContent=detailMeta.textContent;}});
    input.addEventListener('change',updateTimes);input.addEventListener('blur',updateTimes);
   });
   edit.append(startLabel,endLabel);
@@ -2423,9 +2442,33 @@ function showSuggestions(items){
   preview.onclick=async()=>{if(!updateTimes())return;try{activeHighlightPreviewStart=g.start;activeHighlightPreviewEnd=g.end;previewFinished=false;video.pause();await seekVideo(g.start);updatePreviewTimer();await video.play();exportStatus('Previewing highlight '+(i+1)+' · '+fmt(g.start)+'–'+fmt(g.end)+'.');}catch(e){activeHighlightPreviewStart=null;activeHighlightPreviewEnd=null;updatePreviewTimer();exportStatus('Could not preview this moment: '+(e.message||String(e)));}};
   const use=document.createElement('button');use.type='button';use.textContent='Use for clip';
   use.onclick=()=>{if(!updateTimes())return;setClockValue('start',g.start);setClockValue('end',g.end);exportStatus('Highlight '+(i+1)+' selected. Choose output shape and create your clip.');$('start').scrollIntoView({behavior:'smooth',block:'center'});};
-  actions.append(preview,use);body.append(reason,para,edit,times,actions);details.append(summary,body);div.append(top,details);carousel.appendChild(div);
+  const copy=document.createElement('button');copy.type='button';copy.textContent='📋 Copy highlight details';
+  const copyStatus=document.createElement('span');copyStatus.className='note';copyStatus.setAttribute('aria-live','polite');
+  copy.onclick=async()=>{
+   if(!updateTimes()){copyStatus.textContent='Correct the start and end times before copying.';return;}
+   const report=[
+    'CLIPMIND HIGHLIGHT '+String(i+1).padStart(2,'0'),'Category: '+story.type,'Title: '+story.title,
+    'Start: '+fmt(g.start),'End: '+fmt(g.end),'Duration: '+(g.end-g.start).toFixed(2)+' seconds',
+    'Why it stands out: '+story.reason,'AI suggested range: '+fmt(g.suggestedStart)+' – '+fmt(g.suggestedEnd),
+    'Current edited range: '+fmt(g.start)+' – '+fmt(g.end),'Source video: '+(selectedFile?.name||'Not available'),
+    '','FULL PASSAGE',para.textContent||g.text||''
+   ].join('\n');
+   copy.disabled=true;copyStatus.textContent='Copying…';
+   try{await copyDiagnosticText(report);copyStatus.textContent='Copied highlight '+(i+1)+'. Paste it wherever needed.';}
+   catch(error){copyStatus.textContent='Copy failed. Check browser clipboard permission and try again.';}
+   finally{copy.disabled=false;}
+  };
+  actions.append(preview,use,copy);body.append(reason,para,edit,times,actions,copyStatus);
+  div.append(detailTop,heading,detailMeta,body);panel.appendChild(div);
  });
- host.appendChild(carousel);$('batchControls').style.display='flex';
+ host.append(carousel,toggle,panel);
+ toggle.addEventListener('click',()=>{
+  const opening=panel.classList.contains('hidden');
+  panel.classList.toggle('hidden',!opening);
+  toggle.setAttribute('aria-expanded',String(opening));
+  toggle.textContent=opening?'Hide all highlight details ('+items.length+')':'View all highlights & details ('+items.length+')';
+ });
+ $('batchControls').style.display='flex';
 }
 document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{
  if(!duration)return;const parsed=parseClipTime($('start').value);
