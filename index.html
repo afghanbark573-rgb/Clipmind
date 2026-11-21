@@ -371,6 +371,35 @@ button,input,select{font:inherit}button{touch-action:manipulation}
  .playback-speed-controls>button{padding:7px 8px!important;font-size:10px}
 }
 
+
+/* Structural fix: disclosure panels expand in document flow, never float over other sections. */
+#analysisDisclosures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;gap:7px;width:100%;min-width:0;position:static;overflow:visible}
+#analysisDisclosures>details{display:block;min-width:0;width:100%;box-sizing:border-box;align-self:start;overflow:hidden}
+#analysisDisclosures>details[open]{grid-column:1/-1;align-self:stretch}
+#analysisDisclosures>details>summary{width:100%;min-width:0;box-sizing:border-box;min-height:48px;height:auto;white-space:normal;overflow-wrap:anywhere}
+#analysisDisclosures .disclosure-content{position:static!important;inset:auto!important;display:block;width:100%;max-width:100%;max-height:none!important;min-width:0;box-sizing:border-box;overflow:visible!important;overscroll-behavior:auto;padding:11px;background:#242424;border:0;border-top:1px solid #414141;border-radius:0;box-shadow:none}
+#analysisDisclosures .disclosure-content>*{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+#analysisDisclosures .disclosure-content #aiHistory{display:block;max-height:none;overflow:visible;white-space:normal;padding-left:22px}
+#analysisDisclosures .disclosure-content #audioDiagnosticsText{display:block;width:100%;max-height:none!important;overflow:visible!important;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
+#analysisDisclosures .disclosure-content .transcript-full,#analysisDisclosures .disclosure-content .transcript{display:block;width:100%;max-width:100%;max-height:none;overflow:visible;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
+#analysisDisclosures .disclosure-content .transcript-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+#analysisDisclosures .disclosure-content .transcript-tools>*{min-width:0;max-width:100%}
+body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!important;opacity:1!important}
+#highlightResultsSection,#results,.highlight-details-panel{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+.highlight-details-panel{display:flex;flex-flow:row nowrap;gap:10px;width:100%;padding:2px 0 12px;margin:0 0 8px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding:0;-webkit-overflow-scrolling:touch}
+.highlight-detail-card,.highlight-details-panel>.highlight-detail-card{flex:0 0 100%!important;width:100%!important;max-width:100%!important;min-width:100%!important;box-sizing:border-box;margin:0!important;scroll-snap-align:start;overflow:hidden}
+.highlight-detail-card .suggestion-body,.highlight-detail-card .suggestion-edit,.highlight-detail-card .suggestion-actions{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+.highlight-detail-card .suggestion-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.highlight-detail-card .suggestion-actions button{min-width:0;width:100%;box-sizing:border-box}
+#recognitionSettingsSection{width:100%;min-width:0;box-sizing:border-box}
+#recognitionSettingsSection .ai-recognition-settings{margin:0;padding:0;border:0;background:transparent}
+#recognitionSettingsSection .ai-settings-heading{display:none}
+@media(max-width:390px){
+ #analysisDisclosures{gap:5px}
+ #analysisDisclosures>details>summary{padding:8px 5px;font-size:9px!important}
+ .highlight-detail-card,.highlight-details-panel>.highlight-detail-card{flex-basis:100%!important;min-width:100%!important}
+}
+
 </style></head>
 <body>
 <header><div class="logo">▶</div><div><strong>ClipMind</strong><small>Your private video clip studio</small></div></header>
@@ -557,6 +586,21 @@ button,input,select{font:inherit}button{touch-action:manipulation}
 <script type="module">
 const $=id=>document.getElementById(id);
 
+// Give recognition settings their own full-width card, separate from the AI workflow.
+const recognitionSettings=$('language')?.closest('.ai-recognition-settings');
+if(recognitionSettings&&!recognitionSettings.dataset.moved){
+ const settingsCard=document.createElement('section');
+ settingsCard.className='card recognition-settings-card';
+ settingsCard.id='recognitionSettingsSection';
+ const settingsHeading=document.createElement('h2');
+ settingsHeading.textContent='Recognition settings';
+ settingsCard.appendChild(settingsHeading);
+ const resultsSection=$('highlightResultsSection');
+ if(resultsSection?.parentNode)resultsSection.parentNode.insertBefore(settingsCard,resultsSection);
+ settingsCard.appendChild(recognitionSettings);
+ recognitionSettings.dataset.moved='true';
+}
+
 function enhanceSelect(select){
  if(!select||select.dataset.enhanced==='1')return;
  select.dataset.enhanced='1';
@@ -683,9 +727,31 @@ function drawCropPreview(){const c=$('cropPreviewCanvas');if(!c||!video.videoWid
 video.addEventListener('loadeddata',()=>{drawCropPreview();$('previewTools').classList.remove('hidden');});
 video.addEventListener('timeupdate',drawCropPreview);
 document.querySelectorAll('input[name="shape"]').forEach(x=>x.addEventListener('change',drawCropPreview));
-$('setStartNow').addEventListener('click',()=>{if(!duration)return;setClockValue('start',Math.min(duration,video.currentTime));exportStatus('Clip start set to current video position.');});
-$('setEndNow').addEventListener('click',()=>{if(!duration)return;setClockValue('end',Math.min(duration,video.currentTime));exportStatus('Clip end set to current video position.');});
-$('resetClipTimes').addEventListener('click',()=>{if(!duration)return;setClockValue('start',0);setClockValue('end',Math.min(duration,30));exportStatus('Clip range reset to the first 30 seconds (or full video if shorter).');});
+function currentVideoSecond(){
+ if(!video||!Number.isFinite(video.currentTime)||!Number.isFinite(duration)||duration<=0)return null;
+ return Math.max(0,Math.min(duration,video.currentTime));
+}
+$('setStartNow').addEventListener('click',()=>{
+ const now=currentVideoSecond();if(now===null){exportStatus('Select a video and wait for it to finish loading first.');return;}
+ if(now>=duration-.05){exportStatus('The playhead is at the end of the video. Move it earlier to set a valid start.');return;}
+ const end=parseClipTime($('end').value);
+ setClockValue('start',now);
+ if(!Number.isFinite(end)||end<=now)setClockValue('end',duration);
+ exportStatus('Clip start set to '+fmt(now)+' from the video playhead.');
+});
+$('setEndNow').addEventListener('click',()=>{
+ const now=currentVideoSecond();if(now===null){exportStatus('Select a video and wait for it to finish loading first.');return;}
+ if(now<=0){exportStatus('Move the video playhead forward before setting the clip end.');return;}
+ const start=parseClipTime($('start').value);
+ if(Number.isFinite(start)&&now<=start)setClockValue('start',0);
+ setClockValue('end',now);
+ exportStatus('Clip end set to '+fmt(now)+' from the video playhead.');
+});
+$('resetClipTimes').addEventListener('click',()=>{
+ if(!Number.isFinite(duration)||duration<=0){exportStatus('Select a video and wait for it to finish loading first.');return;}
+ setClockValue('start',0);setClockValue('end',duration);
+ exportStatus('Clip range reset to the full video · 00:00–'+fmt(duration)+'.');
+});
 
 function saveCurrentOverlapReview(){
  const item=overlapReviewItems[overlapReviewIndex];if(!item)return;
@@ -853,11 +919,7 @@ $('previewSeek').addEventListener('input',()=>{if(activeHighlightPreviewStart===
 video.addEventListener('pause',()=>{if(activeHighlightPreviewEnd!==null&&video.currentTime<activeHighlightPreviewEnd){/* Keep the selected range visible so the user can resume or scrub. */} });
 function setAnalysisBusy(busy){
  analysisBusy=!!busy;document.body.classList.toggle('analysis-busy',analysisBusy);
- for(const id of ['aiHistoryBox','audioDiagnostics']){
-  const panel=$(id),summary=panel?.querySelector('summary');if(!panel||!summary)continue;
-  if(analysisBusy){panel.open=false;summary.setAttribute('aria-disabled','true');summary.setAttribute('tabindex','-1');summary.title='Available after transcription finishes.';}
-  else{summary.removeAttribute('aria-disabled');summary.removeAttribute('tabindex');summary.removeAttribute('title');}
- }
+ // Keep progress and diagnostics available while processing; their contents update live.
 }
 const aiStatus=t=>{
  $('aiStatus').textContent=t;
@@ -940,11 +1002,14 @@ function formatClockInput(el){
  el.value=digits.slice(0,2)+':'+digits.slice(2);
 }
 function setClockValue(id,value){
- const canonical=$(id);if(!canonical)return;
+ const canonical=$(id);if(!canonical)return false;
  const seconds=Number.isFinite(value)?Math.max(0,Math.floor(value)):0;
  canonical.value=fmt(seconds);
  const wrap=document.querySelector('[data-clock-for="'+id+'"]');
- if(wrap){const field=wrap.querySelector('.clock-flat');if(field)field.value=canonical.value;}
+ if(wrap){const field=wrap.querySelector('.clock-flat');if(field){field.value=canonical.value;field.dataset.lastValue=canonical.value;}}
+ canonical.dispatchEvent(new Event('input',{bubbles:true}));
+ canonical.dispatchEvent(new Event('change',{bubbles:true}));
+ return true;
 }
 function initClockEditors(root=document){
  root.querySelectorAll('.clock-edit').forEach(wrap=>{
