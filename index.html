@@ -332,6 +332,45 @@ button,input,select{font:inherit}button{touch-action:manipulation}
  .transcription-clock .clock-metric strong{font-size:16px}
 }
 
+
+/* Corrected mobile review layout: a stacked deck teaser, then horizontal detail browsing. */
+.highlight-stack-preview{width:100%;min-width:0;margin:12px 0 9px;padding:3px 8px 5px;box-sizing:border-box}
+.highlight-stack-deck{position:relative;height:142px;max-width:440px;margin:0 auto}
+.highlight-stack-layer{position:absolute;left:5%;right:5%;height:108px;border:1px solid #505050;border-radius:15px;background:#303030;box-shadow:0 5px 12px #0004}
+.highlight-stack-layer-back{top:0;transform:scale(.94);opacity:.55}
+.highlight-stack-layer-middle{top:10px;transform:scale(.975);opacity:.82}
+.highlight-stack-front{position:absolute;left:0;right:0;top:22px;min-height:108px;box-sizing:border-box;padding:13px 15px;border:1px solid #76512d;border-radius:14px;background:linear-gradient(145deg,#292929,#202020);box-shadow:0 8px 18px #0005;display:flex;flex-direction:column;justify-content:space-between;gap:9px}
+.highlight-stack-top{display:flex;justify-content:space-between;gap:8px;color:#f5b36b;font-size:9px;font-weight:850;letter-spacing:.7px}
+.highlight-stack-front strong{font-size:14px;line-height:1.3;overflow-wrap:anywhere}
+.highlight-stack-front small{font-size:10px;color:#aaa;line-height:1.35}
+.highlight-detail-batch{display:flex;align-items:center;gap:5px;font-size:10px;color:#aaa;white-space:nowrap}
+.highlight-detail-batch input{width:17px;height:17px;accent-color:var(--accent)}
+.highlight-details-panel{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;width:100%;min-width:0;box-sizing:border-box;padding:3px 2px 13px;scroll-snap-type:x mandatory;scroll-padding:2px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.highlight-detail-card{flex:0 0 min(88%,520px);width:auto;max-width:100%;min-width:0;scroll-snap-align:start}
+.highlight-detail-card .suggestion-topline{align-items:center}
+#analysisDisclosures{position:relative;isolation:isolate}
+#analysisDisclosures>details[open]{grid-column:auto}
+#analysisDisclosures .disclosure-content{position:absolute;top:calc(100% + 7px);left:0;right:0;width:auto;max-width:100%;box-sizing:border-box;z-index:40;max-height:min(44vh,380px);overflow:auto;overscroll-behavior:contain;padding:11px;background:#242424;border:1px solid #76512d;border-radius:12px;box-shadow:0 12px 26px #000b}
+#analysisDisclosures .disclosure-content>*{max-width:100%;min-width:0;box-sizing:border-box}
+#analysisDisclosures .disclosure-content .transcript-full,#analysisDisclosures .disclosure-content .transcript{width:100%;max-width:100%;max-height:none;overflow:visible;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
+#analysisDisclosures .disclosure-content .transcript-heading,#analysisDisclosures .disclosure-content .transcript-tools,#analysisDisclosures .disclosure-content .transcript-note{width:100%;max-width:100%;box-sizing:border-box}
+.playback-speed-controls{display:grid;grid-template-columns:minmax(0,1fr) 88px auto;align-items:center;gap:9px;padding-top:8px;border-top:1px solid #414141;min-width:0}
+.playback-speed-controls>.custom-select{width:88px;min-width:0;margin:0}
+.playback-speed-controls>.custom-select .custom-select-trigger{width:100%;height:40px;min-height:40px;padding:7px 9px;border-radius:9px;font-size:13px}
+.playback-speed-controls>button{width:auto!important;min-width:0;height:40px;min-height:40px;margin:0!important;padding:7px 10px!important;white-space:nowrap;font-size:11px}
+.app-note-disclosure{padding:0;overflow:hidden}
+.app-note-disclosure>summary{display:flex;align-items:center;min-height:44px;padding:11px 13px;font-size:12px;font-weight:750;color:#e8e8e8;background:#242424}
+.app-note-content{padding:0 13px 11px;color:#aaa;font-size:11px;line-height:1.5}
+.app-note-content p{margin:7px 0}
+@media(max-width:390px){
+ .highlight-stack-deck{height:136px}
+ .highlight-stack-front{padding:12px}
+ .highlight-stack-front strong{font-size:13px}
+ .playback-speed-controls{grid-template-columns:minmax(0,1fr) 82px auto;gap:6px}
+ .playback-speed-controls>.custom-select{width:82px}
+ .playback-speed-controls>button{padding:7px 8px!important;font-size:10px}
+}
+
 </style></head>
 <body>
 <header><div class="logo">▶</div><div><strong>ClipMind</strong><small>Your private video clip studio</small></div></header>
@@ -511,7 +550,8 @@ button,input,select{font:inherit}button{touch-action:manipulation}
 <p id="exportStatus" class="status">Select a video first.</p>
 <div id="clipOutputs" aria-live="polite"></div>
 </section>
-<div class="card note"><b>Highlight note:</b> Titles and reasons are generated from transcript wording and structural cues; the app does not yet inspect visual scenes or guarantee viral performance. Review the preview and boundaries. <b>Memory note:</b> ClipMind unloads the Whisper model and FFmpeg engine after each analysis to free phone memory. Timestamp controls are built only when you open the transcript panel, and temporary audio samples are cleared after recognition. Transcript timestamps are phrase-level estimates returned by Whisper, not exact word boundaries. ClipMind will not invent highlight times if timestamp data is missing. Tap Prepare AI tools again before analyzing another range. <b>Important:</b> Fast extraction uses FFmpeg WebAssembly, which may download a large engine the first time. It is usually faster than real-time playback, but speed depends on the video format and phone. If direct extraction fails, use the real-time fallback. You can inspect only a chosen time range instead of the whole video. Very long selected ranges can still use substantial phone memory. Highlight ranking uses transcript structure and language signals, not full visual understanding. Titles and explanations are generated from transcript clues and are not proof that a moment will perform well. Keep Chrome open while processing.</div>
+<details class="card note app-note-disclosure"><summary>Highlight note</summary><div class="app-note-content"><p>Titles and reasons are generated from transcript wording and structural cues; the app does not yet inspect visual scenes or guarantee viral performance. Review the preview and boundaries.</p></div></details>
+<details class="card note app-note-disclosure"><summary>Memory & processing notes</summary><div class="app-note-content"><p>ClipMind unloads the Whisper model and FFmpeg engine after each analysis to free phone memory. Timestamp controls are built only when you open the transcript panel, and temporary audio samples are cleared after recognition. Transcript timestamps are phrase-level estimates returned by Whisper, not exact word boundaries. ClipMind will not invent highlight times if timestamp data is missing. Tap Prepare AI tools again before analyzing another range.</p><p>Fast extraction uses FFmpeg WebAssembly, which may download a large engine the first time. It is usually faster than real-time playback, but speed depends on the video format and phone. If direct extraction fails, use the real-time fallback. You can inspect only a chosen time range instead of the whole video. Very long selected ranges can still use substantial phone memory. Highlight ranking uses transcript structure and language signals, not full visual understanding. Titles and explanations are generated from transcript clues and are not proof that a moment will perform well. Keep Chrome open while processing.</p></div></details>
 </main><footer>ClipMind · v0.16.4 · Editorial highlights & precision controls</footer>
 
 <script type="module">
@@ -883,7 +923,7 @@ function stopTranscriptionClock(success){
 }
 
 const exportStatus=t=>$('exportStatus').textContent=t;
-for(const id of ['aiHistoryBox','audioDiagnostics'])$(id).addEventListener('toggle',()=>{if(analysisBusy&&$(id).open)$(id).open=false;});
+const disclosureIds=['aiHistoryBox','audioDiagnostics','transcriptBox'];disclosureIds.forEach(id=>$(id).addEventListener('toggle',()=>{const current=$(id);if(!current.open)return;disclosureIds.filter(other=>other!==id).forEach(other=>{if($(other).open)$(other).open=false;});}));
 function fmt(s){s=Math.max(0,Number(s)||0);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0')}
 function parseClipTime(value){
  const v=String(value||'').trim();
@@ -998,10 +1038,10 @@ file.onchange=()=>{
  activeHighlightPreviewStart=null;activeHighlightPreviewEnd=null;previewFinished=false;updatePreviewTimer();video.src=objectUrl;video.classList.remove('hidden');$('previewTools').classList.remove('hidden');video.playbackRate=Number($('previewSpeed').value)||1;
  $('meta').textContent=f.name+' · '+(f.size/1048576).toFixed(1)+' MB';$('meta').classList.remove('hidden');
  $('duration').textContent='Loading video details…';$('analyze').disabled=true;$('create').disabled=true;$('readinessPanel').classList.remove('hidden');$('readinessState').textContent='Checking…';$('readinessSummary').textContent='Waiting for video metadata.';$('readinessReport').textContent='Loading video metadata…';readinessReportText='';
- $('results').innerHTML='';$('transcriptionClockPanel').classList.add('hidden');if(transcriptionClockInterval){clearInterval(transcriptionClockInterval);transcriptionClockInterval=null;}transcriptionClockStartedAt=0;$('transcriptBox').classList.add('hidden');transcriptChunks=[];transcriptFullText='';transcriptSegmentsRendered=false;$('transcript').replaceChildren();$('transcriptFull').textContent='The full recognized text will appear here.';$('aiHistory').innerHTML='<li>New video selected.</li>'; $('fastRead').classList.add('hidden');$('firstPassTest').classList.add('hidden');$('startRead').classList.add('hidden');$('overlapReview').classList.add('hidden');overlapReviewItems=[];overlapReviewAnswers={};overlapReviewIndex=0;$('reviewNext').disabled=false;
+ $('results').innerHTML='';$('highlightResultsSection').classList.add('hidden');$('transcriptionClockPanel').classList.add('hidden');if(transcriptionClockInterval){clearInterval(transcriptionClockInterval);transcriptionClockInterval=null;}transcriptionClockStartedAt=0;$('transcriptBox').classList.add('hidden');transcriptChunks=[];transcriptFullText='';transcriptSegmentsRendered=false;$('transcript').replaceChildren();$('transcriptFull').textContent='The full recognized text will appear here.';$('aiHistory').innerHTML='<li>New video selected.</li>'; $('fastRead').classList.add('hidden');$('firstPassTest').classList.add('hidden');$('startRead').classList.add('hidden');$('overlapReview').classList.add('hidden');overlapReviewItems=[];overlapReviewAnswers={};overlapReviewIndex=0;$('reviewNext').disabled=false;
  video.onloadedmetadata=()=>{
   duration=video.duration;drawCropPreview();$('duration').textContent='Video length: '+fmt(duration)+' · '+video.videoWidth+'×'+video.videoHeight;runReadinessCheck();
-  setClockValue('start',0);setClockValue('end',Math.min(30,duration));
+  setClockValue('start',0);setClockValue('end',duration);
   setClockValue('analysisStart',0);setClockValue('analysisEnd',duration);
   $('analyze').disabled=false;$('create').disabled=false;aiStatus('Video ready. Tap Find highlights with AI.');
   exportStatus('Video ready. You can create a manual clip or run AI first.');
@@ -2513,24 +2553,16 @@ function showSuggestions(items){
  const host=$('results');host.innerHTML='';$('highlightResultsSection').classList.remove('hidden');window.clipMindSuggestions=items;
  $('selectAll').textContent='Select all';$('batchControls').style.display='none';
  if(!items.length){host.innerHTML='<p class="status">No reliable timestamped highlights were available. ClipMind will not estimate clip times from transcript length. You can still review the transcript and set clip times manually below.</p>';return;}
- const note=document.createElement('details');note.className='highlight-note';note.innerHTML='<summary>About these highlights</summary><p>Highlights are shown as compact cards. Tap “Show all highlights” to browse full details horizontally.</p>';host.appendChild(note);
- const previewList=document.createElement('div');previewList.className='highlight-preview-list';previewList.setAttribute('aria-label','Compact highlight list');
+ const stackPreview=document.createElement('div');stackPreview.className='highlight-stack-preview';stackPreview.setAttribute('aria-label','Stacked preview of the available highlights');
  const toggle=document.createElement('button');toggle.type='button';toggle.className='secondary highlight-details-toggle';toggle.textContent='Show all highlights ('+items.length+')';toggle.setAttribute('aria-expanded','false');
  const panel=document.createElement('section');panel.className='highlight-details-panel hidden';panel.setAttribute('aria-label','All highlight details');
  items.forEach((g,i)=>{
   const story=highlightStory(g.text);g.suggestedStart=Number.isFinite(g.suggestedStart)?g.suggestedStart:g.start;g.suggestedEnd=Number.isFinite(g.suggestedEnd)?g.suggestedEnd:g.end;g.story=story;
-  const compact=document.createElement('article');compact.className='highlight-preview-card';
-  const number=document.createElement('span');number.className='highlight-preview-number';number.textContent=String(i+1).padStart(2,'0');
-  const copyText=document.createElement('div');copyText.className='highlight-preview-copy';
-  const title=document.createElement('div');title.className='highlight-preview-title';title.textContent=story.title;
-  const meta=document.createElement('div');meta.className='highlight-preview-meta';meta.textContent=story.type+' · '+fmt(g.start)+'–'+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';copyText.append(title,meta);
-  const batchLabel=document.createElement('label');batchLabel.className='highlight-preview-batch';
-  const check=document.createElement('input');check.type='checkbox';check.className='suggestion-check';check.dataset.index=String(i);check.setAttribute('aria-label','Include highlight '+(i+1)+' in batch');
-  const batchText=document.createElement('span');batchText.textContent='Batch';batchLabel.append(check,batchText);compact.append(number,copyText,batchLabel);previewList.appendChild(compact);
+
   const div=document.createElement('article');div.className='suggestion highlight-detail-card';
   const detailTop=document.createElement('div');detailTop.className='suggestion-topline';
   const detailTag=document.createElement('div');detailTag.className='tag';detailTag.textContent='HIGHLIGHT '+String(i+1).padStart(2,'0');
-  const detailType=document.createElement('span');detailType.className='moment-type';detailType.textContent=story.type;detailTag.appendChild(detailType);detailTop.appendChild(detailTag);
+  const detailType=document.createElement('span');detailType.className='moment-type';detailType.textContent=story.type;detailTag.appendChild(detailType);const batchLabel=document.createElement('label');batchLabel.className='highlight-detail-batch';const check=document.createElement('input');check.type='checkbox';check.className='suggestion-check';check.dataset.index=String(i);check.setAttribute('aria-label','Include highlight '+(i+1)+' in batch');const batchText=document.createElement('span');batchText.textContent='Batch';batchLabel.append(check,batchText);detailTop.append(detailTag,batchLabel);
   const heading=document.createElement('div');heading.className='suggestion-heading';heading.textContent=story.title;
   const detailMeta=document.createElement('div');detailMeta.className='suggestion-meta';detailMeta.textContent=fmt(g.start)+' – '+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';
   const body=document.createElement('div');body.className='suggestion-body';
@@ -2568,9 +2600,13 @@ function showSuggestions(items){
   };
   actions.append(preview,use,copy);body.append(reason,para,edit,times,actions,copyStatus);div.append(detailTop,heading,detailMeta,body);panel.appendChild(div);
  });
- host.append(panel,previewList,toggle);
- toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);previewList.classList.toggle('hidden',opening);toggle.setAttribute('aria-expanded',String(opening));toggle.textContent=opening?'Hide all highlights ('+items.length+')':'Show all highlights ('+items.length+')';if(opening)panel.scrollIntoView({behavior:'smooth',block:'nearest'});});
- $('batchControls').style.display='grid';
+ const deck=document.createElement('div');deck.className='highlight-stack-deck';deck.innerHTML='<div class="highlight-stack-layer highlight-stack-layer-back"></div><div class="highlight-stack-layer highlight-stack-layer-middle"></div><div class="highlight-stack-front"><div class="highlight-stack-top"><span>CLIPMIND HIGHLIGHTS</span><span>'+String(items.length).padStart(2,'0')+' MOMENTS</span></div><strong></strong><small></small></div>';
+ deck.querySelector('.highlight-stack-front strong').textContent=items[0].story.title;
+ deck.querySelector('.highlight-stack-front small').textContent=items[0].story.type+' · '+fmt(items[0].start)+'–'+fmt(items[0].end)+' · '+items.length+' highlights ready';
+ stackPreview.appendChild(deck);
+ host.append(stackPreview,toggle,panel);
+ toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);stackPreview.classList.toggle('hidden',opening);toggle.setAttribute('aria-expanded',String(opening));toggle.textContent=opening?'Hide all highlights ('+items.length+')':'Show all highlights ('+items.length+')';$('batchControls').style.display=opening?'grid':'none';if(opening)panel.scrollIntoView({behavior:'smooth',block:'nearest'});});
+ $('batchControls').style.display='none';
 }
 document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{
  if(!duration)return;const parsed=parseClipTime($('start').value);
