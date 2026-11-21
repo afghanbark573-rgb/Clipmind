@@ -2451,7 +2451,7 @@ function showSuggestions(items){
     'Start: '+fmt(g.start),'End: '+fmt(g.end),'Duration: '+(g.end-g.start).toFixed(2)+' seconds',
     'Why it stands out: '+story.reason,'AI suggested range: '+fmt(g.suggestedStart)+' – '+fmt(g.suggestedEnd),
     'Current edited range: '+fmt(g.start)+' – '+fmt(g.end),'Source video: '+(selectedFile?.name||'Not available'),
-    '','FULL PASSAGE',g.text||para.textContent||''
+    '','FULL PASSAGE',para.textContent||g.text||''
    ].join('\n');
    copy.disabled=true;copyStatus.textContent='Copying…';
    try{await copyDiagnosticText(report);copyStatus.textContent='Copied highlight '+(i+1)+'. Paste it wherever needed.';}
