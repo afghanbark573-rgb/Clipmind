@@ -2441,7 +2441,7 @@ function showSuggestions(items){
     '',
     'FULL PASSAGE',
     g.text||para.textContent||''
-   ].join('\\n');
+   ].join('\n');
    copy.disabled=true;copyStatus.textContent='Copying…';
    try{await copyDiagnosticText(report);copyStatus.textContent='Copied highlight '+(i+1)+'. Paste it wherever needed.';}
    catch(error){copyStatus.textContent='Copy failed. Check browser clipboard permission and try again.';}
