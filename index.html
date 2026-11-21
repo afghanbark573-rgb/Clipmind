@@ -400,6 +400,35 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
  .highlight-detail-card,.highlight-details-panel>.highlight-detail-card{flex-basis:100%!important;min-width:100%!important}
 }
 
+
+/* Compact clip range utility; no full-width playhead buttons. */
+.clip-range-utility{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:5px}
+.reset-range-button{width:auto!important;min-height:30px;margin:0!important;padding:5px 10px!important;border-radius:8px;font-size:11px}
+.clip-range-utility>span{font-size:10px;color:#a3a3a3;line-height:1.35}
+/* Fixed analysis tabs: the controls stay in place while one content panel expands below. */
+#analysisDisclosures{display:block;width:100%;min-width:0;position:static;overflow:visible}
+.analysis-disclosure-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;width:100%;min-width:0}
+.analysis-disclosure-tab{display:flex;align-items:center;justify-content:center;min-width:0;min-height:44px;margin:0!important;padding:8px 6px!important;border:1px solid #414141;border-radius:10px;background:#292929;color:#e8e8e8;font-size:11px;font-weight:750;line-height:1.25;text-align:center;white-space:normal;overflow-wrap:anywhere}
+.analysis-disclosure-tab[aria-selected=true]{border-color:#a9672b;background:#30271f;color:#ffbd78}
+.analysis-disclosure-content{display:block;width:100%;min-width:0;box-sizing:border-box;margin-top:8px;padding:11px;border:1px solid #76512d;border-radius:12px;background:#242424;overflow:visible}
+.analysis-disclosure-content[hidden]{display:none}
+.analysis-disclosure-content>.disclosure-content{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:0;border:0;background:transparent;overflow:visible}
+.analysis-disclosure-content>.disclosure-content>*{max-width:100%;min-width:0;box-sizing:border-box}
+.analysis-disclosure-content #aiHistory{max-height:190px;overflow:auto;overscroll-behavior:contain}
+.analysis-disclosure-content #audioDiagnosticsText{display:block;width:100%;max-height:260px!important;overflow:auto!important;overscroll-behavior:contain;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
+.analysis-disclosure-content .transcript-horizontal-rail{display:flex;flex-flow:row nowrap;gap:10px;width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding:0;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.transcript-page{flex:0 0 100%;width:100%;max-width:100%;min-width:100%;box-sizing:border-box;scroll-snap-align:start;border:1px solid #414141;border-radius:10px;padding:10px;background:#202020;overflow:hidden}
+.transcript-page .transcript-heading{margin:0 0 8px}
+.transcript-page .transcript-tools{margin:0 0 8px;display:flex;flex-wrap:wrap;gap:7px}
+.transcript-page .transcript-full,.transcript-page .transcript{width:100%;max-width:100%;height:36vh;max-height:360px;min-height:180px;overflow:auto!important;overscroll-behavior:contain;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
+.transcript-page .transcript-note{margin:5px 0 8px}
+.analysis-disclosure-content #transcript{scroll-behavior:auto}
+@media(max-width:390px){
+ .analysis-disclosure-tabs{gap:5px}
+ .analysis-disclosure-tab{padding:7px 4px!important;font-size:10px}
+ .transcript-page .transcript-full,.transcript-page .transcript{height:34vh;min-height:170px}
+}
+
 </style></head>
 <body>
 <header><div class="logo">▶</div><div><strong>ClipMind</strong><small>Your private video clip studio</small></div></header>
@@ -449,8 +478,6 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 
 <section class="card">
 <h2>2. AI highlight finder</h2>
-<p class="help">Choose which part of the video to inspect. By default, ClipMind checks the whole video. There is no fixed time limit, but shorter ranges finish sooner and use less phone memory.</p>
-
 <div class="ai-recognition-settings"><div class="ai-settings-heading">Recognition settings</div>
 <label class="field" style="display:block;margin-top:12px">SPOKEN LANGUAGE
 <select id="language" aria-label="Spoken language">
@@ -479,6 +506,7 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 </select></label>
 <p class="help" style="margin-top:7px">Base is an accuracy experiment for English. It downloads a larger model and may take longer on your phone. Tiny remains available if Base is too slow.</p>
 </div>
+<p class="help">Choose which part of the video to inspect. By default, ClipMind checks the whole video. There is no fixed time limit, but shorter ranges finish sooner and use less phone memory.</p>
 <div id="aiActionGrid" class="ai-action-grid">
 <button id="analyze" class="primary" disabled>✨ Prepare AI tools</button>
 <button id="fastRead" class="secondary hidden">⚡ Extract audio and find highlights</button>
@@ -557,7 +585,7 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
  </div><input id="end" type="text" maxlength="8" inputmode="numeric" autocomplete="off" placeholder="00:30" value="00:30" aria-label="Clip end time" class="clock-canonical" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;padding:0;margin:0" tabindex="-1"></label>
 </div>
 <p class="help" style="margin-top:8px">Tap where you want to edit, or use the arrow keys to move between digits. Each digit stays in its position; Backspace clears only the selected digit. The colon never moves.</p>
-<div class="boundary-tools"><button id="setStartNow" class="secondary" type="button">Set start to current video time</button><button id="setEndNow" class="secondary" type="button">Set end to current video time</button><button id="resetClipTimes" class="secondary" type="button">Reset suggested range</button></div>
+<div class="clip-range-utility"><button id="resetClipTimes" class="secondary reset-range-button" type="button">Reset range</button><span>Adjust start and end above, or choose a highlight.</span></div>
 <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">
 <button class="secondary preset" data-sec="15" style="width:auto">15 sec</button>
 <button class="secondary preset" data-sec="30" style="width:auto">30 sec</button>
@@ -586,19 +614,42 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 <script type="module">
 const $=id=>document.getElementById(id);
 
-// Give recognition settings their own full-width card, separate from the AI workflow.
-const recognitionSettings=$('language')?.closest('.ai-recognition-settings');
-if(recognitionSettings&&!recognitionSettings.dataset.moved){
- const settingsCard=document.createElement('section');
- settingsCard.className='card recognition-settings-card';
- settingsCard.id='recognitionSettingsSection';
- const settingsHeading=document.createElement('h2');
- settingsHeading.textContent='Recognition settings';
- settingsCard.appendChild(settingsHeading);
- const resultsSection=$('highlightResultsSection');
- if(resultsSection?.parentNode)resultsSection.parentNode.insertBefore(settingsCard,resultsSection);
- settingsCard.appendChild(recognitionSettings);
- recognitionSettings.dataset.moved='true';
+// Stable tab strip: the three controls never move when their content changes.
+const disclosureRoot=$('analysisDisclosures');
+const disclosureIds=['aiHistoryBox','audioDiagnostics','transcriptBox'];
+const disclosureTabs=document.createElement('div');disclosureTabs.className='analysis-disclosure-tabs';disclosureTabs.setAttribute('role','tablist');disclosureTabs.setAttribute('aria-label','Analysis information');
+const disclosureContent=document.createElement('div');disclosureContent.className='analysis-disclosure-content';disclosureContent.hidden=true;
+const disclosureRecords=[];
+disclosureIds.forEach((id,index)=>{
+ const details=$(id),summary=details.querySelector('summary'),content=details.querySelector('.disclosure-content');
+ const button=document.createElement('button');button.type='button';button.className='analysis-disclosure-tab';button.textContent=summary.textContent.trim();button.setAttribute('role','tab');button.setAttribute('aria-selected','false');button.id=id+'Tab';button.setAttribute('aria-controls','analysisDisclosureContent');
+ details.hidden=true;details.open=false;disclosureTabs.appendChild(button);
+ const record={details,content,button,id,index};disclosureRecords.push(record);
+ button.addEventListener('click',()=>{
+  const wasActive=button.getAttribute('aria-selected')==='true';
+  disclosureRecords.forEach(item=>{item.button.setAttribute('aria-selected','false');item.details.open=false;});
+  if(wasActive){disclosureContent.hidden=true;disclosureContent.replaceChildren();return;}
+  button.setAttribute('aria-selected','true');details.open=true;disclosureContent.replaceChildren(content);disclosureContent.hidden=false;
+ });
+});
+disclosureContent.id='analysisDisclosureContent';disclosureContent.setAttribute('role','tabpanel');
+disclosureRoot.replaceChildren(disclosureTabs,disclosureContent);
+// Keep transcript reading as two swipeable, independently scrollable pages.
+const transcriptContent=$('transcriptBox').querySelector('.disclosure-content');
+if(transcriptContent){
+ const nodes=[...transcriptContent.children];
+ const fullCard=document.createElement('section');fullCard.className='transcript-page transcript-full-page';
+ const timedCard=document.createElement('section');timedCard.className='transcript-page transcript-timed-page';
+ const headings=nodes.filter(x=>x.classList.contains('transcript-heading'));
+ const fullHeading=headings[0],timedHeading=headings[1];
+ const tools=nodes.find(x=>x.classList.contains('transcript-tools'));
+ const full=nodes.find(x=>x.id==='transcriptFull');
+ const note=nodes.find(x=>x.classList.contains('transcript-note'));
+ const timed=nodes.find(x=>x.id==='transcript');
+ [fullHeading,tools,full].filter(Boolean).forEach(x=>fullCard.appendChild(x));
+ [timedHeading,note,timed].filter(Boolean).forEach(x=>timedCard.appendChild(x));
+ const rail=document.createElement('div');rail.className='transcript-horizontal-rail';rail.setAttribute('aria-label','Swipe between full transcript and timestamped segments');
+ rail.append(fullCard,timedCard);transcriptContent.replaceChildren(rail);
 }
 
 function enhanceSelect(select){
@@ -727,26 +778,6 @@ function drawCropPreview(){const c=$('cropPreviewCanvas');if(!c||!video.videoWid
 video.addEventListener('loadeddata',()=>{drawCropPreview();$('previewTools').classList.remove('hidden');});
 video.addEventListener('timeupdate',drawCropPreview);
 document.querySelectorAll('input[name="shape"]').forEach(x=>x.addEventListener('change',drawCropPreview));
-function currentVideoSecond(){
- if(!video||!Number.isFinite(video.currentTime)||!Number.isFinite(duration)||duration<=0)return null;
- return Math.max(0,Math.min(duration,video.currentTime));
-}
-$('setStartNow').addEventListener('click',()=>{
- const now=currentVideoSecond();if(now===null){exportStatus('Select a video and wait for it to finish loading first.');return;}
- if(now>=duration-.05){exportStatus('The playhead is at the end of the video. Move it earlier to set a valid start.');return;}
- const end=parseClipTime($('end').value);
- setClockValue('start',now);
- if(!Number.isFinite(end)||end<=now)setClockValue('end',duration);
- exportStatus('Clip start set to '+fmt(now)+' from the video playhead.');
-});
-$('setEndNow').addEventListener('click',()=>{
- const now=currentVideoSecond();if(now===null){exportStatus('Select a video and wait for it to finish loading first.');return;}
- if(now<=0){exportStatus('Move the video playhead forward before setting the clip end.');return;}
- const start=parseClipTime($('start').value);
- if(Number.isFinite(start)&&now<=start)setClockValue('start',0);
- setClockValue('end',now);
- exportStatus('Clip end set to '+fmt(now)+' from the video playhead.');
-});
 $('resetClipTimes').addEventListener('click',()=>{
  if(!Number.isFinite(duration)||duration<=0){exportStatus('Select a video and wait for it to finish loading first.');return;}
  setClockValue('start',0);setClockValue('end',duration);
@@ -985,7 +1016,7 @@ function stopTranscriptionClock(success){
 }
 
 const exportStatus=t=>$('exportStatus').textContent=t;
-const disclosureIds=['aiHistoryBox','audioDiagnostics','transcriptBox'];disclosureIds.forEach(id=>$(id).addEventListener('toggle',()=>{const current=$(id);if(!current.open)return;disclosureIds.filter(other=>other!==id).forEach(other=>{if($(other).open)$(other).open=false;});}));
+
 function fmt(s){s=Math.max(0,Number(s)||0);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0')}
 function parseClipTime(value){
  const v=String(value||'').trim();
