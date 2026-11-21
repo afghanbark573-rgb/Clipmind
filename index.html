@@ -2423,7 +2423,31 @@ function showSuggestions(items){
   preview.onclick=async()=>{if(!updateTimes())return;try{activeHighlightPreviewStart=g.start;activeHighlightPreviewEnd=g.end;previewFinished=false;video.pause();await seekVideo(g.start);updatePreviewTimer();await video.play();exportStatus('Previewing highlight '+(i+1)+' · '+fmt(g.start)+'–'+fmt(g.end)+'.');}catch(e){activeHighlightPreviewStart=null;activeHighlightPreviewEnd=null;updatePreviewTimer();exportStatus('Could not preview this moment: '+(e.message||String(e)));}};
   const use=document.createElement('button');use.type='button';use.textContent='Use for clip';
   use.onclick=()=>{if(!updateTimes())return;setClockValue('start',g.start);setClockValue('end',g.end);exportStatus('Highlight '+(i+1)+' selected. Choose output shape and create your clip.');$('start').scrollIntoView({behavior:'smooth',block:'center'});};
-  actions.append(preview,use);body.append(reason,para,edit,times,actions);details.append(summary,body);div.append(top,details);carousel.appendChild(div);
+  const copy=document.createElement('button');copy.type='button';copy.textContent='📋 Copy highlight details';
+  const copyStatus=document.createElement('span');copyStatus.className='note';copyStatus.setAttribute('aria-live','polite');
+  copy.onclick=async()=>{
+   if(!updateTimes()){copyStatus.textContent='Correct the start and end times before copying.';return;}
+   const report=[
+    'CLIPMIND HIGHLIGHT '+String(i+1).padStart(2,'0'),
+    'Category: '+story.type,
+    'Title: '+story.title,
+    'Start: '+fmt(g.start),
+    'End: '+fmt(g.end),
+    'Duration: '+(g.end-g.start).toFixed(2)+' seconds',
+    'Why it stands out: '+story.reason,
+    'AI suggested range: '+fmt(g.suggestedStart)+' – '+fmt(g.suggestedEnd),
+    'Current edited range: '+fmt(g.start)+' – '+fmt(g.end),
+    'Source video: '+(selectedFile?.name||'Not available'),
+    '',
+    'FULL PASSAGE',
+    g.text||para.textContent||''
+   ].join('\\n');
+   copy.disabled=true;copyStatus.textContent='Copying…';
+   try{await copyDiagnosticText(report);copyStatus.textContent='Copied highlight '+(i+1)+'. Paste it wherever needed.';}
+   catch(error){copyStatus.textContent='Copy failed. Check browser clipboard permission and try again.';}
+   finally{copy.disabled=false;}
+  };
+  actions.append(preview,use,copy);body.append(reason,para,edit,times,actions,copyStatus);details.append(summary,body);div.append(top,details);carousel.appendChild(div);
  });
  host.appendChild(carousel);$('batchControls').style.display='flex';
 }
