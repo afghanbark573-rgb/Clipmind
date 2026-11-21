@@ -238,6 +238,49 @@ button,input,select{font:inherit}button{touch-action:manipulation}
 .readiness-content .readiness-report{max-width:100%;box-sizing:border-box}
 @media(max-width:390px){.highlight-preview-card{grid-template-columns:30px minmax(0,1fr) auto;gap:7px;padding:8px}.highlight-preview-title{font-size:11px}.highlight-detail-card{flex-basis:92%}}
 
+
+/* Mobile space pass: paired actions, page-like previews and single-open disclosures. */
+.ai-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:9px;min-width:0}
+.ai-action-grid>button{width:100%;min-width:0;min-height:44px;height:auto;margin:0;padding:8px 7px;border-radius:10px;font-size:12px;line-height:1.25;overflow-wrap:anywhere}
+.ai-action-grid:not(:has(>button:not(.hidden)~button:not(.hidden)))>button:not(.hidden){grid-column:1/-1}
+.batch-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.batch-row button{width:100%;min-width:0;min-height:44px;height:auto;margin:0;padding:8px 7px;font-size:13px;line-height:1.2;border-radius:10px}
+.analysis-disclosures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:9px;align-items:start;min-width:0}
+#analysisDisclosures>details{min-width:0;margin:0!important;align-self:start}
+#analysisDisclosures>details>summary{display:flex;align-items:center;min-height:46px;padding:8px 7px;gap:5px;font-size:10px!important;line-height:1.25;overflow-wrap:anywhere}
+#analysisDisclosures>details>summary::after{flex:0 0 6px;width:6px;height:6px}
+#analysisDisclosures>details[open]{grid-column:1/-1}
+#analysisDisclosures>details[open]>summary{min-height:44px;padding:10px 12px;font-size:12px!important}
+.highlight-preview-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}
+.highlight-preview-card{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr) auto;grid-template-rows:auto 1fr;align-items:center;gap:7px;min-height:112px;padding:9px;border-radius:11px;background:#202020;box-shadow:inset 0 0 0 1px #303030}
+.highlight-preview-card:only-child{grid-column:1/-1}
+.highlight-preview-number{grid-column:1;grid-row:1;width:28px;height:28px}
+.highlight-preview-copy{grid-column:1/-1;grid-row:2;align-self:start}
+.highlight-preview-title{font-size:12px;line-height:1.3}
+.highlight-preview-meta{font-size:10px;line-height:1.35;overflow-wrap:anywhere}
+.highlight-preview-batch{grid-column:3;grid-row:1;font-size:9px;gap:4px}
+.highlight-preview-batch input{width:16px;height:16px}
+.highlight-details-toggle{width:100%;min-height:42px;margin:3px 0 8px;padding:8px 10px;font-size:13px;line-height:1.2}
+.highlight-details-panel{gap:8px;padding:0;margin:0 0 8px;scroll-padding:0}
+.highlight-detail-card{flex:0 0 100%;width:100%;max-width:100%;padding:11px;margin:0;scroll-snap-align:start}
+.highlight-detail-card .suggestion-body{margin-top:8px;padding-top:7px}
+.highlight-detail-card .suggestion-body>p{font-size:12px;line-height:1.42;margin:6px 0}
+.highlight-detail-card .suggestion-edit{margin-top:9px;column-gap:8px;row-gap:6px}
+.highlight-detail-card .suggestion-edit label{gap:5px;font-size:10px}
+.highlight-detail-card .suggestion-time-input{height:39px;min-height:39px;font-size:15px!important}
+.highlight-detail-card .suggestion-time-summary{margin-top:8px;gap:6px}
+.highlight-detail-card .suggestion-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:9px}
+.highlight-detail-card .suggestion-actions button{width:100%;min-width:0;min-height:38px;height:auto;margin:0;padding:7px 4px;font-size:11px;line-height:1.15;white-space:nowrap}
+.highlight-detail-card .suggestion-actions .note{font-size:10px;line-height:1.3}
+@media(max-width:380px){
+ .analysis-disclosures{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+ #analysisDisclosures>details>summary{padding:7px 5px;font-size:9px!important}
+ .highlight-preview-card{min-height:118px;padding:8px}
+ .highlight-detail-card{padding:10px}
+ .highlight-detail-card .suggestion-actions{gap:4px}
+ .highlight-detail-card .suggestion-actions button{font-size:10px;padding:7px 2px}
+}
+
 </style></head>
 <body>
 <header><div class="logo">▶</div><div><strong>ClipMind</strong><small>Your private video clip studio</small></div></header>
@@ -315,10 +358,12 @@ button,input,select{font:inherit}button{touch-action:manipulation}
 <option value="tiny">Whisper Tiny · faster, lighter</option>
 </select></label>
 <p class="help" style="margin-top:7px">Base is an accuracy experiment for English. It downloads a larger model and may take longer on your phone. Tiny remains available if Base is too slow.</p>
+<div id="aiActionGrid" class="ai-action-grid">
 <button id="analyze" class="primary" disabled>✨ Prepare AI tools</button>
 <button id="fastRead" class="secondary hidden">⚡ Extract audio and find highlights</button>
 <button id="firstPassTest" class="secondary hidden">🧪 Run reconciliation diagnostic + audio review</button>
 <button id="startRead" class="secondary hidden">▶ Use real-time fallback instead</button>
+</div>
 <div class="progress-head hidden" id="aiProgressHead"><span id="aiProgressLabel">Waiting for analysis</span><strong id="aiProgressPct">0%</strong></div>
 <progress id="aiProgress" class="hidden" value="0" max="100" aria-label="Current processing stage progress"></progress>
 <p id="aiProgressNote" class="progress-note hidden">Percentages describe the current stage, not an estimated time remaining.</p>
@@ -327,8 +372,19 @@ button,input,select{font:inherit}button{touch-action:manipulation}
  <div class="clock-metric"><span class="clock-label">ESTIMATED TOTAL TIME</span><strong id="transcriptionEstimate">Calculating…</strong><span id="transcriptionEstimateNote" class="clock-state">Estimate includes a 60-second buffer</span></div>
 </div>
 <p id="aiStatus" class="status" role="status" aria-live="polite">Select a video to begin.</p>
-<details id="aiHistoryBox" style="margin-top:8px"><summary style="font-size:12px;color:#cbd5e1">Recent progress steps</summary><ol id="aiHistory"><li>Waiting to start.</li></ol></details>
-<details id="audioDiagnostics" style="margin-top:8px"><summary style="font-size:12px;color:#cbd5e1">Audio & transcription diagnostics</summary><button id="copyDiagnostics" class="secondary" type="button" style="margin:10px 0 7px">📋 Copy full report</button><p id="copyDiagnosticsStatus" class="help" aria-live="polite" style="margin:0 2px 7px"></p><div id="diagnosticCopySections" class="hidden" style="margin:8px 0 10px;padding:10px;background:#101a2a;border:1px solid #2a3850;border-radius:10px"><p id="diagnosticReportCount" class="help" style="margin:0 0 8px"></p><div id="diagnosticCopyButtons" style="display:grid;grid-template-columns:1fr 1fr;gap:7px"></div></div><pre id="audioDiagnosticsText" style="white-space:pre-wrap;overflow-wrap:anywhere;color:#a7b3c7;background:#101a2a;padding:10px;border-radius:9px;font-size:11px;line-height:1.5">Diagnostics will appear after an analysis attempt.</pre></details>
+<div id="analysisDisclosures" class="analysis-disclosures">
+<details id="aiHistoryBox"><summary style="font-size:12px;color:#cbd5e1">Recent progress</summary><ol id="aiHistory"><li>Waiting to start.</li></ol></details>
+<details id="audioDiagnostics" style="margin-top:8px"><summary style="font-size:12px;color:#cbd5e1">Audio diagnostics</summary><button id="copyDiagnostics" class="secondary" type="button" style="margin:10px 0 7px">📋 Copy full report</button><p id="copyDiagnosticsStatus" class="help" aria-live="polite" style="margin:0 2px 7px"></p><div id="diagnosticCopySections" class="hidden" style="margin:8px 0 10px;padding:10px;background:#101a2a;border:1px solid #2a3850;border-radius:10px"><p id="diagnosticReportCount" class="help" style="margin:0 0 8px"></p><div id="diagnosticCopyButtons" style="display:grid;grid-template-columns:1fr 1fr;gap:7px"></div></div><pre id="audioDiagnosticsText" style="white-space:pre-wrap;overflow-wrap:anywhere;color:#a7b3c7;background:#101a2a;padding:10px;border-radius:9px;font-size:11px;line-height:1.5">Diagnostics will appear after an analysis attempt.</pre></details>
+<details id="transcriptBox" class="hidden">
+<summary style="font-size:13px;color:#cbd5e1">View full transcript</summary>
+<div class="transcript-heading">FULL RECOGNIZED TEXT</div>
+<div class="transcript-tools"><button id="copyFullTranscript" class="secondary" type="button">📋 Copy full transcript</button><span id="transcriptCopyStatus" class="note" aria-live="polite"></span></div>
+<div id="transcriptFull" class="transcript-full">The full recognized text will appear here.</div>
+<div class="transcript-heading">TIMESTAMPED SEGMENTS</div>
+<p class="transcript-note">Tap a timestamp to jump to that phrase. The phrase currently under playback is highlighted; alignment is phrase-level, not word-level. Timestamped segments may be sparser than the full text when the speech model does not return a time for every phrase.</p>
+<div id="transcript" class="transcript"></div>
+</details>
+</div>
 <section id="overlapReview" class="review-panel hidden" aria-live="polite">
  <h2>Overlap listening audit</h2>
  <p class="help">Run the full comparison diagnostic again when needed. Production now tries the built-in long-audio pipeline first and uses manual windows only as a recovery fallback. The diagnostic remains separate and does not change production transcription or highlights.</p>
@@ -354,16 +410,8 @@ button,input,select{font:inherit}button{touch-action:manipulation}
  </div>
 </section>
 <div id="results"></div>
-<div class="batch-row" id="batchControls" style="margin-top:10px;display:none"><button id="createSelected" class="primary" type="button">Create selected clips</button><button id="selectAll" class="secondary" type="button">Select all</button></div>
-<details id="transcriptBox" class="hidden" style="margin-top:13px">
-<summary style="font-size:13px;color:#cbd5e1">View full transcript</summary>
-<div class="transcript-heading">FULL RECOGNIZED TEXT</div>
-<div class="transcript-tools"><button id="copyFullTranscript" class="secondary" type="button">📋 Copy full transcript</button><span id="transcriptCopyStatus" class="note" aria-live="polite"></span></div>
-<div id="transcriptFull" class="transcript-full">The full recognized text will appear here.</div>
-<div class="transcript-heading">TIMESTAMPED SEGMENTS</div>
-<p class="transcript-note">Tap a timestamp to jump to that phrase. The phrase currently under playback is highlighted; alignment is phrase-level, not word-level. Timestamped segments may be sparser than the full text when the speech model does not return a time for every phrase.</p>
-<div id="transcript" class="transcript"></div>
-</details>
+<div class="batch-row" id="batchControls" style="margin-top:10px;display:none"><button id="createSelected" class="primary" type="button" aria-label="Create selected clips">Create selected</button><button id="selectAll" class="secondary" type="button">Select all</button></div>
+
 </section>
 
 <section class="card">
@@ -2456,7 +2504,7 @@ function showSuggestions(items){
   const preview=document.createElement('button');preview.type='button';preview.textContent='▶ Preview';
   preview.onclick=async()=>{if(!updateTimes())return;try{activeHighlightPreviewStart=g.start;activeHighlightPreviewEnd=g.end;previewFinished=false;video.pause();await seekVideo(g.start);updatePreviewTimer();await video.play();exportStatus('Previewing highlight '+(i+1)+' · '+fmt(g.start)+'–'+fmt(g.end)+'.');}catch(e){activeHighlightPreviewStart=null;activeHighlightPreviewEnd=null;updatePreviewTimer();exportStatus('Could not preview this moment: '+(e.message||String(e)));}};
   const use=document.createElement('button');use.type='button';use.textContent='Use for clip';use.onclick=()=>{if(!updateTimes())return;setClockValue('start',g.start);setClockValue('end',g.end);exportStatus('Highlight '+(i+1)+' selected. Choose output shape and create your clip.');$('start').scrollIntoView({behavior:'smooth',block:'center'});};
-  const copy=document.createElement('button');copy.type='button';copy.textContent='📋 Copy highlight details';
+  const copy=document.createElement('button');copy.type='button';copy.textContent='Copy';copy.setAttribute('aria-label','Copy highlight details');copy.title='Copy highlight details';
   const copyStatus=document.createElement('span');copyStatus.className='note';copyStatus.setAttribute('aria-live','polite');
   copy.onclick=async()=>{if(!updateTimes()){copyStatus.textContent='Correct the start and end times before copying.';return;}
    const report=['CLIPMIND HIGHLIGHT '+String(i+1).padStart(2,'0'),'Category: '+story.type,'Title: '+story.title,'Start: '+fmt(g.start),'End: '+fmt(g.end),'Duration: '+(g.end-g.start).toFixed(2)+' seconds','Why it stands out: '+story.reason,'AI suggested range: '+fmt(g.suggestedStart)+' – '+fmt(g.suggestedEnd),'Current edited range: '+fmt(g.start)+' – '+fmt(g.end),'Source video: '+(selectedFile?.name||'Not available'),'','FULL PASSAGE',para.textContent||g.text||''].join('\n');
@@ -2464,9 +2512,9 @@ function showSuggestions(items){
   };
   actions.append(preview,use,copy);body.append(reason,para,edit,times,actions,copyStatus);div.append(detailTop,heading,detailMeta,body);panel.appendChild(div);
  });
- host.append(previewList,toggle,panel);
- toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);toggle.setAttribute('aria-expanded',String(opening));toggle.textContent=opening?'Hide all highlights ('+items.length+')':'Show all highlights ('+items.length+')';if(opening)panel.scrollIntoView({behavior:'smooth',block:'nearest'});});
- $('batchControls').style.display='flex';
+ host.append(panel,previewList,toggle);
+ toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);previewList.classList.toggle('hidden',opening);toggle.setAttribute('aria-expanded',String(opening));toggle.textContent=opening?'Hide all highlights ('+items.length+')':'Show all highlights ('+items.length+')';if(opening)panel.scrollIntoView({behavior:'smooth',block:'nearest'});});
+ $('batchControls').style.display='grid';
 }
 document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{
  if(!duration)return;const parsed=parseClipTime($('start').value);
@@ -2623,6 +2671,12 @@ $('selectAll').onclick=()=>{
  const checks=[...document.querySelectorAll('.suggestion-check')];const all=checks.length&&checks.every(c=>c.checked);
  checks.forEach(c=>c.checked=!all);$('selectAll').textContent=all?'Select all':'Clear selection';
 };
+
+
+const analysisDisclosurePanels=[$('aiHistoryBox'),$('audioDiagnostics'),$('transcriptBox')];
+analysisDisclosurePanels.forEach(panel=>panel.addEventListener('toggle',()=>{
+ if(panel.open)analysisDisclosurePanels.forEach(other=>{if(other!==panel)other.open=false;});
+}));
 
 </script>
 </body></html>
