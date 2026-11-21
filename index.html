@@ -493,7 +493,7 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 
 <section class="card recognition-settings-card">
 <h2>2. Recognition settings</h2>
-<div class="ai-recognition-settings"><div class="ai-settings-heading">Recognition settings</div>
+<div class="ai-recognition-settings">
 <label class="field" style="display:block;margin-top:12px">SPOKEN LANGUAGE
 <select id="language" aria-label="Spoken language">
 <option value="english" selected>English</option>
@@ -589,10 +589,10 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 <h2>5. Create your clips</h2><p class="help">Choose a highlight above, adjust its boundaries if needed, and export one clip or a batch. Exports run one at a time.</p>
 <div class="clip-time-grid">
 <label class="clip-time-field" for="start">START (MM:SS)
-<input id="start" class="clip-time-input" type="text" inputmode="text" maxlength="5" autocomplete="off" value="00:00" placeholder="MM:SS" aria-label="Clip start time">
+<input id="start" class="clip-time-input" type="text" inputmode="numeric" maxlength="5" autocomplete="off" value="00:00" placeholder="MM:SS" aria-label="Clip start time">
 </label>
 <label class="clip-time-field" for="end">END (MM:SS)
-<input id="end" class="clip-time-input" type="text" inputmode="text" maxlength="5" autocomplete="off" value="00:30" placeholder="MM:SS" aria-label="Clip end time">
+<input id="end" class="clip-time-input" type="text" inputmode="numeric" maxlength="5" autocomplete="off" value="00:30" placeholder="MM:SS" aria-label="Clip end time">
 </label>
 </div>
 <p class="help clip-time-help">Enter minutes and seconds as MM:SS. You can edit either field directly.</p>
@@ -1133,6 +1133,12 @@ function initClockEditors(root=document){
  });
 }
 initClockEditors();
+document.querySelectorAll('.clip-time-input').forEach(field=>{
+ field.addEventListener('blur',()=>{
+  const parsed=parseClipTime(field.value);
+  if(Number.isFinite(parsed)&&parsed>=0)field.value=fmt(parsed);
+ });
+});
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 $('choose').addEventListener('click',()=>{
  try{
