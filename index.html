@@ -184,10 +184,6 @@ button,input,select{font:inherit}button{touch-action:manipulation}
 .highlight-carousel{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 12px;scroll-snap-type:x mandatory;scroll-padding:2px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;}
 .highlight-carousel::-webkit-scrollbar{height:5px}.highlight-carousel::-webkit-scrollbar-thumb{background:#555;border-radius:8px}
 .suggestion{flex:0 0 min(86vw,360px);min-width:0;scroll-snap-align:start;padding:12px;background:#242424;border-color:#484848}
-.suggestion-summary{list-style:none;cursor:pointer;display:block;min-width:0}
-.suggestion-summary::-webkit-details-marker{display:none}
-.suggestion-summary:after{content:'＋ Open details';display:block;color:#f59e45;font-size:10px;font-weight:750;margin-top:8px}
-.suggestion-details[open]>.suggestion-summary:after{content:'− Close details'}
 .suggestion-topline{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:7px}
 .suggestion-summary .tag{min-width:0}.suggestion-summary .moment-type{margin-left:5px}
 .suggestion-heading{font-size:14px;font-weight:800;line-height:1.35;overflow-wrap:anywhere;margin:0 0 7px}
@@ -199,7 +195,6 @@ button,input,select{font:inherit}button{touch-action:manipulation}
 .suggestion-body>p:not(.suggestion-reason){font-size:12px;color:#cfcfcf;line-height:1.5}
 .suggestion-details[open] .suggestion-body{animation:highlightReveal .14s ease-out}
 @keyframes highlightReveal{from{opacity:.65;transform:translateY(-2px)}to{opacity:1;transform:translateY(0)}}
-@media(min-width:700px){.highlight-carousel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible;padding:2px}.suggestion{width:auto;min-width:0;flex:auto;scroll-snap-align:none}}
 .highlight-details-toggle{width:100%;margin-top:2px;text-align:center;font-weight:800}
 .highlight-details-panel{display:grid;gap:10px;padding-top:4px}
 .highlight-details-heading{font-size:15px;margin:4px 2px;color:#f5f5f5}
@@ -2457,7 +2452,7 @@ function showSuggestions(items){
     'Why it stands out: '+story.reason,'AI suggested range: '+fmt(g.suggestedStart)+' – '+fmt(g.suggestedEnd),
     'Current edited range: '+fmt(g.start)+' – '+fmt(g.end),'Source video: '+(selectedFile?.name||'Not available'),
     '','FULL PASSAGE',g.text||para.textContent||''
-   ].join('\\n');
+   ].join('\n');
    copy.disabled=true;copyStatus.textContent='Copying…';
    try{await copyDiagnosticText(report);copyStatus.textContent='Copied highlight '+(i+1)+'. Paste it wherever needed.';}
    catch(error){copyStatus.textContent='Copy failed. Check browser clipboard permission and try again.';}
