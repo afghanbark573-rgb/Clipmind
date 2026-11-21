@@ -205,6 +205,39 @@ button,input,select{font:inherit}button{touch-action:manipulation}
 .highlight-card-hint{font-size:10px;color:#f59e45;margin:auto 0 0;line-height:1.4}
 @media(max-width:360px){.transcription-clock{gap:6px}.clock-metric{padding:9px}.clock-metric strong{font-size:18px}.suggestion{flex-basis:88vw}}
 
+/* Compact highlight browsing and consistent full-width content alignment */
+.highlight-preview-list{display:grid;gap:7px;margin:8px 0 10px;min-width:0;width:100%}
+.highlight-preview-card{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:9px;width:100%;min-width:0;padding:9px 10px;border:1px solid #414141;border-radius:10px;background:#202020}
+.highlight-preview-number{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:#49331f;color:#ffc27d;font-size:11px;font-weight:850}
+.highlight-preview-copy{min-width:0}
+.highlight-preview-title{font-size:12px;font-weight:800;line-height:1.3;overflow-wrap:anywhere}
+.highlight-preview-meta{font-size:10px;color:#aaa;margin-top:3px;font-variant-numeric:tabular-nums}
+.highlight-preview-batch{display:flex;align-items:center;gap:5px;font-size:10px;color:#aaa;white-space:nowrap}
+.highlight-preview-batch input{width:17px;height:17px;accent-color:var(--accent)}
+.highlight-details-toggle{margin:2px 0 8px}
+.highlight-details-panel{display:flex;gap:10px;width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;padding:3px 2px 12px;scroll-snap-type:x mandatory;scroll-padding:2px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.highlight-details-panel::-webkit-scrollbar{height:5px}
+.highlight-details-panel::-webkit-scrollbar-thumb{background:#555;border-radius:8px}
+.highlight-detail-card{flex:0 0 min(88%,520px);width:auto;max-width:100%;min-width:0;scroll-snap-align:start;overflow:hidden}
+.highlight-detail-card .suggestion-body{width:100%;min-width:0;margin-left:0;margin-right:0}
+.highlight-detail-card .suggestion-body>p{max-width:100%;overflow-wrap:anywhere;white-space:pre-wrap}
+.highlight-detail-card .suggestion-edit,.highlight-detail-card .suggestion-time-summary,.highlight-detail-card .suggestion-actions{width:100%;min-width:0}
+.highlight-detail-card .suggestion-actions button{min-width:0}
+#results{width:100%;min-width:0;overflow:hidden}
+.highlight-note{margin:6px 1px 8px}
+#transcriptBox{width:100%;max-width:100%;min-width:0}
+#transcriptBox>.transcript-heading,#transcriptBox>.transcript-tools,#transcriptBox>.transcript-full,#transcriptBox>.transcript-note,#transcriptBox>.transcript{display:block;width:auto;max-width:calc(100% - 20px);min-width:0;box-sizing:border-box}
+#transcriptBox>.transcript-full,#transcriptBox>.transcript{overflow-x:hidden;overflow-wrap:anywhere}
+.readiness-panel{padding:0;overflow:hidden}
+.readiness-summary{display:flex;align-items:center;gap:9px;min-height:44px;padding:10px 12px;list-style:none;cursor:pointer;background:#292929}
+.readiness-summary::-webkit-details-marker{display:none}
+.readiness-summary::marker{content:''}
+.readiness-summary::after{content:'';display:block;flex:0 0 7px;width:7px;height:7px;margin-left:auto;border-right:1.5px solid #a3a3a3;border-bottom:1.5px solid #a3a3a3;transform:rotate(45deg) translateY(-1px);transition:transform .18s ease,border-color .18s ease}
+.readiness-panel[open] .readiness-summary::after{transform:rotate(225deg) translateY(-1px);border-color:#f59e45}
+.readiness-content{padding:10px 12px 12px}
+.readiness-content .readiness-report{max-width:100%;box-sizing:border-box}
+@media(max-width:390px){.highlight-preview-card{grid-template-columns:30px minmax(0,1fr) auto;gap:7px;padding:8px}.highlight-preview-title{font-size:11px}.highlight-detail-card{flex-basis:92%}}
+
 </style></head>
 <body>
 <header><div class="logo">▶</div><div><strong>ClipMind</strong><small>Your private video clip studio</small></div></header>
@@ -227,14 +260,15 @@ button,input,select{font:inherit}button{touch-action:manipulation}
  <div class="preview-timer-meta"><span id="previewOriginalStart">Video 00:00</span><span id="previewOriginalNow">Position 00:00</span><span id="previewOriginalEnd">End 00:00</span></div>
 </div>
 <p id="duration" class="status">No video selected.</p>
-<div id="readinessPanel" class="readiness-panel hidden" aria-live="polite">
- <div class="readiness-head"><strong>Device & browser readiness</strong><span id="readinessState">Not checked</span></div>
- <p id="readinessSummary" class="help" style="margin:5px 0 9px">Run a quick check before loading AI tools or processing a video.</p>
- <pre id="readinessReport" class="readiness-report">No readiness report yet.</pre>
- <div class="readiness-actions"><button id="runReadiness" class="secondary" type="button">↻ Run readiness check</button><button id="copyReadiness" class="secondary" type="button">Copy report</button></div>
- <p id="readinessCopyStatus" class="help" aria-live="polite" style="margin:7px 1px 0"></p>
-</div>
-</section>
+<details id="readinessPanel" class="readiness-panel hidden">
+ <summary class="readiness-summary"><strong>Device & browser readiness</strong><span id="readinessState">Not checked</span></summary>
+ <div class="readiness-content">
+  <p id="readinessSummary" class="help" style="margin:5px 0 9px">Run a quick check before loading AI tools or processing a video.</p>
+  <pre id="readinessReport" class="readiness-report">No readiness report yet.</pre>
+  <div class="readiness-actions"><button id="runReadiness" class="secondary" type="button">↻ Run readiness check</button><button id="copyReadiness" class="secondary" type="button">Copy report</button></div>
+  <p id="readinessCopyStatus" class="help" aria-live="polite" style="margin:7px 1px 0"></p>
+ </div>
+</details>
 
 <section class="card">
 <h2>2. AI highlight finder</h2>
@@ -2372,36 +2406,23 @@ function enhanceDynamicClockInput(input){
 }
 
 function showSuggestions(items){
- const host=$('results');host.innerHTML='';
- window.clipMindSuggestions=items;
+ const host=$('results');host.innerHTML='';window.clipMindSuggestions=items;
  $('selectAll').textContent='Select all';$('batchControls').style.display='none';
  if(!items.length){host.innerHTML='<p class="status">No reliable timestamped highlights were available. ClipMind will not estimate clip times from transcript length. You can still review the transcript and set clip times manually below.</p>';return;}
- const note=document.createElement('p');note.className='status highlight-note';
- note.textContent='Swipe horizontally to browse highlights. Open the single details panel below to review explanations, passages and editing controls for every highlight.';
- host.appendChild(note);
- const carousel=document.createElement('div');carousel.className='highlight-carousel';carousel.setAttribute('aria-label','Suggested highlights. Swipe horizontally on mobile.');
- const toggle=document.createElement('button');toggle.type='button';toggle.className='secondary highlight-details-toggle';toggle.textContent='View all highlights & details ('+items.length+')';
- toggle.setAttribute('aria-expanded','false');
+ const note=document.createElement('p');note.className='status highlight-note';note.textContent='Highlights are shown as compact cards. Tap “Show all highlights” to browse full details horizontally.';host.appendChild(note);
+ const previewList=document.createElement('div');previewList.className='highlight-preview-list';previewList.setAttribute('aria-label','Compact highlight list');
+ const toggle=document.createElement('button');toggle.type='button';toggle.className='secondary highlight-details-toggle';toggle.textContent='Show all highlights ('+items.length+')';toggle.setAttribute('aria-expanded','false');
  const panel=document.createElement('section');panel.className='highlight-details-panel hidden';panel.setAttribute('aria-label','All highlight details');
- const detailHeading=document.createElement('h3');detailHeading.className='highlight-details-heading';detailHeading.textContent='All highlights & details';
- panel.appendChild(detailHeading);
  items.forEach((g,i)=>{
-  const story=highlightStory(g.text);
-  g.suggestedStart=Number.isFinite(g.suggestedStart)?g.suggestedStart:g.start;
-  g.suggestedEnd=Number.isFinite(g.suggestedEnd)?g.suggestedEnd:g.end;g.story=story;
-  const card=document.createElement('article');card.className='suggestion highlight-compact-card';
-  const top=document.createElement('div');top.className='suggestion-topline';
-  const tag=document.createElement('div');tag.className='tag';tag.textContent='HIGHLIGHT '+String(i+1).padStart(2,'0');
-  const type=document.createElement('span');type.className='moment-type';type.textContent=story.type;tag.appendChild(type);
-  const selectLabel=document.createElement('label');selectLabel.className='suggestion-batch';
+  const story=highlightStory(g.text);g.suggestedStart=Number.isFinite(g.suggestedStart)?g.suggestedStart:g.start;g.suggestedEnd=Number.isFinite(g.suggestedEnd)?g.suggestedEnd:g.end;g.story=story;
+  const compact=document.createElement('article');compact.className='highlight-preview-card';
+  const number=document.createElement('span');number.className='highlight-preview-number';number.textContent=String(i+1).padStart(2,'0');
+  const copyText=document.createElement('div');copyText.className='highlight-preview-copy';
+  const title=document.createElement('div');title.className='highlight-preview-title';title.textContent=story.title;
+  const meta=document.createElement('div');meta.className='highlight-preview-meta';meta.textContent=story.type+' · '+fmt(g.start)+'–'+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';copyText.append(title,meta);
+  const batchLabel=document.createElement('label');batchLabel.className='highlight-preview-batch';
   const check=document.createElement('input');check.type='checkbox';check.className='suggestion-check';check.dataset.index=String(i);check.setAttribute('aria-label','Include highlight '+(i+1)+' in batch');
-  const batchText=document.createElement('span');batchText.textContent='Batch';selectLabel.append(check,batchText);top.append(tag,selectLabel);
-  const title=document.createElement('div');title.className='suggestion-heading';title.textContent=story.title;
-  const meta=document.createElement('div');meta.className='suggestion-meta';meta.textContent=fmt(g.start)+' – '+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';
-  const excerpt=document.createElement('p');excerpt.className='highlight-excerpt';excerpt.textContent=g.text;
-  const hint=document.createElement('p');hint.className='highlight-card-hint';hint.textContent='Full explanation, passage and editing controls are in the details panel below.';
-  card.append(top,title,meta,excerpt,hint);carousel.appendChild(card);
-
+  const batchText=document.createElement('span');batchText.textContent='Batch';batchLabel.append(check,batchText);compact.append(number,copyText,batchLabel);previewList.appendChild(compact);
   const div=document.createElement('article');div.className='suggestion highlight-detail-card';
   const detailTop=document.createElement('div');detailTop.className='suggestion-topline';
   const detailTag=document.createElement('div');detailTag.className='tag';detailTag.textContent='HIGHLIGHT '+String(i+1).padStart(2,'0');
@@ -2421,53 +2442,30 @@ function showSuggestions(items){
   const currentRow=document.createElement('div');currentRow.className='current-range-row';
   const durationText=document.createElement('strong');durationText.className='current-duration';durationText.textContent='Clip length: '+Math.round(g.end-g.start)+' sec';currentRow.append(durationText);times.append(suggestedText,currentRow);
   const updateTimes=()=>{
-   const from=parseClipTime(startInput.value),to=parseClipTime(endInput.value);
-   if(!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<=from||to>duration)return false;
+   const from=parseClipTime(startInput.value),to=parseClipTime(endInput.value);if(!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<=from||to>duration)return false;
    g.start=from;g.end=to;startInput.value=fmt(from);endInput.value=fmt(to);durationText.textContent='Clip length: '+Math.round(to-from)+' sec';
    const relevant=(transcriptChunks||[]).map(c=>{const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);return {start:transcriptRangeStart+(ts?ts[0]:c.start),end:transcriptRangeStart+(ts?ts[1]:c.end),text:(c.text||'').trim()};}).filter(c=>c.text&&Number.isFinite(c.start)&&Number.isFinite(c.end)&&c.end>from&&c.start<to);
    if(relevant.length)para.textContent=relevant.map(c=>c.text).join(' ');
-   meta.textContent=fmt(g.start)+' – '+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';
-   detailMeta.textContent=meta.textContent;
-   const compactMeta=card.querySelector('.suggestion-meta');if(compactMeta)compactMeta.textContent=meta.textContent;
-   const compactExcerpt=card.querySelector('.highlight-excerpt');if(compactExcerpt)compactExcerpt.textContent=para.textContent;
-   return true;
+   detailMeta.textContent=fmt(g.start)+' – '+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';meta.textContent=story.type+' · '+detailMeta.textContent;return true;
   };
   [startInput,endInput].forEach(input=>{
-   input.addEventListener('input',()=>{const from=parseClipTime(startInput.value),to=parseClipTime(endInput.value);if(Number.isFinite(from)&&Number.isFinite(to)&&from>=0&&to>from&&to<=duration){g.start=from;g.end=to;durationText.textContent='Clip length: '+Math.round(to-from)+' sec';detailMeta.textContent=fmt(from)+' – '+fmt(to)+' · '+Math.round(to-from)+' sec';const cm=card.querySelector('.suggestion-meta');if(cm)cm.textContent=detailMeta.textContent;}});
+   input.addEventListener('input',()=>{const from=parseClipTime(startInput.value),to=parseClipTime(endInput.value);if(Number.isFinite(from)&&Number.isFinite(to)&&from>=0&&to>from&&to<=duration){g.start=from;g.end=to;durationText.textContent='Clip length: '+Math.round(to-from)+' sec';detailMeta.textContent=fmt(from)+' – '+fmt(to)+' · '+Math.round(to-from)+' sec';meta.textContent=story.type+' · '+detailMeta.textContent;}});
    input.addEventListener('change',updateTimes);input.addEventListener('blur',updateTimes);
-  });
-  edit.append(startLabel,endLabel);
+  });edit.append(startLabel,endLabel);
   const actions=document.createElement('div');actions.className='suggestion-actions';
   const preview=document.createElement('button');preview.type='button';preview.textContent='▶ Preview';
   preview.onclick=async()=>{if(!updateTimes())return;try{activeHighlightPreviewStart=g.start;activeHighlightPreviewEnd=g.end;previewFinished=false;video.pause();await seekVideo(g.start);updatePreviewTimer();await video.play();exportStatus('Previewing highlight '+(i+1)+' · '+fmt(g.start)+'–'+fmt(g.end)+'.');}catch(e){activeHighlightPreviewStart=null;activeHighlightPreviewEnd=null;updatePreviewTimer();exportStatus('Could not preview this moment: '+(e.message||String(e)));}};
-  const use=document.createElement('button');use.type='button';use.textContent='Use for clip';
-  use.onclick=()=>{if(!updateTimes())return;setClockValue('start',g.start);setClockValue('end',g.end);exportStatus('Highlight '+(i+1)+' selected. Choose output shape and create your clip.');$('start').scrollIntoView({behavior:'smooth',block:'center'});};
+  const use=document.createElement('button');use.type='button';use.textContent='Use for clip';use.onclick=()=>{if(!updateTimes())return;setClockValue('start',g.start);setClockValue('end',g.end);exportStatus('Highlight '+(i+1)+' selected. Choose output shape and create your clip.');$('start').scrollIntoView({behavior:'smooth',block:'center'});};
   const copy=document.createElement('button');copy.type='button';copy.textContent='📋 Copy highlight details';
   const copyStatus=document.createElement('span');copyStatus.className='note';copyStatus.setAttribute('aria-live','polite');
-  copy.onclick=async()=>{
-   if(!updateTimes()){copyStatus.textContent='Correct the start and end times before copying.';return;}
-   const report=[
-    'CLIPMIND HIGHLIGHT '+String(i+1).padStart(2,'0'),'Category: '+story.type,'Title: '+story.title,
-    'Start: '+fmt(g.start),'End: '+fmt(g.end),'Duration: '+(g.end-g.start).toFixed(2)+' seconds',
-    'Why it stands out: '+story.reason,'AI suggested range: '+fmt(g.suggestedStart)+' – '+fmt(g.suggestedEnd),
-    'Current edited range: '+fmt(g.start)+' – '+fmt(g.end),'Source video: '+(selectedFile?.name||'Not available'),
-    '','FULL PASSAGE',para.textContent||g.text||''
-   ].join('\n');
-   copy.disabled=true;copyStatus.textContent='Copying…';
-   try{await copyDiagnosticText(report);copyStatus.textContent='Copied highlight '+(i+1)+'. Paste it wherever needed.';}
-   catch(error){copyStatus.textContent='Copy failed. Check browser clipboard permission and try again.';}
-   finally{copy.disabled=false;}
+  copy.onclick=async()=>{if(!updateTimes()){copyStatus.textContent='Correct the start and end times before copying.';return;}
+   const report=['CLIPMIND HIGHLIGHT '+String(i+1).padStart(2,'0'),'Category: '+story.type,'Title: '+story.title,'Start: '+fmt(g.start),'End: '+fmt(g.end),'Duration: '+(g.end-g.start).toFixed(2)+' seconds','Why it stands out: '+story.reason,'AI suggested range: '+fmt(g.suggestedStart)+' – '+fmt(g.suggestedEnd),'Current edited range: '+fmt(g.start)+' – '+fmt(g.end),'Source video: '+(selectedFile?.name||'Not available'),'','FULL PASSAGE',para.textContent||g.text||''].join('\n');
+   copy.disabled=true;copyStatus.textContent='Copying…';try{await copyDiagnosticText(report);copyStatus.textContent='Copied highlight '+(i+1)+'. Paste it wherever needed.';}catch(error){copyStatus.textContent='Copy failed. Check browser clipboard permission and try again.';}finally{copy.disabled=false;}
   };
-  actions.append(preview,use,copy);body.append(reason,para,edit,times,actions,copyStatus);
-  div.append(detailTop,heading,detailMeta,body);panel.appendChild(div);
+  actions.append(preview,use,copy);body.append(reason,para,edit,times,actions,copyStatus);div.append(detailTop,heading,detailMeta,body);panel.appendChild(div);
  });
- host.append(carousel,toggle,panel);
- toggle.addEventListener('click',()=>{
-  const opening=panel.classList.contains('hidden');
-  panel.classList.toggle('hidden',!opening);
-  toggle.setAttribute('aria-expanded',String(opening));
-  toggle.textContent=opening?'Hide all highlight details ('+items.length+')':'View all highlights & details ('+items.length+')';
- });
+ host.append(previewList,toggle,panel);
+ toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);toggle.setAttribute('aria-expanded',String(opening));toggle.textContent=opening?'Hide all highlights ('+items.length+')':'Show all highlights ('+items.length+')';if(opening)panel.scrollIntoView({behavior:'smooth',block:'nearest'});});
  $('batchControls').style.display='flex';
 }
 document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{
