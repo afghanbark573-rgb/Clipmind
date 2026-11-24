@@ -17,7 +17,7 @@ h1{font-size:29px;line-height:1.12;margin:8px 0}.sub{color:var(--muted);line-hei
 .card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:15px;margin:13px 0}
 h2{font-size:16px;margin:0 0 5px}.help{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 13px}
 .pick{width:100%;border:1px dashed #667799;background:#1b2940;color:white;border-radius:13px;padding:18px 12px;font-size:15px;font-weight:700;min-height:68px}
-#file{position:absolute;left:-10000px;top:auto;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+#file{position:absolute;left:-9999px;width:1px;height:1px}
 #preview{width:100%;max-height:340px;background:#05070c;border-radius:12px;margin-top:13px}
 .hidden{display:none!important}.meta,.status{font-size:12px;color:var(--muted);line-height:1.5;margin:10px 2px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -136,7 +136,7 @@ details>summary:focus-visible{outline:2px solid #f59e45;outline-offset:-3px;bord
 
 /* v0.14.4 polished controls */
 .custom-select{position:relative;margin-top:7px}
-.custom-select-native{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;left:-10000px!important;top:auto!important;clip-path:inset(50%)!important}
+.custom-select-native{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;left:-9999px!important}
 .custom-select-trigger{width:100%;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:12px 14px;border:1px solid #484848;border-radius:12px;background:#242424;color:#f5f5f5;font:inherit;font-size:15px}
 /* Match custom dropdown indicators to the shared expandable-panel chevron. */
 .custom-select-trigger:after{content:'';display:block;flex:0 0 7px;width:7px;height:7px;margin-left:auto;border-right:1.5px solid #a3a3a3;border-bottom:1.5px solid #a3a3a3;transform:rotate(45deg) translateY(-1px);transition:transform .18s ease,border-color .18s ease}
@@ -433,9 +433,8 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 /* Mobile-safe clip range controls: two readable MM:SS fields, no tiny digit cells. */
 .clip-time-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:7px}
 .clip-time-field{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:11px;font-weight:750;letter-spacing:.35px;color:#c4c4c4}
-.clip-time-grid .clip-time-clock{display:flex;width:100%;max-width:none;margin:0}
-.clip-time-grid .clip-time-clock .clock-flat{display:block;width:100%!important;max-width:100%;height:48px;min-height:48px;margin:0!important;padding:9px 8px!important;border:1px solid #555!important;border-radius:10px!important;background:#202020!important;color:#f5f5f5!important;text-align:center;font:800 19px/1.2 ui-monospace,SFMono-Regular,monospace!important;font-variant-numeric:tabular-nums;letter-spacing:1.5px}
-.clip-time-grid .clip-time-clock .clock-flat:focus{outline:2px solid #f59e45;border-color:#f59e45!important}
+.clip-time-grid .clip-time-input{display:block;width:100%;min-width:0;height:48px;min-height:48px;margin:0!important;padding:9px 8px!important;border:1px solid #555!important;border-radius:10px!important;background:#202020!important;color:#f5f5f5!important;text-align:center;font:800 19px/1.2 ui-monospace,SFMono-Regular,monospace!important;font-variant-numeric:tabular-nums;letter-spacing:1.5px}
+.clip-time-grid .clip-time-input:focus{outline:2px solid #f59e45;border-color:#f59e45!important}
 .clip-time-grid .clock-canonical{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;left:-10000px!important}
 .clip-time-help{margin:7px 1px 4px!important;font-size:10px}
 .clip-range-utility{margin-top:4px}
@@ -445,7 +444,7 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 #highlightResultsSection,#results{min-width:0}
 @media(max-width:390px){
  .clip-time-grid{gap:8px}
- .clip-time-grid .clip-time-clock .clock-flat{height:44px;min-height:44px;font-size:17px!important}
+ .clip-time-grid .clip-time-input{height:44px;min-height:44px;font-size:17px!important}
  .clip-duration-presets{gap:6px}
  .clip-duration-presets .preset{font-size:12px}
 }
@@ -460,8 +459,8 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 
 <section class="card">
 <h2>1. Choose your video</h2><p class="help">Works with English, Hindi, Dari/Persian, Arabic, and many other spoken languages. Clear audio gives the best results.</p>
-<input id="file" type="file" accept="video/*" aria-label="Choose a video file">
-<button class="pick" id="choose" type="button">＋ &nbsp; Select video</button>
+<input id="file" type="file" accept="video/*">
+<button class="pick" id="choose">＋ &nbsp; Select video</button>
 <div id="meta" class="meta hidden"></div>
 <video id="preview" class="hidden" controls playsinline preload="metadata"></video>
 <div id="previewTools" class="preview-tools hidden"><div class="inspection-range-controls" aria-label="AI inspection range"><div class="row">
@@ -593,17 +592,23 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 
 <section class="card">
 <h2>5. Create your clips</h2><p class="help">Choose a highlight above, adjust its boundaries if needed, and export one clip or a batch. Exports run one at a time.</p>
-<div class="clip-time-grid">
-<label class="clip-time-field">START (MM:SS)
-<span class="clock-edit clip-time-clock" data-clock-for="start" role="group" aria-label="Clip start time"></span>
-<input id="start" class="clip-time-input clock-canonical" type="text" maxlength="8" inputmode="numeric" autocomplete="off" value="00:00" aria-label="Clip start time" tabindex="-1">
-</label>
-<label class="clip-time-field">END (MM:SS)
-<span class="clock-edit clip-time-clock" data-clock-for="end" role="group" aria-label="Clip end time"></span>
-<input id="end" class="clip-time-input clock-canonical" type="text" maxlength="8" inputmode="numeric" autocomplete="off" value="00:30" aria-label="Clip end time" tabindex="-1">
-</label>
+<div class="row">
+<label class="field">START (min:sec)<div class="clock-edit" data-clock-for="start" role="group" aria-label="Clip start time">
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time minute tens" data-digit="0" value="0">
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time minute units" data-digit="1" value="0">
+ <span class="clock-colon" aria-hidden="true">:</span>
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time second tens" data-digit="2" value="0">
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time second units" data-digit="3" value="0">
+ </div><input id="start" type="text" maxlength="8" inputmode="numeric" autocomplete="off" placeholder="00:00" value="00:00" aria-label="Clip start time" class="clock-canonical" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;padding:0;margin:0" tabindex="-1"></label>
+<label class="field">END (min:sec)<div class="clock-edit" data-clock-for="end" role="group" aria-label="Clip end time">
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time minute tens" data-digit="0" value="0">
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time minute units" data-digit="1" value="0">
+ <span class="clock-colon" aria-hidden="true">:</span>
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time second tens" data-digit="2" value="0">
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time second units" data-digit="3" value="0">
+ </div><input id="end" type="text" maxlength="8" inputmode="numeric" autocomplete="off" placeholder="00:30" value="00:30" aria-label="Clip end time" class="clock-canonical" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;padding:0;margin:0" tabindex="-1"></label>
 </div>
-<p class="help clip-time-help">Enter four digits in order (MMSS). ClipMind formats the value as MM:SS.</p>
+<p class="help" style="margin-top:8px">Tap where you want to edit, or use the arrow keys to move between digits. Each digit stays in its position; Backspace clears only the selected digit. The colon never moves.</p>
 <div class="clip-range-utility"><button id="resetClipTimes" class="secondary reset-range-button" type="button">Reset range</button><span>Adjust start and end above, or choose a highlight.</span></div>
 <div class="clip-duration-presets" aria-label="Clip duration presets">
 <button class="secondary preset" data-sec="15" type="button">15 sec</button>
@@ -646,15 +651,22 @@ disclosureIds.forEach((id,index)=>{
  const record={details,content,button,id,index};disclosureRecords.push(record);
  button.addEventListener('click',()=>{
   const wasActive=button.getAttribute('aria-selected')==='true';
-  disclosureRecords.forEach(item=>{item.button.setAttribute('aria-selected','false');item.details.open=false;});
-  if(wasActive){disclosureContent.hidden=true;disclosureContent.replaceChildren();return;}
+  disclosureRecords.forEach(item=>{
+   item.button.setAttribute('aria-selected','false');item.details.open=false;
+   if(item.content.parentNode===disclosureContent)item.details.appendChild(item.content);
+  });
+  if(wasActive){disclosureContent.hidden=true;return;}
   button.setAttribute('aria-selected','true');details.open=true;disclosureContent.replaceChildren(content);disclosureContent.hidden=false;
  });
 });
 disclosureContent.id='analysisDisclosureContent';disclosureContent.setAttribute('role','tabpanel');
-disclosureRoot.replaceChildren(disclosureTabs,disclosureContent);
+const disclosureSourcePanels=document.createElement('div');
+disclosureSourcePanels.hidden=true;
+disclosureSourcePanels.setAttribute('aria-hidden','true');
+disclosureRecords.forEach(item=>disclosureSourcePanels.appendChild(item.details));
+disclosureRoot.replaceChildren(disclosureTabs,disclosureContent,disclosureSourcePanels);
 // Keep transcript reading as two swipeable, independently scrollable pages.
-const transcriptContent=$('transcriptBox').querySelector('.disclosure-content');
+const transcriptContent=disclosureRecords.find(item=>item.id==='transcriptBox')?.content||null;
 if(transcriptContent){
  const nodes=[...transcriptContent.children];
  const fullCard=document.createElement('section');fullCard.className='transcript-page transcript-full-page';
@@ -682,7 +694,11 @@ function enhanceSelect(select){
  trigger.addEventListener('click',()=>{const open=!wrap.classList.contains('open');document.querySelectorAll('.custom-select.open').forEach(x=>{x.classList.remove('open');x.querySelector('.custom-select-trigger')?.setAttribute('aria-expanded','false');});if(open){wrap.classList.add('open');trigger.setAttribute('aria-expanded','true');const selected=menu.querySelector('[aria-selected="true"]');selected?.scrollIntoView({block:'nearest'});selected?.focus();}});
  menu.addEventListener('keydown',e=>{const opts=[...menu.querySelectorAll('.custom-select-option')],idx=opts.indexOf(document.activeElement);if(e.key==='Escape'){close();trigger.focus();}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();opts[Math.max(0,Math.min(opts.length-1,idx+(e.key==='ArrowDown'?1:-1))) ]?.focus();}else if(e.key==='Home'){e.preventDefault();opts[0]?.focus();}else if(e.key==='End'){e.preventDefault();opts.at(-1)?.focus();}});
  document.addEventListener('click',e=>{if(!wrap.contains(e.target))close();});
- const parent=select.parentElement; if(parent&&parent.tagName==='LABEL'){parent.insertAdjacentElement('afterend',wrap);}else{select.parentNode.insertBefore(wrap,select);} wrap.append(trigger,menu,select);select.classList.add('custom-select-native');select.tabIndex=-1;select.setAttribute('aria-hidden','true');render();select.addEventListener('change',render);
+ const parent=select.parentElement;
+ if(parent&&parent.tagName==='LABEL'){parent.insertAdjacentElement('afterend',wrap);}else{select.parentNode.insertBefore(wrap,select);}
+ wrap.append(trigger,menu,select);
+ select.classList.add('custom-select-native');
+ render();select.addEventListener('change',render);
 }
 ['language','englishModel','previewSpeed'].forEach(id=>enhanceSelect($(id)));
 
@@ -759,6 +775,7 @@ $('diagnosticCopyButtons')?.addEventListener('click',async event=>{
  catch(error){if(status)status.textContent='Could not copy '+section.label+'. Try selecting that section manually.';}
 });
 const file=$('file'), video=$('preview');
+
 let readinessReportText='';
 function runReadinessCheck(){
  const rows=[];let pass=0,warn=0,fail=0;
@@ -1116,12 +1133,12 @@ function initClockEditors(root=document){
    if(event.key==='End'){event.preventDefault();field.setSelectionRange(5,5);}
   });
   field.addEventListener('beforeinput',event=>{
-   if(event.inputType==='insertText'&&event.data&&/^\d$/.test(event.data)){
-    event.preventDefault();insertDigit(event.data);
+   const type=event.inputType||'';
+   if(type==='insertText'&&event.data&&/^\d$/.test(event.data)){
+    event.preventDefault();insertDigit(event.data);return;
    }
   });
   field.addEventListener('input',()=>{
-   // Fallback for mobile keyboards that do not emit beforeinput consistently.
    const raw=field.value,old=field.dataset.lastValue||'00:00';
    const digits=raw.replace(/\D/g,'').slice(-4).padStart(4,'0').split('');
    if(raw.length!==5||raw[2]!==':'){
@@ -1141,22 +1158,8 @@ function initClockEditors(root=document){
  });
 }
 initClockEditors();
-document.querySelectorAll('.clip-time-input').forEach(field=>{
- field.addEventListener('blur',()=>{
-  const parsed=parseClipTime(field.value);
-  if(Number.isFinite(parsed)&&parsed>=0)field.value=fmt(parsed);
- });
-});
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-$('choose').addEventListener('click',()=>{
- // Keep the file-input activation directly inside this trusted tap. Android
- // Chrome can fail to surface showPicker() for visually clipped inputs.
- try{
-  file.click();
- }catch(error){
-  $('duration').textContent='Could not open the video picker. Please try again or check Chrome file permissions.';
- }
-});
+$('choose').onclick=()=>file.click();
 file.onchange=()=>{
  const f=file.files?.[0];if(!f)return;selectedFile=f;
  if(typeof outputUrls!=='undefined'){outputUrls.forEach(url=>URL.revokeObjectURL(url));outputUrls.clear();}
