@@ -40,13 +40,33 @@ body.analysis-busy #aiHistoryBox summary,body.analysis-busy #audioDiagnostics su
 .download{display:block;text-align:center;background:#244638;border:1px solid #3a735b;border-radius:11px;color:#d2ffe8;text-decoration:none;font-weight:700;padding:13px;margin-top:13px}
 .note{font-size:12px;color:var(--muted);line-height:1.55}
 #results{display:grid;gap:9px;margin-top:12px}
+#clipOutputs{display:flex;gap:10px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:4px 2px 12px;margin-top:10px}
+#clipOutputs:empty{display:none}
+#clipOutputs .clip-output{scroll-snap-align:start}
+#clipOutputs video{width:100%;max-height:220px;aspect-ratio:16/9;object-fit:contain;background:#080808;border-radius:9px}
 .suggestion{border:1px solid #40506b;border-radius:12px;padding:12px;background:#101a2a}.suggestion-title{font-size:15px;font-weight:800;line-height:1.35;margin:6px 0}.suggestion-reason{font-size:11px;color:#a7b3c7;line-height:1.45;margin:4px 0 9px}.suggestion-edit{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;align-items:start}.suggestion-edit label{display:flex;flex-direction:column;align-items:stretch;gap:6px;min-width:0;width:100%;text-align:left;font-size:10px;color:#a7b3c7;letter-spacing:.4px}.suggestion-edit .clock-edit{display:flex;width:100%;max-width:none;margin:0}.suggestion-edit .clock-flat{display:block;width:100%!important;max-width:100%;height:40px;min-height:40px;text-align:center;font:700 15px/1.2 ui-monospace,monospace;letter-spacing:1px;padding:7px 6px!important;border-radius:8px;border:1px solid #555;background:#202020;color:#fff}.suggestion-edit .clock-flat:focus{border-color:var(--accent);outline:1px solid var(--accent)}.suggestion-edit{grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:12px;row-gap:8px}.suggestion-edit label{min-width:0}.suggestion-time-input{display:block;width:100%;min-width:0;height:42px;min-height:42px;margin:0!important;padding:8px 7px!important;border:1px solid #555!important;border-radius:9px!important;background:#202020!important;color:#f5f5f5!important;text-align:center;font:700 16px/1.2 ui-monospace,monospace!important;font-variant-numeric:tabular-nums;letter-spacing:1px}.suggestion-time-input:focus{outline:1px solid var(--accent);border-color:var(--accent)!important}.suggestion-edit label{gap:7px;font-size:11px;line-height:1.2;letter-spacing:.55px}.suggestion-time-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:11px}.suggested-range{font-size:12px;color:#b8b8b8;line-height:1.4}.current-range-row{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap}.current-duration{color:var(--accent);font-size:13px;font-weight:750;white-space:nowrap}
 @media(max-width:360px){.suggestion-edit{gap:8px}.suggestion-time-input{font-size:15px!important}.suggestion{padding:11px}.current-range-row{align-items:flex-start}}.suggestion-actions button{min-height:40px}.moment-type{display:inline-block;border:1px solid #40506b;border-radius:99px;padding:3px 7px;margin-left:5px;color:#c7d2fe;font-size:9px;letter-spacing:.3px}
 .suggestion strong{font-size:13px}.suggestion p{font-size:12px;color:#c2cde0;line-height:1.45;margin:7px 0;max-height:none;overflow:visible;white-space:pre-wrap;overflow-wrap:anywhere}
-.suggestion button{background:#2c3b58;color:white;border:1px solid #52627e;border-radius:9px;padding:9px 11px;font-weight:700}.suggestion-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:11px}.suggestion-actions button{min-height:42px}.suggestion-select{min-height:42px;padding:0 4px}.suggestion-select{display:flex;align-items:center;gap:7px;font-size:12px;color:#d5deec}.suggestion-select input{width:18px;height:18px;accent-color:var(--accent)}.clip-output{border:1px solid #40506b;border-radius:12px;background:#101a2a;padding:12px;margin-top:10px}.clip-output video{width:100%;max-height:280px;background:#05070c;border-radius:9px}.clip-output strong{display:block;font-size:13px;margin-bottom:7px}.clip-output .download{margin-top:8px}
+.suggestion button{background:#2c3b58;color:white;border:1px solid #52627e;border-radius:9px;padding:9px 11px;font-weight:700}.suggestion-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:11px}.suggestion-actions button{min-height:42px}.suggestion-select{min-height:42px;padding:0 4px}.suggestion-select{display:flex;align-items:center;gap:7px;font-size:12px;color:#d5deec}.suggestion-select input{width:18px;height:18px;accent-color:var(--accent)}.clip-output{flex:0 0 min(84%,360px);width:min(84%,360px);min-width:0;border:1px solid #484848;border-radius:12px;background:#242424;padding:12px;margin:0}.clip-output video{width:100%;max-height:280px;background:#05070c;border-radius:9px}.clip-output strong{display:block;font-size:13px;margin-bottom:7px}.clip-output .download{margin-top:8px}
 .export-verification{font-size:11px;color:#a3a3a3;margin-top:7px;line-height:1.45}.export-verification strong{display:inline;color:#b8e6c5;font-size:11px;margin:0}.export-retry{width:100%;margin-top:10px;background:#49331f;border:1px solid #a9672b;color:#fff1df;border-radius:9px;padding:11px;font-weight:750}.batch-row{display:flex;gap:8px;flex-wrap:wrap}.batch-row button{flex:1;min-width:130px}
 .tag{font-size:10px;color:var(--good);font-weight:800;letter-spacing:.6px}
-.transcript{max-height:280px;overflow:auto;font-size:12px;line-height:1.65;color:#d5deec;background:#0c1525;padding:11px;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere}.transcript-line{display:block;margin:0 0 7px}.transcript-heading{font-size:11px;color:#a5b4fc;font-weight:800;letter-spacing:.5px;margin:10px 0 6px}.transcript-note{font-size:11px;color:#9eabc0;line-height:1.45;margin:5px 0 9px}.transcript-full{max-height:220px;overflow:auto;border:1px solid #2a3850;border-radius:9px;padding:10px;background:#101a2a;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.transcript-jump{border:1px solid #52627e;border-radius:6px;background:#24324a;color:#c7d2fe;padding:3px 6px;margin-right:6px;font:700 11px system-ui;cursor:pointer}.transcript-jump:active{background:#405579}
+.transcript{height:250px;max-height:250px;overflow:auto;border:1px solid #484848;font-size:12px;line-height:1.65;color:#dedede;background:#202020;padding:11px;border-radius:9px;white-space:pre-wrap;overflow-wrap:anywhere}.transcript-line{display:block;margin:0 0 7px}.transcript-heading{font-size:11px;color:#a5b4fc;font-weight:800;letter-spacing:.5px;margin:10px 0 6px}.transcript-note{font-size:11px;color:#9eabc0;line-height:1.45;margin:5px 0 9px}.transcript-full{height:250px;max-height:250px;overflow:auto;border:1px solid #484848;border-radius:9px;padding:10px;background:#202020;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.transcript-jump{border:1px solid #52627e;border-radius:6px;background:#24324a;color:#c7d2fe;padding:3px 6px;margin-right:6px;font:700 11px system-ui;cursor:pointer}.transcript-jump:active{background:#405579}
+/* Equal-sized transcript tabs with an explicit horizontal swipe affordance. */
+.transcript-view-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0 5px}
+.transcript-view-tab{min-width:0;min-height:42px;padding:8px 6px;border:1px solid #555;border-radius:9px;background:#292929;color:#ddd;font-size:12px;font-weight:750}
+.transcript-view-tab.is-active{border-color:#a9672b;background:#30271f;color:#ffbd78}
+.transcript-swipe-hint{font-size:10px;color:#a3a3a3;text-align:center;margin:3px 0 8px}
+.transcript-view-viewport{width:100%;overflow:hidden;border:1px solid #76512d;border-radius:11px;padding:8px;background:#202020;touch-action:pan-y}
+.transcript-view-track{display:flex;width:200%;transform:translateX(0);transition:transform .2s ease}
+.transcript-view{flex:0 0 50%;width:50%;min-width:0;padding:0 2px;box-sizing:border-box}
+.transcript-view[hidden]{display:block!important;visibility:hidden}
+.transcript-view .transcript-tools{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-height:38px}
+.transcript-view .transcript-tools strong{flex:1 1 100%;font-size:10px;letter-spacing:.5px;color:#f59e45}
+.transcript-view .transcript-tools button{width:auto;min-height:36px;margin:0;padding:7px 9px;font-size:11px}
+.transcript-view .transcript-full,.transcript-view .transcript{height:250px;max-height:250px;overflow-y:auto;overscroll-behavior:contain;border:1px solid #555}
+.transcript-view .transcript-note{min-height:32px}
+@media(prefers-reduced-motion:reduce){.transcript-view-track{transition:none}}
+
 
 .review-panel{border:1px solid #40506b;border-radius:12px;background:#101a2a;padding:12px;margin-top:10px}
 .review-meta{font-size:11px;color:var(--muted);line-height:1.5;margin:5px 0 10px}
@@ -402,8 +422,9 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 
 
 /* Compact clip range utility; no full-width playhead buttons. */
-.clip-range-utility{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:5px}
-.reset-range-button{width:auto!important;min-height:30px;margin:0!important;padding:5px 10px!important;border-radius:8px;font-size:11px}
+.clip-time-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:end;gap:8px}
+.clip-time-row .reset-range-button{width:auto;min-width:68px;min-height:42px;margin:0;padding:8px 9px;font-size:11px;white-space:nowrap}
+@media(max-width:390px){.clip-time-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:6px}.clip-time-row .reset-range-button{min-width:60px;padding:7px 6px;font-size:10px}.clip-time-row .clock-edit,.clip-time-row .clock-edit .clock-flat{width:100%!important}}
 .clip-range-utility>span{font-size:10px;color:#a3a3a3;line-height:1.35}
 /* Fixed analysis tabs: the controls stay in place while one content panel expands below. */
 #analysisDisclosures{display:block;width:100%;min-width:0;position:static;overflow:visible}
@@ -550,12 +571,23 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 <details id="audioDiagnostics" style="margin-top:8px"><summary style="font-size:12px;color:#cbd5e1">Audio diagnostics</summary><div class="disclosure-content"><button id="copyDiagnostics" class="secondary" type="button" style="margin:10px 0 7px">📋 Copy full report</button><p id="copyDiagnosticsStatus" class="help" aria-live="polite" style="margin:0 2px 7px"></p><div id="diagnosticCopySections" class="hidden" style="margin:8px 0 10px;padding:10px;background:#101a2a;border:1px solid #2a3850;border-radius:10px"><p id="diagnosticReportCount" class="help" style="margin:0 0 8px"></p><div id="diagnosticCopyButtons" style="display:grid;grid-template-columns:1fr 1fr;gap:7px"></div></div><pre id="audioDiagnosticsText" style="white-space:pre-wrap;overflow-wrap:anywhere;color:#a7b3c7;background:#101a2a;padding:10px;border-radius:9px;font-size:11px;line-height:1.5">Diagnostics will appear after an analysis attempt.</pre></div></details>
 <details id="transcriptBox" class="hidden">
 <summary style="font-size:13px;color:#cbd5e1">View full transcript</summary><div class="disclosure-content">
-<div class="transcript-heading">FULL RECOGNIZED TEXT</div>
-<div class="transcript-tools"><button id="copyFullTranscript" class="secondary" type="button">📋 Copy full transcript</button><span id="transcriptCopyStatus" class="note" aria-live="polite"></span></div>
+<div class="transcript-view-tabs" role="tablist" aria-label="Transcript views">
+<button id="fullTranscriptTab" class="transcript-view-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="fullTranscriptView">Full transcript</button>
+<button id="timestampTranscriptTab" class="transcript-view-tab" type="button" role="tab" aria-selected="false" aria-controls="timestampTranscriptView">Timestamped transcript</button>
+</div>
+<p class="transcript-swipe-hint">Swipe left or right to switch transcript views, or tap a tab</p>
+<div id="transcriptViewViewport" class="transcript-view-viewport">
+<div id="transcriptViewTrack" class="transcript-view-track">
+<section id="fullTranscriptView" class="transcript-view" role="tabpanel" aria-labelledby="fullTranscriptTab">
+<div class="transcript-tools"><strong>FULL RECOGNIZED TEXT</strong><button id="copyFullTranscript" class="secondary" type="button">Copy full transcript</button><span id="transcriptCopyStatus" class="note" aria-live="polite"></span></div>
 <div id="transcriptFull" class="transcript-full">The full recognized text will appear here.</div>
-<div class="transcript-heading">TIMESTAMPED SEGMENTS</div>
-<p class="transcript-note">Tap a timestamp to jump to that phrase. The phrase currently under playback is highlighted; alignment is phrase-level, not word-level. Timestamped segments may be sparser than the full text when the speech model does not return a time for every phrase.</p>
-<div id="transcript" class="transcript"></div></div>
+</section>
+<section id="timestampTranscriptView" class="transcript-view" role="tabpanel" aria-labelledby="timestampTranscriptTab" hidden>
+<div class="transcript-tools"><strong>TIMESTAMPED SEGMENTS</strong><button id="copyTimestampTranscript" class="secondary" type="button">Copy timestamps & text</button><span id="timestampCopyStatus" class="note" aria-live="polite"></span></div>
+<p class="transcript-note">Tap a timestamp to jump to that phrase. Alignment is phrase-level, not word-level.</p>
+<div id="transcript" class="transcript"></div>
+</section>
+</div></div></div>
 </details>
 </div>
 <section id="overlapReview" class="review-panel hidden" aria-live="polite">
@@ -592,7 +624,7 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 
 <section class="card">
 <h2>5. Create your clips</h2><p class="help">Choose a highlight above, adjust its boundaries if needed, and export one clip or a batch. Exports run one at a time.</p>
-<div class="row">
+<div class="row clip-time-row">
 <label class="field">START (min:sec)<div class="clock-edit" data-clock-for="start" role="group" aria-label="Clip start time">
  <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time minute tens" data-digit="0" value="0">
  <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time minute units" data-digit="1" value="0">
@@ -607,9 +639,10 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
  <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time second tens" data-digit="2" value="0">
  <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time second units" data-digit="3" value="0">
  </div><input id="end" type="text" maxlength="8" inputmode="numeric" autocomplete="off" placeholder="00:30" value="00:30" aria-label="Clip end time" class="clock-canonical" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;padding:0;margin:0" tabindex="-1"></label>
+<button id="resetClipTimes" class="secondary reset-range-button" type="button">Reset range</button>
 </div>
 <p class="help" style="margin-top:8px">Tap where you want to edit, or use the arrow keys to move between digits. Each digit stays in its position; Backspace clears only the selected digit. The colon never moves.</p>
-<div class="clip-range-utility"><button id="resetClipTimes" class="secondary reset-range-button" type="button">Reset range</button><span>Adjust start and end above, or choose a highlight.</span></div>
+<p class="note" style="margin-top:7px">Adjust start and end above, or choose a highlight.</p>
 <div class="clip-duration-presets" aria-label="Clip duration presets">
 <button class="secondary preset" data-sec="15" type="button">15 sec</button>
 <button class="secondary preset" data-sec="30" type="button">30 sec</button>
