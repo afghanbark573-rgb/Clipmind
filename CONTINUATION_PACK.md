@@ -725,4 +725,54 @@ Production `main` remains unchanged at index blob `8a1f73a61b3c55e5a40e8690237af
 Development compare at this checkpoint: `9` commits ahead and `0` behind production.
 Draft PR #9 remains unmerged. Do not merge or deploy without explicit user approval.
 
+
+## 21. Mobile alignment refinement — 2026-11-25
+
+User tested the previous visual-cleanup build on Android Chrome and confirmed:
+- The separated Exported Clips card works and should be preserved.
+- Remaining issues were alignment of clip controls, layout options and preview, oversized transcript copy controls, inconsistent scrollbar styling, unequal Analysis tab content heights, and stacked recognition settings.
+
+### Implemented
+
+- Development branch: `fix/mobile-usability-repair`.
+- Latest commit: `0c94bfb732d265c7b33c8c0c19b3ab37f7412e5f`.
+- Latest `index.html` blob: `572f692a2eb4e1e69c5a86675151a089b4156722`.
+- Test app commit: `f7e036c60cb61fbed5ec94353de9fea8a56a7387`.
+- Test app and development blobs are identical.
+- Test URL: https://afghanbark573-rgb.github.io/ClipMind-Mobile-Test/
+
+Changes:
+1. Start, End and Reset Range are arranged in one aligned row on normal mobile widths; very narrow screens fall back safely.
+2. Duration presets are a single four-button row with smaller contained labels.
+3. Aspect-ratio choices and framing preview are grouped side by side; labels are contained in their own boxes. On very narrow widths they stack to avoid crushing.
+4. Create Clip is explicitly a full-width, thin action button; its status message sits below it.
+5. Full Transcript and Timestamped Transcript copy controls sit in compact heading rows at the right edge.
+6. All native scrollable regions use the same brown thumb / dark track scrollbar theme as Exported Clips.
+7. Recent Progress, Audio Diagnostics and Transcript content panels use a shared fixed outer height (470px on narrow mobile widths; 490px at wider widths), with each panel's content independently filling/scrolling within it.
+8. Recognition Language and English Model fields are side by side with equal dropdown trigger heights and internally scrollable option menus. The enhanced dropdown is now nested inside its associated label to make the two-column grid structurally correct.
+
+### Static validation
+
+- JavaScript syntax parser passed.
+- CSS brace balance passed (balanced and never negative).
+- Source checks passed for shared scrollbars, equal panel heights, two-column recognition settings, compact transcript copy heading rows, single-row range controls, side-by-side shape/preview and full-width thin Create Clip button.
+- Development `index.html` and test app `index.html` are identical.
+- Production `main` remains unchanged at blob `8a1f73a61b3c55e5a40e8690237af8308a7c4260`.
+- FFmpeg worker was inspected and not modified in this phase.
+- No runtime Android/browser verification has yet been performed for this newest layout pass.
+
+### User verification requested
+
+On the Xiaomi 14, confirm:
+- Start / End / Reset align on one row; presets remain one row.
+- Aspect ratio options and preview align side by side, with no clipped labels.
+- Create Clip is long and thin.
+- Both transcript copy buttons are compact and aligned with their headings.
+- Recent Progress, Audio Diagnostics and Transcript outer panels remain the same height.
+- Their internal scrollbars match the exported clips scrollbar.
+- Recognition dropdowns are side by side, same height, and their option menus scroll internally.
+- Exported Clips gallery still works as before.
+
+Production deployment remains prohibited without explicit user approval. Draft PR #9 remains unmerged.
+
 **End of master continuation pack.**
