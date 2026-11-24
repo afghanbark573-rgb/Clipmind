@@ -450,6 +450,23 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
  .clip-duration-presets .preset{font-size:12px}
 }
 
+.transcript-view-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:0 0 9px}
+.transcript-view-tab{min-width:0;min-height:42px;padding:8px 7px;border:1px solid #484848;border-radius:9px;background:#292929;color:#ddd;font-size:11px;font-weight:750;line-height:1.25}
+.transcript-view-tab[aria-selected="true"]{border-color:#a9672b;background:#30271f;color:#ffbd78}
+.transcript-page .transcript-tools{margin:0 0 8px}
+.transcript-page .transcript-tools button{width:auto;min-height:38px;margin:0;padding:8px 10px;font-size:11px}
+.clip-range-control-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:end;gap:9px;margin-top:7px}
+.clip-range-control-row>.row{min-width:0;grid-column:1/3;margin:0}
+.clip-range-control-row>.reset-range-button{grid-column:3;align-self:end;min-height:46px;padding:8px 11px!important;white-space:nowrap}
+.clip-output-gallery{display:flex;flex-flow:row nowrap;gap:10px;width:100%;min-width:0;margin-top:10px;padding:2px 1px 12px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding:1px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.clip-output-gallery>.clip-output{flex:0 0 min(88%,460px);width:min(88%,460px);min-width:0;margin:0;scroll-snap-align:start}
+.clip-output-gallery .clip-output video{display:block;width:100%;max-height:280px}
+@media(max-width:420px){
+ .clip-range-control-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+ .clip-range-control-row>.row{grid-column:1/3}
+ .clip-range-control-row>.reset-range-button{grid-column:1/3;justify-self:end;min-height:38px}
+ .clip-output-gallery>.clip-output{flex-basis:88%;width:88%}
+}
 </style></head>
 <body>
 <header><div class="logo">▶</div><div><strong>ClipMind</strong><small>Your private video clip studio</small></div></header>
@@ -593,7 +610,7 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 
 <section class="card">
 <h2>5. Create your clips</h2><p class="help">Choose a highlight above, adjust its boundaries if needed, and export one clip or a batch. Exports run one at a time.</p>
-<div class="row">
+<div class="clip-range-control-row"><div class="row">
 <label class="field">START (min:sec)<div class="clock-edit" data-clock-for="start" role="group" aria-label="Clip start time">
  <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time minute tens" data-digit="0" value="0">
  <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time minute units" data-digit="1" value="0">
@@ -608,9 +625,8 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
  <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time second tens" data-digit="2" value="0">
  <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time second units" data-digit="3" value="0">
  </div><input id="end" type="text" maxlength="8" inputmode="numeric" autocomplete="off" placeholder="00:30" value="00:30" aria-label="Clip end time" class="clock-canonical" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;padding:0;margin:0" tabindex="-1"></label>
-</div>
-<p class="help" style="margin-top:8px">Tap where you want to edit, or use the arrow keys to move between digits. Each digit stays in its position; Backspace clears only the selected digit. The colon never moves.</p>
-<div class="clip-range-utility"><button id="resetClipTimes" class="secondary reset-range-button" type="button">Reset range</button><span>Adjust start and end above, or choose a highlight.</span></div>
+<button id="resetClipTimes" class="secondary reset-range-button" type="button">Reset range</button></div>
+<p class="help" style="margin-top:8px">Tap where you want to edit, or use the arrow keys to move between digits. Each digit stays in its position; Backspace clears only the selected digit.</p>
 <div class="clip-duration-presets" aria-label="Clip duration presets">
 <button class="secondary preset" data-sec="15" type="button">15 sec</button>
 <button class="secondary preset" data-sec="30" type="button">30 sec</button>
@@ -630,7 +646,7 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 <button id="create" class="primary" disabled>Create clip</button>
 <div id="exportProgressPanel" class="export-progress-panel hidden"><div class="export-progress-head"><span id="exportProgressTitle">Preparing export</span><span id="exportProgressCount">0 / 0</span></div><progress id="exportProgress" value="0" max="100"></progress><div id="exportProgressText">Waiting to start…</div></div>
 <p id="exportStatus" class="status">Select a video first.</p>
-<div id="clipOutputs" aria-live="polite"></div>
+<div id="clipOutputs" class="clip-output-gallery" aria-label="Exported clips gallery" aria-live="polite"></div>
 </section>
 <details class="card note app-note-disclosure"><summary>Highlight note</summary><div class="app-note-content"><p>Titles and reasons are generated from transcript wording and structural cues; the app does not yet inspect visual scenes or guarantee viral performance. Review the preview and boundaries.</p></div></details>
 <details class="card note app-note-disclosure"><summary>Memory & processing notes</summary><div class="app-note-content"><p>ClipMind unloads the Whisper model and FFmpeg engine after each analysis to free phone memory. Timestamp controls are built only when you open the transcript panel, and temporary audio samples are cleared after recognition. Transcript timestamps are phrase-level estimates returned by Whisper, not exact word boundaries. ClipMind will not invent highlight times if timestamp data is missing. Tap Prepare AI tools again before analyzing another range.</p><p>Fast extraction uses FFmpeg WebAssembly, which may download a large engine the first time. It is usually faster than real-time playback, but speed depends on the video format and phone. If direct extraction fails, use the real-time fallback. You can inspect only a chosen time range instead of the whole video. Very long selected ranges can still use substantial phone memory. Highlight ranking uses transcript structure and language signals, not full visual understanding. Titles and explanations are generated from transcript clues and are not proof that a moment will perform well. Keep Chrome open while processing.</p></div></details>
@@ -680,8 +696,22 @@ if(transcriptContent){
  const timed=nodes.find(x=>x.id==='transcript');
  [fullHeading,tools,full].filter(Boolean).forEach(x=>fullCard.appendChild(x));
  [timedHeading,note,timed].filter(Boolean).forEach(x=>timedCard.appendChild(x));
+ const viewTabs=document.createElement('div');viewTabs.className='transcript-view-tabs';viewTabs.setAttribute('role','tablist');viewTabs.setAttribute('aria-label','Transcript views');
+ const fullTab=document.createElement('button');fullTab.type='button';fullTab.className='transcript-view-tab';fullTab.textContent='Full transcript';fullTab.setAttribute('role','tab');fullTab.setAttribute('aria-selected','true');
+ const timedTab=document.createElement('button');timedTab.type='button';timedTab.className='transcript-view-tab';timedTab.textContent='Timestamped transcript';timedTab.setAttribute('role','tab');timedTab.setAttribute('aria-selected','false');
+ viewTabs.append(fullTab,timedTab);
+ const timedTools=document.createElement('div');timedTools.className='transcript-tools';
+ const copyTimed=document.createElement('button');copyTimed.type='button';copyTimed.className='secondary';copyTimed.textContent='📋 Copy timestamped transcript';
+ const timedCopyStatus=document.createElement('span');timedCopyStatus.className='note';timedCopyStatus.setAttribute('aria-live','polite');timedTools.append(copyTimed,timedCopyStatus);
+ timedCard.insertBefore(timedTools,note||timed);
+ copyTimed.addEventListener('click',async()=>{try{await copyDiagnosticText(buildTimestampedTranscriptText());timedCopyStatus.textContent='Timestamped transcript copied.';}catch(error){timedCopyStatus.textContent='Copy unavailable. Select the text and copy it manually.';}});
  const rail=document.createElement('div');rail.className='transcript-horizontal-rail';rail.setAttribute('aria-label','Swipe between full transcript and timestamped segments');
- rail.append(fullCard,timedCard);transcriptContent.replaceChildren(rail);
+ rail.append(fullCard,timedCard);
+ const setTranscriptTab=index=>{fullTab.setAttribute('aria-selected',String(index===0));timedTab.setAttribute('aria-selected',String(index===1));};
+ fullTab.addEventListener('click',()=>rail.scrollTo({left:0,behavior:'smooth'}));
+ timedTab.addEventListener('click',()=>rail.scrollTo({left:rail.clientWidth,behavior:'smooth'}));
+ let transcriptScrollFrame=0;rail.addEventListener('scroll',()=>{if(transcriptScrollFrame)return;transcriptScrollFrame=requestAnimationFrame(()=>{transcriptScrollFrame=0;setTranscriptTab(rail.clientWidth?Math.round(rail.scrollLeft/rail.clientWidth):0);});},{passive:true});
+ transcriptContent.replaceChildren(viewTabs,rail);
 }
 
 function enhanceSelect(select){
@@ -983,6 +1013,11 @@ video.addEventListener('timeupdate',()=>{updatePreviewTimer();if(activeHighlight
 function updateActiveTranscriptLine(){const host=$('transcript');if(!host||!transcriptSegmentsRendered)return;const t=video.currentTime-transcriptRangeStart;let active=null;for(const line of host.querySelectorAll('.transcript-line')){const jump=line.querySelector('.transcript-jump');if(!jump)continue;const a=Number(jump.dataset.localStart),b=Number(jump.dataset.localEnd);const match=Number.isFinite(a)&&Number.isFinite(b)&&t>=a&&t<=b;if(match)active=line;line.classList.toggle('is-speaking',match);}if(active&&$('transcriptBox').open){const box=host.getBoundingClientRect(),item=active.getBoundingClientRect();if(item.bottom>box.bottom||item.top<box.top)active.scrollIntoView({block:'nearest',behavior:'auto'});}}
 video.addEventListener('timeupdate',updateActiveTranscriptLine);
 video.addEventListener('play',updatePreviewTimer);video.addEventListener('pause',updatePreviewTimer);video.addEventListener('seeked',updatePreviewTimer);
+// Only one video player may play at a time. Rendering and scrolling never autoplay.
+document.addEventListener('play',event=>{
+ const active=event.target;if(!(active instanceof HTMLVideoElement))return;
+ document.querySelectorAll('video').forEach(player=>{if(player!==active&&!player.paused)player.pause();});
+},true);
 $('previewSeek').addEventListener('input',()=>{if(activeHighlightPreviewStart===null||activeHighlightPreviewEnd===null)return;const fraction=Number($('previewSeek').value)/1000;video.currentTime=activeHighlightPreviewStart+(activeHighlightPreviewEnd-activeHighlightPreviewStart)*fraction;updatePreviewTimer();});
 video.addEventListener('pause',()=>{if(activeHighlightPreviewEnd!==null&&video.currentTime<activeHighlightPreviewEnd){/* Keep the selected range visible so the user can resume or scrub. */} });
 function setAnalysisBusy(busy){
@@ -2289,6 +2324,17 @@ function renderTranscript(chunks,fullText,rangeStart){
  $('transcriptFull').textContent=transcriptFullText||'No speech was recognized.';
  $('transcript').replaceChildren();
 }
+function buildTimestampedTranscriptText(){
+ const rows=(transcriptChunks||[]).map(c=>{
+  const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);
+  const start=ts?ts[0]:(Number.isFinite(c.start)?c.start:null);
+  const end=ts?ts[1]:(Number.isFinite(c.end)?c.end:null);
+  const phrase=String(c.text||'').trim();if(!phrase)return '';
+  const label=Number.isFinite(start)?fmt(transcriptRangeStart+start)+(Number.isFinite(end)&&end>start?'–'+fmt(transcriptRangeStart+end):''):'Time unavailable';
+  return '['+label+'] '+phrase;
+ }).filter(Boolean);
+ return rows.join('\n')||'No timestamped segments were returned for this transcript.';
+}
 function renderTimestampedSegments(){
  if(transcriptSegmentsRendered)return;
  transcriptSegmentsRendered=true;
@@ -2690,6 +2736,13 @@ function enhanceDynamicClockInput(input){
  initClockEditors(wrap.parentElement);
 }
 
+function getHighlightPassage(g,from,to){
+ const relevant=(transcriptChunks||[]).map(c=>{
+  const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);
+  return {start:transcriptRangeStart+(ts?ts[0]:c.start),end:transcriptRangeStart+(ts?ts[1]:c.end),text:String(c.text||'').trim()};
+ }).filter(c=>c.text&&Number.isFinite(c.start)&&Number.isFinite(c.end)&&c.end>from&&c.start<to);
+ return relevant.length?relevant.map(c=>c.text).join(' '):(g.text||'').trim();
+}
 function formatHighlightReport(g,index,passage){
  const story=g.story||highlightStory(g.text||'');
  const start=Number.isFinite(g.start)?g.start:0,end=Number.isFinite(g.end)?g.end:0;
@@ -2743,8 +2796,7 @@ function showSuggestions(items){
   const updateTimes=()=>{
    const from=parseClipTime(startInput.value),to=parseClipTime(endInput.value);if(!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<=from||to>duration)return false;
    g.start=from;g.end=to;startInput.value=fmt(from);endInput.value=fmt(to);durationText.textContent='Clip length: '+Math.round(to-from)+' sec';
-   const relevant=(transcriptChunks||[]).map(c=>{const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);return {start:transcriptRangeStart+(ts?ts[0]:c.start),end:transcriptRangeStart+(ts?ts[1]:c.end),text:(c.text||'').trim()};}).filter(c=>c.text&&Number.isFinite(c.start)&&Number.isFinite(c.end)&&c.end>from&&c.start<to);
-   if(relevant.length)para.textContent=relevant.map(c=>c.text).join(' ');
+   para.textContent=getHighlightPassage(g,from,to);
    detailMeta.textContent=fmt(g.start)+' – '+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';meta.textContent=story.type+' · '+detailMeta.textContent;return true;
   };
   [startInput,endInput].forEach(input=>{
@@ -2758,7 +2810,7 @@ function showSuggestions(items){
   const copy=document.createElement('button');copy.type='button';copy.textContent='Copy';copy.setAttribute('aria-label','Copy highlight details');copy.title='Copy highlight details';
   const copyStatus=document.createElement('span');copyStatus.className='note';copyStatus.setAttribute('aria-live','polite');
   copy.onclick=async()=>{if(!updateTimes()){copyStatus.textContent='Correct the start and end times before copying.';return;}
-   const report=formatHighlightReport(g,i,para.textContent||g.text||'');
+   const report=formatHighlightReport(g,i,getHighlightPassage(g,g.start,g.end));
    copy.disabled=true;copyStatus.textContent='Copying…';try{await copyDiagnosticText(report);copyStatus.textContent='Copied highlight '+(i+1)+'. Paste it wherever needed.';}catch(error){copyStatus.textContent='Copy failed. Check browser clipboard permission and try again.';}finally{copy.disabled=false;}
   };
   actions.append(preview,use,copy);body.append(reason,para,edit,times,actions,copyStatus);div.append(detailTop,heading,detailMeta,body);panel.appendChild(div);
@@ -2783,7 +2835,7 @@ function showSuggestions(items){
     copyAllStatus.textContent='Highlight '+(index+1)+' has invalid times. Correct it before copying all.';return;
    }
    g.start=from;g.end=to;
-   const passage=card.querySelector('.suggestion-passage')?.textContent||g.text||'';
+   const passage=getHighlightPassage(g,from,to);
    reports.push(formatHighlightReport(g,index,passage));
   }
   copyAll.disabled=true;copyAllStatus.textContent='Preparing all '+reports.length+' highlights…';
