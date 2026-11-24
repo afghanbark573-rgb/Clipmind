@@ -660,8 +660,8 @@ The user reviewed the coordinated mobile UX test build on a Xiaomi Android devic
 ### Implemented on development branch
 
 - Development branch: `fix/mobile-usability-repair`.
-- Commit: `f1783f39507321b981370bdafdcee9ee48bb478b`.
-- Updated `index.html` blob: `7dfbf0b9046ed16086295a81ef5e079f9a50c1d6`.
+- Commits: `f1783f39507321b981370bdafdcee9ee48bb478b` and follow-up `e3f561a3f9bf35b17ee8afba03cdb2735b15c19c`.
+- Updated `index.html` blob: `1f5ea162d6cf725b0e0319a3cc95be04e5e9d1d1`.
 - FFmpeg worker and companion worker files were not modified.
 - Existing transcription, highlight generation, copy, editing and export logic were retained.
 
@@ -670,7 +670,7 @@ Changes:
 1. **Separated clip creation and exported results**
    - The Create Your Clips card now contains the range, duration presets, output shape, framing preview and Create Clip action.
    - Added a separate, initially hidden Exported Clips card for progress, status and the horizontal gallery.
-   - The results card appears when export begins or an export status needs to be shown.
+   - The results card appears when export begins or an export error/result needs to be shown. Ordinary video-ready, reset-range and highlight-preview messages use a separate status under the clip controls so the results card stays hidden until an export is relevant.
    - Exported video cards retain preview, download and playback-verification details.
 
 2. **Audio diagnostics scrolling**
@@ -693,9 +693,9 @@ Changes:
 ### Test build
 
 - Mirrored exact updated `index.html` to `afghanbark573-rgb/ClipMind-Mobile-Test`, branch `main`.
-- Test commit: `ba2c2b26bd2cf5456102d01bd648156450a046b0`.
+- Test commits: `ba2c2b26bd2cf5456102d01bd648156450a046b0` and follow-up `ca2dc6aec1a5ee8c6a558efda973bd1c04f853a9`.
 - Test URL: https://afghanbark573-rgb.github.io/ClipMind-Mobile-Test/
-- Test and development file blobs match: `7dfbf0b9046ed16086295a81ef5e079f9a50c1d6`.
+- Test and development file blobs match: `1f5ea162d6cf725b0e0319a3cc95be04e5e9d1d1`.
 
 ### Static checks
 
