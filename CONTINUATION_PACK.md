@@ -570,6 +570,84 @@ The GitHub repository is the durable project record. Deleting ChatGPT conversati
 | Date | Update |
 |---|---|
 | 2026-11-23 | Initial master continuation pack created, consolidating project identity, architecture, engineering rules, UI decisions, research, history, current source state and next actions. |
+| 2026-11-24 | Added coordinated mobile UX phase implementation, test-build mirror, static checks, updated branch state and pending Xiaomi 14 verification. |
 | 2026-11-24 | Added Android end-to-end test evidence, FFmpeg same-origin worker repair, Copy/Copy All implementation and source identifiers, actual user-provided copy outputs, unresolved Highlight 02 passage discrepancy, locked next actions, and the strict “no more, no less” continuity rule. |
+
+
+---
+
+## 19. Coordinated mobile UX phase — 2026-11-24
+
+The user explicitly approved implementing the previously discussed mobile UX improvements together as one coordinated phase, rather than limiting the work to the Highlight 02 copy discrepancy. This approval supersedes the earlier sequential hold in section 17 for this agreed scope.
+
+### Implemented on the development branch
+
+- Development branch: `fix/mobile-usability-repair`.
+- Latest development commit: `d556db7588ac7f8fb5c4546246a42aba31882b67`.
+- Updated `index.html` blob: `647a13649e12a3f172ee42646789525fc0a931c3`.
+- The FFmpeg worker implementation and its companion files were not changed in this commit.
+- The existing Graphite Orange styling and working application workflows were retained.
+
+Implemented changes:
+
+1. **Canonical highlight passage generation**
+   - Added one shared passage resolver based on normalized timestamp chunks and the currently edited start/end range.
+   - The visible highlight passage, individual Copy and Copy All now use the same resolver.
+   - This directly addresses the previously observed mismatch where Copy All could use stale card text while individual Copy refreshed from the edited range.
+   - The existing report formatter and metadata structure remain intact.
+
+2. **Transcript views**
+   - Retained the existing equal-width, horizontally swipeable Full Transcript and Timestamped Transcript pages.
+   - Added explicit Full Transcript / Timestamped Transcript tab controls.
+   - The active tab indicator follows horizontal swiping and tab selection.
+   - Added Copy Timestamped Transcript, serializing each available phrase with its timestamp range and preserving phrase order.
+   - The existing Copy Full Transcript action remains in place.
+   - Both transcript panes retain bounded independent vertical scrolling.
+
+3. **Clip range controls**
+   - Moved Reset Range alongside the Start and End controls.
+   - Uses a three-column layout when there is sufficient width and a two-row fallback on narrow screens.
+   - Existing time parsing, digit editing and reset behavior remain unchanged.
+
+4. **Exported clips**
+   - Changed the output container to a horizontal swipeable gallery.
+   - Existing preview players, download links, file details and playback-verification information remain attached to each output.
+
+5. **Single active player**
+   - Added a delegated play-event rule so starting any video player pauses other video players on the page.
+   - The rule does not initiate playback; loading, rendering and scrolling do not autoplay videos.
+
+### Test build and repository state
+
+- Mirrored the exact updated `index.html` blob to test repository `afghanbark573-rgb/ClipMind-Mobile-Test`, branch `main`.
+- Test repository commit: `ba10eb5fe0cd01b4958597c176e5c3b11d51c6a7`.
+- Test app URL: https://afghanbark573-rgb.github.io/ClipMind-Mobile-Test/
+- Test build and feature branch file blobs match: `647a13649e12a3f172ee42646789525fc0a931c3`.
+
+### Static verification and release protection
+
+- JavaScript module script passed a JavaScript Function-parser syntax check; no static syntax error was reported.
+- Source assertions confirmed the shared passage resolver is used by individual Copy and Copy All, timestamped transcript copy exists, transcript tab synchronization exists, and the global single-player rule exists.
+- These are static checks only. They do not replace browser runtime testing.
+- No Xiaomi 14 runtime regression test has yet been completed for this coordinated phase.
+- Production `main` remains unchanged at index blob `8a1f73a61b3c55e5a40e8690237af8308a7c4260`.
+- Current compare: `fix/mobile-usability-repair` is 8 commits ahead and 0 behind production `main`.
+- Draft PR #9 remains unmerged. Do not merge or deploy without explicit user approval.
+
+### Required next verification
+
+On Xiaomi 14 / Android Chrome, open the test app and verify:
+
+1. Individual Copy and Copy All produce exactly the same full passage for the same highlight, including Highlight 02 and after editing its timestamps.
+2. Full Transcript and Timestamped Transcript can be selected by tabs and by horizontal swipe; the active tab indicator stays synchronized.
+3. Each transcript view scrolls vertically within its own bounded pane, without expanding the page or trapping page scrolling.
+4. Both transcript copy actions work; timestamped copy preserves all available timestamps and phrases.
+5. Start, End and Reset Range remain usable at normal and narrow mobile widths.
+6. Multiple exported clips appear in a horizontal gallery; each still previews, downloads and displays its verification details.
+7. Starting playback in the source preview, highlight preview or an exported clip pauses any other playing video. Opening panels or scrolling must not start playback.
+8. Regression-test FFmpeg audio extraction, Whisper transcription, highlight generation, timestamp edits, single export and batch export.
+
+Do not mark the coordinated phase device-verified until the user has completed the mobile test and supplied results. Keep production protected.
+
 
 **End of master continuation pack.**
