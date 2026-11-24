@@ -659,6 +659,7 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 
 <div class="crop-preview"><canvas id="cropPreviewCanvas" width="90" height="160" aria-label="Preview of selected output crop"></canvas><div class="crop-preview-copy"><b>Framing preview</b><br><span id="cropPreviewLabel">9:16 Portrait · centre crop</span></div></div>
 <button id="create" class="primary" disabled>Create clip</button>
+<p id="clipActionStatus" class="status hidden" aria-live="polite"></p>
 </section>
 <section id="exportResultsSection" class="card hidden">
 <h2>6. Exported clips</h2>
@@ -864,9 +865,9 @@ video.addEventListener('loadeddata',()=>{drawCropPreview();$('previewTools').cla
 video.addEventListener('timeupdate',drawCropPreview);
 document.querySelectorAll('input[name="shape"]').forEach(x=>x.addEventListener('change',drawCropPreview));
 $('resetClipTimes').addEventListener('click',()=>{
- if(!Number.isFinite(duration)||duration<=0){exportStatus('Select a video and wait for it to finish loading first.');return;}
+ if(!Number.isFinite(duration)||duration<=0){clipActionStatus('Select a video and wait for it to finish loading first.');return;}
  setClockValue('start',0);setClockValue('end',duration);
- exportStatus('Clip range reset to the full video · 00:00–'+fmt(duration)+'.');
+ clipActionStatus('Clip range reset.');
 });
 
 function saveCurrentOverlapReview(){
@@ -1027,7 +1028,7 @@ function updatePreviewTimer(){
  $('previewOriginalEnd').textContent='End '+fmt(activeHighlightPreviewEnd);
  $('previewPlaybackState').textContent=video.ended?'Ended':video.paused?'Paused':'Playing';
 }
-video.addEventListener('timeupdate',()=>{updatePreviewTimer();if(activeHighlightPreviewEnd!==null&&!previewFinished&&video.currentTime>=activeHighlightPreviewEnd){previewFinished=true;video.pause();video.currentTime=activeHighlightPreviewEnd;updatePreviewTimer();exportStatus('Highlight preview finished.');}});
+video.addEventListener('timeupdate',()=>{updatePreviewTimer();if(activeHighlightPreviewEnd!==null&&!previewFinished&&video.currentTime>=activeHighlightPreviewEnd){previewFinished=true;video.pause();video.currentTime=activeHighlightPreviewEnd;updatePreviewTimer();clipActionStatus('Highlight preview finished.');}});
 function updateActiveTranscriptLine(){const host=$('transcript');if(!host||!transcriptSegmentsRendered)return;const t=video.currentTime-transcriptRangeStart;let active=null;for(const line of host.querySelectorAll('.transcript-line')){const jump=line.querySelector('.transcript-jump');if(!jump)continue;const a=Number(jump.dataset.localStart),b=Number(jump.dataset.localEnd);const match=Number.isFinite(a)&&Number.isFinite(b)&&t>=a&&t<=b;if(match)active=line;line.classList.toggle('is-speaking',match);}if(active&&$('transcriptBox').open){const box=host.getBoundingClientRect(),item=active.getBoundingClientRect();if(item.bottom>box.bottom||item.top<box.top)active.scrollIntoView({block:'nearest',behavior:'auto'});}}
 video.addEventListener('timeupdate',updateActiveTranscriptLine);
 video.addEventListener('play',updatePreviewTimer);video.addEventListener('pause',updatePreviewTimer);video.addEventListener('seeked',updatePreviewTimer);
@@ -1105,7 +1106,8 @@ function stopTranscriptionClock(success){
  transcriptionClockStartedAt=0;
 }
 
-const exportStatus=t=>{$('exportResultsSection').classList.remove('hidden');$('exportStatus').textContent=t;};
+const exportStatus=t=>$('exportStatus').textContent=t;
+const clipActionStatus=t=>{$('clipActionStatus').textContent=t;$('clipActionStatus').classList.remove('hidden');};
 
 function fmt(s){s=Math.max(0,Number(s)||0);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0')}
 function parseClipTime(value){
@@ -1218,7 +1220,7 @@ file.onchange=()=>{
  const f=file.files?.[0];if(!f)return;selectedFile=f;
  if(typeof outputUrls!=='undefined'){outputUrls.forEach(url=>URL.revokeObjectURL(url));outputUrls.clear();}
  $('clipOutputs').innerHTML='';window.clipMindSuggestions=[];$('batchControls').style.display='none';
- if(!f.type.startsWith('video/')){exportStatus('That file does not look like a video.');return;}
+ if(!f.type.startsWith('video/')){clipActionStatus('That file does not look like a video.');return;}
  if(objectUrl)URL.revokeObjectURL(objectUrl);
  objectUrl=URL.createObjectURL(f);baseName=f.name.replace(/\.[^.]+$/,'')||'clipmind';
  activeHighlightPreviewStart=null;activeHighlightPreviewEnd=null;previewFinished=false;updatePreviewTimer();video.src=objectUrl;video.classList.remove('hidden');$('previewTools').classList.remove('hidden');video.playbackRate=Number($('previewSpeed').value)||1;
@@ -1230,7 +1232,7 @@ file.onchange=()=>{
   setClockValue('start',0);setClockValue('end',duration);
   setClockValue('analysisStart',0);setClockValue('analysisEnd',duration);
   $('analyze').disabled=false;$('create').disabled=false;aiStatus('Video ready. Tap Find highlights with AI.');
-  exportStatus('Video ready. You can create a manual clip or run AI first.');
+  clipActionStatus('Video ready.');
  };
  video.onerror=()=>{$('duration').textContent='Could not read this video. Try an MP4 in the latest Chrome.'};
 };
@@ -2823,8 +2825,8 @@ function showSuggestions(items){
   });edit.append(startLabel,endLabel);
   const actions=document.createElement('div');actions.className='suggestion-actions';
   const preview=document.createElement('button');preview.type='button';preview.textContent='▶ Preview';
-  preview.onclick=async()=>{if(!updateTimes())return;try{activeHighlightPreviewStart=g.start;activeHighlightPreviewEnd=g.end;previewFinished=false;video.pause();await seekVideo(g.start);updatePreviewTimer();await video.play();exportStatus('Previewing highlight '+(i+1)+' · '+fmt(g.start)+'–'+fmt(g.end)+'.');}catch(e){activeHighlightPreviewStart=null;activeHighlightPreviewEnd=null;updatePreviewTimer();exportStatus('Could not preview this moment: '+(e.message||String(e)));}};
-  const use=document.createElement('button');use.type='button';use.textContent='Use for clip';use.onclick=()=>{if(!updateTimes())return;setClockValue('start',g.start);setClockValue('end',g.end);exportStatus('Highlight '+(i+1)+' selected. Choose output shape and create your clip.');$('start').scrollIntoView({behavior:'smooth',block:'center'});};
+  preview.onclick=async()=>{if(!updateTimes())return;try{activeHighlightPreviewStart=g.start;activeHighlightPreviewEnd=g.end;previewFinished=false;video.pause();await seekVideo(g.start);updatePreviewTimer();await video.play();clipActionStatus('Previewing highlight '+(i+1)+' · '+fmt(g.start)+'–'+fmt(g.end)+'.');}catch(e){activeHighlightPreviewStart=null;activeHighlightPreviewEnd=null;updatePreviewTimer();clipActionStatus('Could not preview this moment: '+(e.message||String(e)));}};
+  const use=document.createElement('button');use.type='button';use.textContent='Use for clip';use.onclick=()=>{if(!updateTimes())return;setClockValue('start',g.start);setClockValue('end',g.end);clipActionStatus('Highlight '+(i+1)+' selected.');$('start').scrollIntoView({behavior:'smooth',block:'center'});};
   const copy=document.createElement('button');copy.type='button';copy.textContent='Copy';copy.setAttribute('aria-label','Copy highlight details');copy.title='Copy highlight details';
   const copyStatus=document.createElement('span');copyStatus.className='note';copyStatus.setAttribute('aria-live','polite');
   copy.onclick=async()=>{if(!updateTimes()){copyStatus.textContent='Correct the start and end times before copying.';return;}
@@ -2985,7 +2987,7 @@ async function exportClip(from,to,shape,onProgress){
 function setExportBusy(busy){activeExport=busy;$('create').disabled=busy;$('createSelected').disabled=busy;$('selectAll').disabled=busy;}
 async function runExports(clips,preserveOutputs=false){
  if(activeExport)return;
- if(!clips.length){exportStatus('Select at least one AI suggestion first.');return;}
+ if(!clips.length){$('exportResultsSection').classList.remove('hidden');exportStatus('Select at least one AI suggestion first.');return;}
  const shape=document.querySelector('input[name="shape"]:checked').value;
  setExportBusy(true);$('exportResultsSection').classList.remove('hidden');$('retryFailedExport')?.remove();if(!preserveOutputs){outputUrls.forEach(url=>URL.revokeObjectURL(url));outputUrls.clear();$('clipOutputs').innerHTML='';}$('exportProgressPanel').classList.remove('hidden');$('exportProgress').value=0;$('exportProgressTitle').textContent='Preparing clips';$('exportProgressCount').textContent='0 / '+clips.length;$('exportProgressText').textContent='Starting the first export…';
  let completed=0,failedClip=null,failedMessage='';
@@ -3008,7 +3010,7 @@ async function runExports(clips,preserveOutputs=false){
 }
 $('create').onclick=()=>{
  const from=parseClipTime($('start').value),to=parseClipTime($('end').value);
- if(!duration||!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<=from||to>duration){exportStatus('Enter valid timestamps. End must be after start and within the video.');return;}
+ if(!duration||!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<=from||to>duration){clipActionStatus('Enter valid timestamps. End must be after start and within the video.');return;}
  runExports([{start:from,end:to}]);
 };
 $('createSelected').onclick=()=>{
