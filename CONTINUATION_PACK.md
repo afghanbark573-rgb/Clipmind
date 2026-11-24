@@ -650,4 +650,79 @@ On Xiaomi 14 / Android Chrome, open the test app and verify:
 Do not mark the coordinated phase device-verified until the user has completed the mobile test and supplied results. Keep production protected.
 
 
+
+---
+
+## 20. Mobile visual-cleanup phase — 2026-11-25
+
+The user reviewed the coordinated mobile UX test build on a Xiaomi Android device and identified five visual issues. The user approved a combined cleanup phase.
+
+### Implemented on development branch
+
+- Development branch: `fix/mobile-usability-repair`.
+- Commit: `f1783f39507321b981370bdafdcee9ee48bb478b`.
+- Updated `index.html` blob: `7dfbf0b9046ed16086295a81ef5e079f9a50c1d6`.
+- FFmpeg worker and companion worker files were not modified.
+- Existing transcription, highlight generation, copy, editing and export logic were retained.
+
+Changes:
+
+1. **Separated clip creation and exported results**
+   - The Create Your Clips card now contains the range, duration presets, output shape, framing preview and Create Clip action.
+   - Added a separate, initially hidden Exported Clips card for progress, status and the horizontal gallery.
+   - The results card appears when export begins or an export status needs to be shown.
+   - Exported video cards retain preview, download and playback-verification details.
+
+2. **Audio diagnostics scrolling**
+   - Bounded the diagnostic report to a fixed 230px reading area (150px minimum).
+   - Added a distinct border and themed scrollbar styling.
+   - Copy Full Report remains outside the scrolling report area.
+
+3. **Aligned transcript views**
+   - Both transcript pages now share a fixed equal height (430px desktop/default; 390px on narrow screens).
+   - Full transcript and timestamped phrases each occupy their own bordered, independently scrollable inner area.
+   - The outer pages remain horizontally swipeable and tabs stay synchronized.
+   - Added themed scrollbar styling for the reading areas and horizontal rail.
+
+4. **Reduced persistent instructions**
+   - Removed redundant explanatory paragraphs from the hero, video selection, language/model settings, AI finder, clip creation, clock editing and crop preview.
+   - Condensed the timestamp note to a short phrase-level timing reminder.
+   - Kept essential field labels, action names, live progress/status and hidden/expandable technical notes.
+   - Did not remove runtime error messages or diagnostic tools.
+
+### Test build
+
+- Mirrored exact updated `index.html` to `afghanbark573-rgb/ClipMind-Mobile-Test`, branch `main`.
+- Test commit: `ba2c2b26bd2cf5456102d01bd648156450a046b0`.
+- Test URL: https://afghanbark573-rgb.github.io/ClipMind-Mobile-Test/
+- Test and development file blobs match: `7dfbf0b9046ed16086295a81ef5e079f9a50c1d6`.
+
+### Static checks
+
+- JavaScript syntax check passed using the Function parser.
+- Source checks confirmed:
+  - export result elements now live in a separate card;
+  - export status/start reveals that card;
+  - diagnostics have a bounded scroll region;
+  - transcript pages share fixed dimensions;
+  - both transcript contents have independent vertical scrolling;
+  - previously approved canonical highlight passage-copy logic remains present;
+  - FFmpeg worker implementation was untouched.
+- Static checks do not establish actual Android browser rendering or runtime behavior.
+
+### User device verification still required
+
+On Xiaomi 14 / Android Chrome, verify:
+
+1. Create Clips and Exported Clips are visibly separate cards.
+2. Exporting one or multiple clips reveals the separate results card and the horizontal gallery still works.
+3. Audio Diagnostics has a clear bounded scroll region; Copy Full Report still works.
+4. Full Transcript and Timestamped Transcript cards have aligned outer and inner boundaries, with independent scrolling and tab/swipe navigation.
+5. Instructions no longer dominate the normal screen; essential errors and status remain understandable.
+6. Repeat a basic FFmpeg extraction, Whisper transcription, highlight generation and export regression check.
+
+Production `main` remains unchanged at index blob `8a1f73a61b3c55e5a40e8690237af8308a7c4260`.
+Development compare at this checkpoint: `9` commits ahead and `0` behind production.
+Draft PR #9 remains unmerged. Do not merge or deploy without explicit user approval.
+
 **End of master continuation pack.**
