@@ -439,4 +439,137 @@ When the user says, “Continue ClipMind from the last checkpoint,” first read
 |---|---|
 | 2026-11-23 | Initial master continuation pack created, consolidating project identity, architecture, engineering rules, UI decisions, research, history, current source state and next actions. |
 
+
+---
+
+## 17. Current checkpoint — 2026-11-24 (supersedes older immediate-status notes)
+
+This section records only work and evidence available at the 2026-11-24 handover. Earlier history remains historical; where an older “current” status conflicts with this section, this newer checkpoint takes precedence.
+
+### Active mobile usability work
+
+- Production application repository: `afghanbark573-rgb/Clipmind`.
+- Production `main` remains protected; no production merge or deployment is authorized by this checkpoint.
+- Test repository: `afghanbark573-rgb/ClipMind-Mobile-Test`.
+- Test app: https://afghanbark573-rgb.github.io/ClipMind-Mobile-Test/
+- Feature branch in production repo: `fix/mobile-usability-repair`.
+- Draft PR: https://github.com/afghanbark573-rgb/Clipmind/pull/9
+- PR #9 title: “Fix four mobile usability issues”.
+- Last recorded feature branch head: `3d2ceee467efee1568284a90d68af04b96e20e0e`.
+- Last recorded production `main` base SHA: `64789e7f38a7409346ae524c7e8311c06ed516b0`.
+- Last recorded compare: feature branch 7 commits ahead, 0 behind; changed paths were `index.html` and `ffmpeg/worker.js`.
+- Production `main` was not changed by this work.
+
+### FFmpeg worker repair and Android end-to-end test
+
+The FFmpeg worker was vendored from the exact `@ffmpeg/ffmpeg@0.12.15` ESM worker implementation into same-origin `ffmpeg/worker.js`, with its companion `const.js` and `errors.js`. This addresses the cross-origin Worker construction issue caused by combining the CDN-loaded FFmpeg module with a local same-origin worker URL.
+
+User-tested on Xiaomi 14 / Android Chrome using a 20 MB, 4:42 (282-second), 1920×1080 video named `1000051037.mp4`:
+
+- Preflight: 10 checks passed.
+- FFmpeg fast extraction passed.
+- Extracted WAV: 9,024,078 bytes; decoded duration 282 seconds.
+- Source audio: 48 kHz mono; Whisper input: 4,512,000 samples at 16 kHz.
+- Whisper model: `onnx-community/whisper-base.en`, WASM/CPU.
+- Primary Method B completed in 110.61 seconds and produced 63 usable timestamp chunks (3,686 raw characters).
+- Method A fallback was not invoked.
+- 63 valid timestamp chunks; 0 removed.
+- Timestamp span union was 261 seconds (92.6% of video duration); this is not a verified speech-coverage metric.
+- User confirmed highlight generation, clip preview and export worked.
+
+This establishes a successful end-to-end device test for this particular video, device and browser. It does not establish universal compatibility or performance.
+
+### Highlight Copy and Copy All implementation
+
+Implemented in the test build and mirrored to the feature branch:
+
+- Shared `formatHighlightReport(g,index,passage)` serializer for individual Copy and Copy All.
+- Report fields include highlight number, category, title, reason, current start/end, duration, original AI suggested range, current edited range, source filename and full passage.
+- Added a `suggestion-passage` class to the passage element.
+- Added a Copy All Highlights action when the expanded Show All Highlights panel is open.
+- Copy All iterates every generated suggestion, not only batch-selected suggestions; it reads each card's current edited timestamps, validates them, collects the passage and separates reports with newline characters.
+- Status/error feedback is present.
+
+Recorded source identifiers:
+- Test repo commit: `053b809f903a82ded3259eb0826021c6c77691d5`.
+- Test app index blob: `d8b36ef08a20bb2895d6d480d6c41e63226fa6ed`.
+- Feature branch commit: `3d2ceee467efee1568284a90d68af04b96e20e0e`.
+- The test and feature branch `index.html` were recorded as identical blobs.
+- Test URL used: https://afghanbark573-rgb.github.io/ClipMind-Mobile-Test/?v=053b809f
+- PR #9 checkpoint comment for this implementation: comment ID `7138459827`.
+
+Static source checks passed for the shared formatter, individual Copy integration, passage selector, Copy All action, iteration across suggestions, timestamp validation, newline separators and report metadata. These are source checks, not runtime verification.
+
+### Latest user-provided Copy / Copy All output — 2026-11-24
+
+The user supplied actual Android copy results:
+
+- Copy All output contained three highlights (01, 02 and 03).
+- Each report included category, title, reason, start/end, duration, AI suggested range, current edited range, source filename and a full passage.
+- The individual Copy output for Highlight 02 was also supplied.
+- A discrepancy was observed for Highlight 02:
+  - Individual Copy passage begins: “You may have to curb your chronic stress.”
+  - Copy All passage begins: “Want to live a long life? You may have to curb your chronic stress.”
+- The rest of the passage content overlaps, but Copy All includes an additional preceding sentence.
+- This indicates the two actions may be reading different passage sources/ranges for the same highlight. Root cause is not yet established.
+
+**Verification status:**
+- User has supplied real-device output for individual Copy and Copy All.
+- The report formatting and metadata are visibly present in both outputs.
+- Do not mark passage consistency as passed.
+- Do not claim the copy feature is fully verified until the Highlight 02 discrepancy is investigated and the user confirms the corrected behaviour.
+- Do not patch this discrepancy without first inspecting the exact source and discussing the cause and proposed change.
+
+### Current locked development direction and next actions
+
+The previously agreed quality-first, balanced sequence remains:
+
+1. Investigate the Highlight 02 individual-vs-Copy-All passage discrepancy. Inspect exact source paths and selectors before proposing a fix. Discuss findings and proposed scope before changing code.
+2. After copy consistency is resolved and device-tested, proceed to the transcript interface: Full Transcript and Timestamped Transcript as two equal-size horizontal pages/tabs, with synchronized active indicator, independent vertical scrolling and a copy action for each view. Avoid nested-scroll traps.
+3. Put Start, End and Reset Range in one row on mobile where width allows, with a narrow-screen fallback.
+4. Make exported clips a horizontal swipeable gallery while preserving preview, download and verification.
+5. Ensure only one player is active across source preview, highlight preview and exported-clip players; starting one pauses the others. Opening or scrolling must not autoplay.
+6. Run regression checks and record each meaningful stage as a separate checkpoint.
+
+Do not begin steps 2–5 until step 1 has been discussed, agreed and completed. Do not add extra scope.
+
+### Mandatory continuity rule clarified on 2026-11-24
+
+The user explicitly clarified:
+
+> “update what we discuss no more no less.”
+
+Apply this to code, plans and project records:
+- Record only what was actually discussed, approved, implemented or tested.
+- Do not add unapproved features, assumptions or decisions.
+- Do not silently alter previously agreed requirements.
+- Keep proposed, locked, implemented, merged, deployed and device-tested states distinct.
+- If a detail is uncertain or conflicting, label it unresolved rather than filling the gap.
+- Ask before expanding scope.
+
+### New-chat recovery procedure
+
+When starting a new chat, the user can say:
+
+“Continue ClipMind from the latest checkpoint. Read the master continuation pack from the GitHub continuity branch, inspect the current repositories/branches and source, and continue from the recorded next action.”
+
+Then:
+1. Read `CONTINUATION_PACK.md` from branch `continuity/clipmind-master-pack` in `afghanbark573-rgb/Clipmind`.
+2. Inspect PR #9, its latest head and comments.
+3. Inspect the test repository and test build before making claims about the running code.
+4. Preserve the production protection rule.
+5. Start with the unresolved Highlight 02 passage discrepancy; discuss before implementing.
+6. Do not rely on prior ChatGPT chats or this chat's memory when the repository record is available.
+
+The GitHub repository is the durable project record. Deleting ChatGPT conversations should not remove this repository, its branches, commits, PR discussion or continuation pack. This cannot guarantee that every external account or hosting service will always remain available, so the GitHub repository and its history remain the project's source of continuity.
+
+---
+
+## 18. Change log
+
+| Date | Update |
+|---|---|
+| 2026-11-23 | Initial master continuation pack created, consolidating project identity, architecture, engineering rules, UI decisions, research, history, current source state and next actions. |
+| 2026-11-24 | Added Android end-to-end test evidence, FFmpeg same-origin worker repair, Copy/Copy All implementation and source identifiers, actual user-provided copy outputs, unresolved Highlight 02 passage discrepancy, locked next actions, and the strict “no more, no less” continuity rule. |
+
 **End of master continuation pack.**
