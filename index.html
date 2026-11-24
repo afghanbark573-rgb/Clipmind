@@ -1292,32 +1292,40 @@ async function loadFastExtractor(){
  if(ffmpegReady&&ffmpeg)return ffmpeg;
  if(ffmpegLoadPromise)return ffmpegLoadPromise;
  ffmpegLoadPromise=(async()=>{
-  let instance=null,timer=null;
+  let instance=null,timer=null,timedOut=false;
   try{
    aiStatus('Loading fast audio extractor… first use downloads the FFmpeg engine.');
-   progressUI('Loading FFmpeg audio engine',null,'Preparing the audio engine. If loading stalls, ClipMind will stop waiting and allow a retry.');
-   const {FFmpeg}=await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js');
-   instance=new FFmpeg();
-   ffmpeg=instance;
-   ffmpegReady=false;
-   ffmpeg.on('log',({message})=>{
-    if(message){
-     ffmpegLogText=(ffmpegLogText+'\n'+message).slice(-200000);
-     if(/time=/.test(message))aiStatus('Extracting audio directly… '+message.match(/time=\S+/)?.[0]);
-    }
+   progressUI('Loading FFmpeg audio engine',null,'Downloading and initializing the FFmpeg library and engine. This step has a 120-second limit; if it cannot finish, the real-time fallback will remain available.');
+   const initialization=(async()=>{
+    const {FFmpeg}=await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js');
+    if(timedOut)throw new Error('FFmpeg loading timed out before the library finished downloading. Check your connection, then retry or use the real-time fallback.');
+    instance=new FFmpeg();
+    ffmpeg=instance;
+    ffmpegReady=false;
+    ffmpeg.on('log',({message})=>{
+     if(message){
+      ffmpegLogText=(ffmpegLogText+'\\n'+message).slice(-200000);
+      if(/time=/.test(message))aiStatus('Extracting audio directly… '+message.match(/time=\\S+/)?.[0]);
+     }
+    });
+    ffmpeg.on('progress',({progress})=>{
+     if(Number.isFinite(progress))progressUI('Extracting audio',Math.max(0,Math.min(99,progress*100)),'Fast extraction progress reported by FFmpeg.');
+    });
+    const base='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
+    const classWorkerURL=new URL('./ffmpeg/worker.js',window.location.href).href;
+    await instance.load({classWorkerURL,coreURL:base+'/ffmpeg-core.js',wasmURL:base+'/ffmpeg-core.wasm'});
+    if(timedOut)throw new Error('FFmpeg initialization exceeded its time limit. Retry or use the real-time fallback.');
+    ffmpegReady=true;
+    aiStatus('Fast audio extractor ready.');
+    return instance;
+   })();
+   const timeout=new Promise((_,reject)=>{
+    timer=setTimeout(()=>{
+     timedOut=true;
+     reject(new Error('FFmpeg took longer than 120 seconds to download or initialize. Check your connection, then retry or use the real-time fallback.'));
+    },120000);
    });
-   ffmpeg.on('progress',({progress})=>{
-    if(Number.isFinite(progress))progressUI('Extracting audio',Math.max(0,Math.min(99,progress*100)),'Fast extraction progress reported by FFmpeg.');
-   });
-   const base='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
-   const classWorkerURL=new URL('./ffmpeg/worker.js',window.location.href).href;
-   await Promise.race([
-    instance.load({classWorkerURL,coreURL:base+'/ffmpeg-core.js',wasmURL:base+'/ffmpeg-core.wasm'}),
-    new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('FFmpeg took too long to initialize. Check your connection, then tap Prepare AI tools to retry.')),120000);})
-   ]);
-   ffmpegReady=true;
-   aiStatus('Fast audio extractor ready.');
-   return instance;
+   return await Promise.race([initialization,timeout]);
   }catch(error){
    if(instance){
     try{instance.terminate();}catch(_){}
