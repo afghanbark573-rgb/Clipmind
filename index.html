@@ -2350,6 +2350,40 @@ function renderTimestampedSegments(){
 $('transcriptBox').addEventListener('toggle',()=>{
  if($('transcriptBox').open)renderTimestampedSegments();
 });
+const transcriptTrack=$('transcriptViewTrack'),transcriptViewport=$('transcriptViewViewport');
+let activeTranscriptView=0,transcriptSwipeStartX=null,transcriptSwipeStartY=null;
+function setTranscriptView(index){
+ activeTranscriptView=index?1:0;
+ transcriptTrack.style.transform='translateX('+(activeTranscriptView?-50:0)+'%)';
+ $('fullTranscriptTab').classList.toggle('is-active',activeTranscriptView===0);
+ $('timestampTranscriptTab').classList.toggle('is-active',activeTranscriptView===1);
+ $('fullTranscriptTab').setAttribute('aria-selected',String(activeTranscriptView===0));
+ $('timestampTranscriptTab').setAttribute('aria-selected',String(activeTranscriptView===1));
+ $('fullTranscriptView').setAttribute('aria-hidden',String(activeTranscriptView!==0));
+ $('timestampTranscriptView').setAttribute('aria-hidden',String(activeTranscriptView!==1));
+ if(activeTranscriptView===1)renderTimestampedSegments();
+}
+$('fullTranscriptTab').addEventListener('click',()=>setTranscriptView(0));
+$('timestampTranscriptTab').addEventListener('click',()=>setTranscriptView(1));
+transcriptViewport.addEventListener('touchstart',event=>{const touch=event.touches[0];transcriptSwipeStartX=touch.clientX;transcriptSwipeStartY=touch.clientY;},{passive:true});
+transcriptViewport.addEventListener('touchend',event=>{
+ if(transcriptSwipeStartX===null)return;
+ const touch=event.changedTouches[0],dx=touch.clientX-transcriptSwipeStartX,dy=touch.clientY-transcriptSwipeStartY;
+ if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.25)setTranscriptView(dx<0?1:0);
+ transcriptSwipeStartX=null;transcriptSwipeStartY=null;
+},{passive:true});
+$('copyTimestampTranscript').addEventListener('click',async()=>{
+ const lines=(transcriptChunks||[]).map(c=>{
+  const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);
+  const start=ts?ts[0]:(Number.isFinite(c.start)?c.start:null),end=ts?ts[1]:(Number.isFinite(c.end)?c.end:null);
+  const a=Number.isFinite(start)?fmt(start+transcriptRangeStart):'[timestamp unavailable]';
+  const b=Number.isFinite(end)?'–'+fmt(end+transcriptRangeStart):'';
+  return a+b+'  '+String(c.text||'').trim();
+ }).filter(line=>line.trim()&&line.trim()!=='[timestamp unavailable]');
+ const report=lines.length?lines.join('\\n'):'No timestamped segments are available.';
+ try{await copyDiagnosticText(report);$('timestampCopyStatus').textContent='Timestamped transcript copied.';}
+ catch(error){$('timestampCopyStatus').textContent='Copy failed. Check browser clipboard permission and try again.';}
+});
 $('transcript').addEventListener('click',event=>{
  const button=event.target.closest('.transcript-jump');
  if(!button)return;
@@ -2722,12 +2756,21 @@ function enhanceDynamicClockInput(input){
  initClockEditors(wrap.parentElement);
 }
 
+function formatHighlightReport(g,index,passage){
+ const story=g.story||highlightStory(g.text||'');
+ const start=Number.isFinite(g.start)?g.start:0,end=Number.isFinite(g.end)?g.end:start;
+ const suggestedStart=Number.isFinite(g.suggestedStart)?g.suggestedStart:start;
+ const suggestedEnd=Number.isFinite(g.suggestedEnd)?g.suggestedEnd:end;
+ return ['CLIPMIND HIGHLIGHT '+String(index+1).padStart(2,'0'),'Category / label: '+(story.type||'Not available'),'Title: '+(story.title||'Not available'),'Why it stands out: '+(story.reason||'Not available'),'Start time: '+fmt(start),'End time: '+fmt(end),'Duration: '+(end-start).toFixed(2)+' seconds','AI suggested range: '+fmt(suggestedStart)+' – '+fmt(suggestedEnd),'Current edited range: '+fmt(start)+' – '+fmt(end),'Source video: '+(selectedFile?.name||'Not available'),'','COMPLETE HIGHLIGHT TEXT',passage||g.currentText||g.text||'Not available',''].join('\\n');
+}
 function showSuggestions(items){
  const host=$('results');host.innerHTML='';$('highlightResultsSection').classList.remove('hidden');window.clipMindSuggestions=items;
  $('selectAll').textContent='Select all';$('batchControls').style.display='none';
  if(!items.length){host.innerHTML='<p class="status">No reliable timestamped highlights were available. ClipMind will not estimate clip times from transcript length. You can still review the transcript and set clip times manually below.</p>';return;}
  const stackPreview=document.createElement('div');stackPreview.className='highlight-stack-preview';stackPreview.setAttribute('aria-label','Stacked preview of the available highlights');
  const toggle=document.createElement('button');toggle.type='button';toggle.className='secondary highlight-details-toggle';toggle.textContent='Show all highlights ('+items.length+')';toggle.setAttribute('aria-expanded','false');
+ const copyAll=document.createElement('button');copyAll.type='button';copyAll.className='secondary copy-all-highlights';copyAll.textContent='Copy all highlights';copyAll.hidden=true;
+ const copyAllStatus=document.createElement('span');copyAllStatus.className='note copy-all-status';copyAllStatus.setAttribute('aria-live','polite');
  const panel=document.createElement('section');panel.className='highlight-details-panel hidden';panel.setAttribute('aria-label','All highlight details');
  items.forEach((g,i)=>{
   const story=highlightStory(g.text);g.suggestedStart=Number.isFinite(g.suggestedStart)?g.suggestedStart:g.start;g.suggestedEnd=Number.isFinite(g.suggestedEnd)?g.suggestedEnd:g.end;g.story=story;
@@ -2755,6 +2798,7 @@ function showSuggestions(items){
    g.start=from;g.end=to;startInput.value=fmt(from);endInput.value=fmt(to);durationText.textContent='Clip length: '+Math.round(to-from)+' sec';
    const relevant=(transcriptChunks||[]).map(c=>{const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);return {start:transcriptRangeStart+(ts?ts[0]:c.start),end:transcriptRangeStart+(ts?ts[1]:c.end),text:(c.text||'').trim()};}).filter(c=>c.text&&Number.isFinite(c.start)&&Number.isFinite(c.end)&&c.end>from&&c.start<to);
    if(relevant.length)para.textContent=relevant.map(c=>c.text).join(' ');
+   g.currentText=para.textContent||g.text||'';
    detailMeta.textContent=fmt(g.start)+' – '+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';meta.textContent=story.type+' · '+detailMeta.textContent;return true;
   };
   [startInput,endInput].forEach(input=>{
@@ -2768,7 +2812,8 @@ function showSuggestions(items){
   const copy=document.createElement('button');copy.type='button';copy.textContent='Copy';copy.setAttribute('aria-label','Copy highlight details');copy.title='Copy highlight details';
   const copyStatus=document.createElement('span');copyStatus.className='note';copyStatus.setAttribute('aria-live','polite');
   copy.onclick=async()=>{if(!updateTimes()){copyStatus.textContent='Correct the start and end times before copying.';return;}
-   const report=['CLIPMIND HIGHLIGHT '+String(i+1).padStart(2,'0'),'Category: '+story.type,'Title: '+story.title,'Start: '+fmt(g.start),'End: '+fmt(g.end),'Duration: '+(g.end-g.start).toFixed(2)+' seconds','Why it stands out: '+story.reason,'AI suggested range: '+fmt(g.suggestedStart)+' – '+fmt(g.suggestedEnd),'Current edited range: '+fmt(g.start)+' – '+fmt(g.end),'Source video: '+(selectedFile?.name||'Not available'),'','FULL PASSAGE',para.textContent||g.text||''].join('\n');
+   g.currentText=para.textContent||g.text||'';
+   const report=formatHighlightReport(g,i,g.currentText);
    copy.disabled=true;copyStatus.textContent='Copying…';try{await copyDiagnosticText(report);copyStatus.textContent='Copied highlight '+(i+1)+'. Paste it wherever needed.';}catch(error){copyStatus.textContent='Copy failed. Check browser clipboard permission and try again.';}finally{copy.disabled=false;}
   };
   actions.append(preview,use,copy);body.append(reason,para,edit,times,actions,copyStatus);div.append(detailTop,heading,detailMeta,body);panel.appendChild(div);
@@ -2777,8 +2822,15 @@ function showSuggestions(items){
  deck.querySelector('.highlight-stack-front strong').textContent=items[0].story.title;
  deck.querySelector('.highlight-stack-front small').textContent=items[0].story.type+' · '+fmt(items[0].start)+'–'+fmt(items[0].end)+' · '+items.length+' highlights ready';
  stackPreview.appendChild(deck);
- host.append(stackPreview,toggle,panel);
- toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);stackPreview.classList.toggle('hidden',opening);toggle.setAttribute('aria-expanded',String(opening));toggle.textContent=opening?'Hide all highlights ('+items.length+')':'Show all highlights ('+items.length+')';$('batchControls').style.display=opening?'grid':'none';if(opening)panel.scrollIntoView({behavior:'smooth',block:'nearest'});});
+ host.append(stackPreview,toggle,copyAll,copyAllStatus,panel);
+ toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);stackPreview.classList.toggle('hidden',opening);copyAll.hidden=!opening;copyAllStatus.textContent='';toggle.setAttribute('aria-expanded',String(opening));toggle.textContent=opening?'Hide all highlights ('+items.length+')':'Show all highlights ('+items.length+')';$('batchControls').style.display=opening?'grid':'none';if(opening)panel.scrollIntoView({behavior:'smooth',block:'nearest'});});
+ copyAll.addEventListener('click',async()=>{
+  const report=['CLIPMIND · COMPLETE GENERATED HIGHLIGHT REPORT','Source video: '+(selectedFile?.name||'Not available'),'Total generated highlights: '+items.length,'Note: includes every generated highlight, independent of batch selection.','',...items.map((g,i)=>formatHighlightReport(g,i,g.currentText||g.text||''))].join('\\n');
+  copyAll.disabled=true;copyAllStatus.textContent='Preparing complete highlight report…';
+  try{await copyDiagnosticText(report);copyAllStatus.textContent='All '+items.length+' complete highlight records copied.';}
+  catch(error){copyAllStatus.textContent='Copy failed. Check browser clipboard permission and try again.';}
+  finally{copyAll.disabled=false;}
+ });
  $('batchControls').style.display='none';
 }
 document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{
@@ -2938,6 +2990,11 @@ $('selectAll').onclick=()=>{
 };
 
 
+document.addEventListener('play',event=>{
+ const current=event.target;
+ if(!(current instanceof HTMLVideoElement))return;
+ document.querySelectorAll('video').forEach(player=>{if(player!==current&&!player.paused)player.pause();});
+},true);
 const analysisDisclosurePanels=[$('aiHistoryBox'),$('audioDiagnostics'),$('transcriptBox')];
 analysisDisclosurePanels.forEach(panel=>panel.addEventListener('toggle',()=>{
  if(panel.open)analysisDisclosurePanels.forEach(other=>{if(other!==panel)other.open=false;});
