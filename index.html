@@ -1312,8 +1312,7 @@ async function loadFastExtractor(){
      if(Number.isFinite(progress))progressUI('Extracting audio',Math.max(0,Math.min(99,progress*100)),'Fast extraction progress reported by FFmpeg.');
     });
     const base='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
-    const classWorkerURL=new URL('./ffmpeg/worker.js',window.location.href).href;
-    await instance.load({classWorkerURL,coreURL:base+'/ffmpeg-core.js',wasmURL:base+'/ffmpeg-core.wasm'});
+    await instance.load({coreURL:base+'/ffmpeg-core.js',wasmURL:base+'/ffmpeg-core.wasm'});
     if(timedOut)throw new Error('FFmpeg initialization exceeded its time limit. Retry or use the real-time fallback.');
     ffmpegReady=true;
     aiStatus('Fast audio extractor ready.');
