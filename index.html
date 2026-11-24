@@ -416,18 +416,25 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 .analysis-disclosure-content>.disclosure-content{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:0;border:0;background:transparent;overflow:visible}
 .analysis-disclosure-content>.disclosure-content>*{max-width:100%;min-width:0;box-sizing:border-box}
 .analysis-disclosure-content #aiHistory{max-height:190px;overflow:auto;overscroll-behavior:contain}
-.analysis-disclosure-content #audioDiagnosticsText{display:block;width:100%;max-height:260px!important;overflow:auto!important;overscroll-behavior:contain;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
+.analysis-disclosure-content #audioDiagnosticsText{display:block;width:100%;height:230px;max-height:230px!important;min-height:150px;overflow-y:scroll!important;overflow-x:hidden;overscroll-behavior:contain;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box;border:1px solid #414141;border-radius:9px;scrollbar-width:thin;scrollbar-color:#a9672b #303030}
+#audioDiagnostics .disclosure-content{min-width:0}
+#audioDiagnosticsText::-webkit-scrollbar,.transcript-page .transcript-full::-webkit-scrollbar,.transcript-page .transcript::-webkit-scrollbar,.transcript-horizontal-rail::-webkit-scrollbar,.clip-output-gallery::-webkit-scrollbar{width:7px;height:7px}
+#audioDiagnosticsText::-webkit-scrollbar-thumb,.transcript-page .transcript-full::-webkit-scrollbar-thumb,.transcript-page .transcript::-webkit-scrollbar-thumb,.transcript-horizontal-rail::-webkit-scrollbar-thumb,.clip-output-gallery::-webkit-scrollbar-thumb{background:#8a5a30;border-radius:10px}
+#audioDiagnosticsText::-webkit-scrollbar-track,.transcript-page .transcript-full::-webkit-scrollbar-track,.transcript-page .transcript::-webkit-scrollbar-track,.transcript-horizontal-rail::-webkit-scrollbar-track,.clip-output-gallery::-webkit-scrollbar-track{background:#303030;border-radius:10px}
 .analysis-disclosure-content .transcript-horizontal-rail{display:flex;flex-flow:row nowrap;gap:10px;width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding:0;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
-.transcript-page{flex:0 0 100%;width:100%;max-width:100%;min-width:100%;box-sizing:border-box;scroll-snap-align:start;border:1px solid #414141;border-radius:10px;padding:10px;background:#202020;overflow:hidden}
+.transcript-page{flex:0 0 100%;width:100%;max-width:100%;min-width:100%;height:430px;min-height:430px;max-height:430px;display:flex;flex-direction:column;box-sizing:border-box;scroll-snap-align:start;border:1px solid #414141;border-radius:10px;padding:10px;background:#202020;overflow:hidden}
 .transcript-page .transcript-heading{margin:0 0 8px}
 .transcript-page .transcript-tools{margin:0 0 8px;display:flex;flex-wrap:wrap;gap:7px}
-.transcript-page .transcript-full,.transcript-page .transcript{width:100%;max-width:100%;height:36vh;max-height:360px;min-height:180px;overflow:auto!important;overscroll-behavior:contain;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
+.transcript-page .transcript-full,.transcript-page .transcript{display:block;flex:1 1 auto;width:100%;max-width:100%;height:auto;max-height:none;min-height:0;overflow-y:scroll!important;overflow-x:hidden;overscroll-behavior:contain;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box;border:1px solid #555;border-radius:9px;padding:11px;background:#1d1d1d;scrollbar-width:thin;scrollbar-color:#a9672b #303030}
+.transcript-page .transcript-note{flex:0 0 auto}
+.transcript-page .transcript-tools{flex:0 0 auto}
+.transcript-page .transcript-heading{flex:0 0 auto}
 .transcript-page .transcript-note{margin:5px 0 8px}
 .analysis-disclosure-content #transcript{scroll-behavior:auto}
 @media(max-width:390px){
  .analysis-disclosure-tabs{gap:5px}
  .analysis-disclosure-tab{padding:7px 4px!important;font-size:10px}
- .transcript-page .transcript-full,.transcript-page .transcript{height:34vh;min-height:170px}
+ .transcript-page{height:390px;min-height:390px;max-height:390px}
 }
 
 
@@ -455,11 +462,19 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 .transcript-view-tab[aria-selected="true"]{border-color:#a9672b;background:#30271f;color:#ffbd78}
 .transcript-page .transcript-tools{margin:0 0 8px}
 .transcript-page .transcript-tools button{width:auto;min-height:38px;margin:0;padding:8px 10px;font-size:11px}
+.transcript-horizontal-rail{scrollbar-width:thin;scrollbar-color:#a9672b #303030}
+.transcript-page .transcript-full-page .transcript-full{margin-top:0}
+.transcript-page .transcript-timed-page #transcript{margin-top:0}
 .clip-range-control-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:end;gap:9px;margin-top:7px}
 .clip-range-control-row>.row{min-width:0;grid-column:1/3;margin:0}
 .clip-range-control-row>.reset-range-button{grid-column:3;align-self:end;min-height:46px;padding:8px 11px!important;white-space:nowrap}
 .clip-output-gallery{display:flex;flex-flow:row nowrap;gap:10px;width:100%;min-width:0;margin-top:10px;padding:2px 1px 12px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding:1px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
 .clip-output-gallery>.clip-output{flex:0 0 min(88%,460px);width:min(88%,460px);min-width:0;margin:0;scroll-snap-align:start}
+#exportResultsSection{min-width:0}
+#exportResultsSection .status:empty{display:none}
+#exportResultsSection .clip-output-gallery:empty{display:none}
+#exportResultsSection .clip-output-gallery{margin-top:12px}
+#exportResultsSection .export-progress-panel{margin-top:0}
 .clip-output-gallery .clip-output video{display:block;width:100%;max-height:280px}
 @media(max-width:420px){
  .clip-range-control-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
@@ -473,10 +488,10 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 <main>
 <div class="kicker">PERSONAL VIDEO TOOL · V0.16.4 HIGHLIGHT INTELLIGENCE</div>
 <h1>Find moments worth clipping.</h1>
-<p class="sub">Choose a video, let the on-device speech model transcribe it, then review, refine, and export suggested moments. Your video and transcript stay in this browser session.</p>
+
 
 <section class="card">
-<h2>1. Choose your video</h2><p class="help">Works with English, Hindi, Dari/Persian, Arabic, and many other spoken languages. Clear audio gives the best results.</p>
+<h2>1. Choose your video</h2>
 <input id="file" type="file" accept="video/*">
 <button class="pick" id="choose">＋ &nbsp; Select video</button>
 <div id="meta" class="meta hidden"></div>
@@ -536,19 +551,19 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 <option value="other">Other / Auto detect</option>
 </select>
 </label>
-<p class="help" style="margin-top:7px">Choose the main spoken language to reduce language mix-ups and help Whisper transcribe more efficiently. Select Auto detect if you are unsure.</p>
+
 <label class="field" style="display:block;margin-top:12px">ENGLISH RECOGNITION MODEL
 <select id="englishModel" aria-label="English recognition model">
 <option value="base" selected>Whisper Base · better accuracy, slower</option>
 <option value="tiny">Whisper Tiny · faster, lighter</option>
 </select></label>
-<p class="help" style="margin-top:7px">Base is an accuracy experiment for English. It downloads a larger model and may take longer on your phone. Tiny remains available if Base is too slow.</p>
+
 </div>
 </section>
 
 <section class="card">
 <h2>3. AI highlight finder</h2>
-<p class="help">Choose which part of the video to inspect. By default, ClipMind checks the whole video. There is no fixed time limit, but shorter ranges finish sooner and use less phone memory.</p>
+
 <div id="aiActionGrid" class="ai-action-grid">
 <button id="analyze" class="primary" disabled>✨ Prepare AI tools</button>
 <button id="fastRead" class="secondary hidden">⚡ Extract audio and find highlights</button>
@@ -572,7 +587,7 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 <div class="transcript-tools"><button id="copyFullTranscript" class="secondary" type="button">📋 Copy full transcript</button><span id="transcriptCopyStatus" class="note" aria-live="polite"></span></div>
 <div id="transcriptFull" class="transcript-full">The full recognized text will appear here.</div>
 <div class="transcript-heading">TIMESTAMPED SEGMENTS</div>
-<p class="transcript-note">Tap a timestamp to jump to that phrase. The phrase currently under playback is highlighted; alignment is phrase-level, not word-level. Timestamped segments may be sparser than the full text when the speech model does not return a time for every phrase.</p>
+<p class="transcript-note">Phrase-level timestamps · Tap a time to seek.</p>
 <div id="transcript" class="transcript"></div></div>
 </details>
 </div>
@@ -609,7 +624,7 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 </section>
 
 <section class="card">
-<h2>5. Create your clips</h2><p class="help">Choose a highlight above, adjust its boundaries if needed, and export one clip or a batch. Exports run one at a time.</p>
+<h2>5. Create your clips</h2>
 <div class="clip-range-control-row"><div class="row">
 <label class="field">START (min:sec)<div class="clock-edit" data-clock-for="start" role="group" aria-label="Clip start time">
  <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time minute tens" data-digit="0" value="0">
@@ -626,14 +641,14 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
  <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time second units" data-digit="3" value="0">
  </div><input id="end" type="text" maxlength="8" inputmode="numeric" autocomplete="off" placeholder="00:30" value="00:30" aria-label="Clip end time" class="clock-canonical" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;padding:0;margin:0" tabindex="-1"></label>
 <button id="resetClipTimes" class="secondary reset-range-button" type="button">Reset range</button></div>
-<p class="help" style="margin-top:8px">Tap where you want to edit, or use the arrow keys to move between digits. Each digit stays in its position; Backspace clears only the selected digit.</p>
+
 <div class="clip-duration-presets" aria-label="Clip duration presets">
 <button class="secondary preset" data-sec="15" type="button">15 sec</button>
 <button class="secondary preset" data-sec="30" type="button">30 sec</button>
 <button class="secondary preset" data-sec="45" type="button">45 sec</button>
 <button class="secondary preset" data-sec="60" type="button">60 sec</button>
 </div>
-<p class="help" style="margin-top:13px">Output shape</p>
+<p class="field-label" style="margin:13px 0 6px">OUTPUT SHAPE</p>
 <div class="shape-grid" role="group" aria-label="Output aspect ratio">
 <label><input type="radio" name="shape" value="9:16" checked> 9:16 Portrait</label>
 <label><input type="radio" name="shape" value="16:9"> 16:9 Landscape</label>
@@ -641,11 +656,14 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 <label><input type="radio" name="shape" value="4:5"> 4:5 Feed</label>
 <label><input type="radio" name="shape" value="original"> Original</label>
 </div>
-<p class="note">Portrait and square formats crop from the centre. Original preserves the source dimensions.</p>
-<div class="crop-preview"><canvas id="cropPreviewCanvas" width="90" height="160" aria-label="Preview of selected output crop"></canvas><div class="crop-preview-copy"><b>Output framing preview</b><br><span id="cropPreviewLabel">9:16 Portrait · centre crop</span><br>Check that faces and important details remain inside the frame.</div></div>
+
+<div class="crop-preview"><canvas id="cropPreviewCanvas" width="90" height="160" aria-label="Preview of selected output crop"></canvas><div class="crop-preview-copy"><b>Framing preview</b><br><span id="cropPreviewLabel">9:16 Portrait · centre crop</span></div></div>
 <button id="create" class="primary" disabled>Create clip</button>
+</section>
+<section id="exportResultsSection" class="card hidden">
+<h2>6. Exported clips</h2>
 <div id="exportProgressPanel" class="export-progress-panel hidden"><div class="export-progress-head"><span id="exportProgressTitle">Preparing export</span><span id="exportProgressCount">0 / 0</span></div><progress id="exportProgress" value="0" max="100"></progress><div id="exportProgressText">Waiting to start…</div></div>
-<p id="exportStatus" class="status">Select a video first.</p>
+<p id="exportStatus" class="status" aria-live="polite"></p>
 <div id="clipOutputs" class="clip-output-gallery" aria-label="Exported clips gallery" aria-live="polite"></div>
 </section>
 <details class="card note app-note-disclosure"><summary>Highlight note</summary><div class="app-note-content"><p>Titles and reasons are generated from transcript wording and structural cues; the app does not yet inspect visual scenes or guarantee viral performance. Review the preview and boundaries.</p></div></details>
@@ -1087,7 +1105,7 @@ function stopTranscriptionClock(success){
  transcriptionClockStartedAt=0;
 }
 
-const exportStatus=t=>$('exportStatus').textContent=t;
+const exportStatus=t=>{$('exportResultsSection').classList.remove('hidden');$('exportStatus').textContent=t;};
 
 function fmt(s){s=Math.max(0,Number(s)||0);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0')}
 function parseClipTime(value){
@@ -2969,7 +2987,7 @@ async function runExports(clips,preserveOutputs=false){
  if(activeExport)return;
  if(!clips.length){exportStatus('Select at least one AI suggestion first.');return;}
  const shape=document.querySelector('input[name="shape"]:checked').value;
- setExportBusy(true);$('retryFailedExport')?.remove();if(!preserveOutputs){outputUrls.forEach(url=>URL.revokeObjectURL(url));outputUrls.clear();$('clipOutputs').innerHTML='';}$('exportProgressPanel').classList.remove('hidden');$('exportProgress').value=0;$('exportProgressTitle').textContent='Preparing clips';$('exportProgressCount').textContent='0 / '+clips.length;$('exportProgressText').textContent='Starting the first export…';
+ setExportBusy(true);$('exportResultsSection').classList.remove('hidden');$('retryFailedExport')?.remove();if(!preserveOutputs){outputUrls.forEach(url=>URL.revokeObjectURL(url));outputUrls.clear();$('clipOutputs').innerHTML='';}$('exportProgressPanel').classList.remove('hidden');$('exportProgress').value=0;$('exportProgressTitle').textContent='Preparing clips';$('exportProgressCount').textContent='0 / '+clips.length;$('exportProgressText').textContent='Starting the first export…';
  let completed=0,failedClip=null,failedMessage='';
  try{
   for(let i=0;i<clips.length;i++){
