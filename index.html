@@ -647,15 +647,53 @@ details[open]>summary::after{border-color:var(--accent)!important}
 ::selection{background:rgba(183,166,203,.28);color:var(--text)}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 
+
+/* Phase 1 — AMOLED Gradient Glass shared header and navigation */
+body{min-height:100vh}
+.app-header{position:sticky;top:0;z-index:80;min-height:68px;padding:10px clamp(14px,3vw,28px);display:flex;align-items:center;gap:14px;background:rgba(7,7,9,.82)!important}
+.brand-lockup{display:flex;align-items:center;gap:11px;min-width:0;color:inherit;text-decoration:none}
+.timeline-logo{position:relative;display:flex;align-items:center;justify-content:center;gap:3px;width:38px;height:38px;flex:0 0 38px;border-radius:12px;background:rgba(183,166,203,.14)!important;border:1px solid rgba(183,166,203,.30);overflow:hidden}
+.timeline-logo i{display:block;width:4px;border-radius:3px;background:var(--accent);height:13px}.timeline-logo i:nth-child(2){height:21px;opacity:.8}.timeline-logo i:nth-child(3){height:16px;opacity:.65}
+.timeline-logo b{position:absolute;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid #f1ede6;left:16px;top:14px;filter:drop-shadow(0 0 3px #000)}
+.brand-copy{display:block;min-width:0}.brand-copy strong{display:block;font-size:17px;line-height:1.15;letter-spacing:-.35px}.brand-copy small{display:block;margin-top:3px;font-size:10px;line-height:1.2;color:var(--muted)!important}
+.header-version{margin-left:8px;padding:5px 9px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:10px;white-space:nowrap}
+.header-actions{display:flex;align-items:center;gap:7px;margin-left:auto}
+.header-icon{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.035);color:var(--text);text-decoration:none;font:600 16px/1 inherit;cursor:pointer}
+.header-icon:hover{background:var(--accent-soft);border-color:rgba(183,166,203,.4)}
+.nav-toggle{flex:0 0 36px;flex-direction:column;gap:4px}.nav-toggle span{width:15px;height:1.5px;background:var(--text);border-radius:2px}
+.nav-backdrop{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.62);backdrop-filter:blur(3px)}
+.app-navigation{position:fixed;z-index:91;inset:0 auto 0 0;width:min(300px,86vw);padding:18px 14px 14px;background:rgba(13,13,16,.97);border-right:1px solid var(--line);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transform:translateX(-105%);transition:transform .22s ease;display:flex;flex-direction:column;gap:5px;box-shadow:18px 0 50px rgba(0,0,0,.35)}
+.app-navigation.is-open{transform:translateX(0)}.nav-heading{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 14px 9px;color:var(--text);font-size:13px}
+.app-navigation>a{display:flex;align-items:center;gap:12px;min-height:43px;padding:9px 11px;border-radius:10px;color:#d9d3cb;text-decoration:none;font-size:13px}
+.app-navigation>a span{width:19px;text-align:center;color:var(--accent);font-size:16px}.app-navigation>a:hover,.app-navigation>a:focus-visible{background:var(--accent-soft);color:var(--text);outline:none}
+.nav-divider{height:1px;background:var(--line);margin:8px 4px}.nav-footer{margin-top:auto;padding:13px 9px 4px;border-top:1px solid var(--line);color:var(--text);font-size:11px}.nav-footer span{display:block;margin-top:4px;color:var(--muted);font-size:10px}
+body.nav-open{overflow:hidden}
+@media(min-width:760px){.app-header{padding-inline:max(22px,calc((100vw - 1120px)/2))}main{max-width:900px}}
+@media(max-width:420px){.app-header{min-height:62px;gap:9px;padding:9px 12px}.brand-copy strong{font-size:16px}.brand-copy small{font-size:9px}.header-version{margin-left:2px;padding:4px 7px;font-size:9px}.header-actions{gap:5px}.header-icon{width:33px;height:33px}}
+@media(max-width:350px){.brand-copy small{display:none}.header-version{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.app-navigation{transition:none}}
+
 </style></head>
 <body>
-<header><div class="logo">▶</div><div><strong>ClipMind</strong><small>Your private video clip studio</small></div></header>
-<main>
+<header class="app-header">
+ <button class="header-icon nav-toggle" id="navToggle" type="button" aria-label="Open navigation" aria-controls="appNavigation" aria-expanded="false"><span></span><span></span><span></span></button>
+ <a class="brand-lockup" href="#home" aria-label="ClipMind home"><span class="logo timeline-logo" aria-hidden="true"><i></i><i></i><i></i><b></b></span><span class="brand-copy"><strong>ClipMind</strong><small>Private video clip studio</small></span></a>
+ <span class="header-version">v0.16.4 · Dev</span>
+ <nav class="header-actions" aria-label="Quick links"><a class="header-icon" href="#appHelp" aria-label="Help and guide" title="Help and guide">?</a><a class="header-icon" href="#recognitionSettings" aria-label="Recognition settings" title="Recognition settings">⚙</a></nav>
+</header>
+<div class="nav-backdrop" id="navBackdrop" hidden></div>
+<aside class="app-navigation" id="appNavigation" aria-label="Main navigation" aria-hidden="true">
+ <div class="nav-heading"><strong>Workspace</strong><button id="navClose" class="header-icon" type="button" aria-label="Close navigation">×</button></div>
+ <a href="#home"><span>⌂</span> Home</a><a href="#chooseVideo"><span>＋</span> Choose video</a><a href="#recognitionSettings"><span>◉</span> Recognition settings</a><a href="#aiFinder"><span>✦</span> AI highlight finder</a><a href="#highlightResultsSection"><span>▤</span> Review highlights</a><a href="#createSection"><span>▣</span> Create your clips</a><a href="#exportResultsSection"><span>⇩</span> Exported clips</a>
+ <div class="nav-divider"></div><a href="#audioDiagnostics"><span>⌁</span> Diagnostics</a><a href="#appHelp"><span>?</span> Help & guide</a>
+ <div class="nav-footer">ClipMind <span>Development build</span></div>
+</aside>
+<main id="home">
 <div class="kicker">PERSONAL VIDEO TOOL · V0.16.4 HIGHLIGHT INTELLIGENCE</div>
 <h1>Find moments worth clipping.</h1>
 
 
-<section class="card">
+<section class="card" id="chooseVideo">
 <h2>1. Choose your video</h2>
 <input id="file" type="file" accept="video/*">
 <button class="pick" id="choose">＋ &nbsp; Select video</button>
@@ -694,7 +732,7 @@ details[open]>summary::after{border-color:var(--accent)!important}
  </div>
 </details>
 
-<section class="card recognition-settings-card">
+<section class="card recognition-settings-card" id="recognitionSettings">
 <h2>2. Recognition settings</h2>
 <div class="ai-recognition-settings">
 <label class="field" style="display:block;margin-top:12px">SPOKEN LANGUAGE
@@ -726,7 +764,7 @@ details[open]>summary::after{border-color:var(--accent)!important}
 </div>
 </section>
 
-<section class="card">
+<section class="card" id="aiFinder">
 <h2>3. AI highlight finder</h2>
 
 <div id="aiActionGrid" class="ai-action-grid">
@@ -788,7 +826,7 @@ details[open]>summary::after{border-color:var(--accent)!important}
 <div class="batch-row" id="batchControls" style="margin-top:10px;display:none"><button id="createSelected" class="primary" type="button" aria-label="Create selected clips">Create selected</button><button id="selectAll" class="secondary" type="button">Select all</button></div>
 </section>
 
-<section class="card">
+<section class="card" id="createSection">
 <h2>5. Create your clips</h2>
 <div class="clip-range-control-row"><div class="row">
 <label class="field">START (min:sec)<div class="clock-edit" data-clock-for="start" role="group" aria-label="Clip start time">
@@ -833,7 +871,7 @@ details[open]>summary::after{border-color:var(--accent)!important}
 <p id="exportStatus" class="status" aria-live="polite"></p>
 <div id="clipOutputs" class="clip-output-gallery" aria-label="Exported clips gallery" aria-live="polite"></div>
 </section>
-<details class="card note app-note-disclosure"><summary>Highlight note</summary><div class="app-note-content"><p>Titles and reasons are generated from transcript wording and structural cues; the app does not yet inspect visual scenes or guarantee viral performance. Review the preview and boundaries.</p></div></details>
+<details class="card note app-note-disclosure" id="appHelp"><summary>Highlight note</summary><div class="app-note-content"><p>Titles and reasons are generated from transcript wording and structural cues; the app does not yet inspect visual scenes or guarantee viral performance. Review the preview and boundaries.</p></div></details>
 <details class="card note app-note-disclosure"><summary>Memory & processing notes</summary><div class="app-note-content"><p>ClipMind unloads the Whisper model and FFmpeg engine after each analysis to free phone memory. Timestamp controls are built only when you open the transcript panel, and temporary audio samples are cleared after recognition. Transcript timestamps are phrase-level estimates returned by Whisper, not exact word boundaries. ClipMind will not invent highlight times if timestamp data is missing. Tap Prepare AI tools again before analyzing another range.</p><p>Fast extraction uses FFmpeg WebAssembly, which may download a large engine the first time. It is usually faster than real-time playback, but speed depends on the video format and phone. If direct extraction fails, use the real-time fallback. You can inspect only a chosen time range instead of the whole video. Very long selected ranges can still use substantial phone memory. Highlight ranking uses transcript structure and language signals, not full visual understanding. Titles and explanations are generated from transcript clues and are not proof that a moment will perform well. Keep Chrome open while processing.</p></div></details>
 </main><footer>ClipMind · v0.16.4 · Editorial highlights & precision controls</footer>
 
@@ -3197,6 +3235,20 @@ const analysisDisclosurePanels=[$('aiHistoryBox'),$('audioDiagnostics'),$('trans
 analysisDisclosurePanels.forEach(panel=>panel.addEventListener('toggle',()=>{
  if(panel.open)analysisDisclosurePanels.forEach(other=>{if(other!==panel)other.open=false;});
 }));
+
+
+/* Phase 1 — accessible mobile navigation */
+(()=>{
+ const panel=document.getElementById('appNavigation'),toggle=document.getElementById('navToggle'),close=document.getElementById('navClose'),backdrop=document.getElementById('navBackdrop');
+ if(!panel||!toggle||!close||!backdrop)return;
+ const setOpen=open=>{
+  panel.classList.toggle('is-open',open);panel.setAttribute('aria-hidden',String(!open));toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Close navigation':'Open navigation');backdrop.hidden=!open;document.body.classList.toggle('nav-open',open);
+  if(open)close.focus();else toggle.focus();
+ };
+ toggle.addEventListener('click',()=>setOpen(!panel.classList.contains('is-open')));close.addEventListener('click',()=>setOpen(false));backdrop.addEventListener('click',()=>setOpen(false));
+ panel.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>setOpen(false)));
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&panel.classList.contains('is-open'))setOpen(false);});
+})();
 
 </script>
 </body></html>
