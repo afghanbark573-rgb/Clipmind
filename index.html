@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#171717">
+<meta name="theme-color" content="#000000">
 <title>ClipMind v0.16.4</title>
 <style>
 :root{color-scheme:dark;--bg:#171717;--card:#242424;--line:#414141;--muted:#a3a3a3;--accent:#f59e45;--good:#43b581}
@@ -17,7 +17,7 @@ h1{font-size:29px;line-height:1.12;margin:8px 0}.sub{color:var(--muted);line-hei
 .card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:15px;margin:13px 0}
 h2{font-size:16px;margin:0 0 5px}.help{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 13px}
 .pick{width:100%;border:1px dashed #667799;background:#1b2940;color:white;border-radius:13px;padding:18px 12px;font-size:15px;font-weight:700;min-height:68px}
-#file{position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#file{position:absolute;left:-9999px;width:1px;height:1px}
 #preview{width:100%;max-height:340px;background:#05070c;border-radius:12px;margin-top:13px}
 .hidden{display:none!important}.meta,.status{font-size:12px;color:var(--muted);line-height:1.5;margin:10px 2px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -196,6 +196,7 @@ button,input,select{font:inherit}button{touch-action:manipulation}
 .suggestion-details[open] .suggestion-body{animation:highlightReveal .14s ease-out}
 @keyframes highlightReveal{from{opacity:.65;transform:translateY(-2px)}to{opacity:1;transform:translateY(0)}}
 .highlight-details-toggle{width:100%;margin-top:2px;text-align:center;font-weight:800}
+.highlight-copy-all-row{display:flex;align-items:center;gap:8px;margin:8px 0}.highlight-copy-all-row button{flex:1;min-height:42px;margin:0}.highlight-copy-all-status{font-size:11px;color:#a3a3a3;line-height:1.4;min-width:0}
 .highlight-details-panel{display:grid;gap:10px;padding-top:4px}
 .highlight-details-heading{font-size:15px;margin:4px 2px;color:#f5f5f5}
 .highlight-detail-card{width:100%;min-width:0}
@@ -415,47 +416,287 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 .analysis-disclosure-content>.disclosure-content{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:0;border:0;background:transparent;overflow:visible}
 .analysis-disclosure-content>.disclosure-content>*{max-width:100%;min-width:0;box-sizing:border-box}
 .analysis-disclosure-content #aiHistory{max-height:190px;overflow:auto;overscroll-behavior:contain}
-.analysis-disclosure-content #audioDiagnosticsText{display:block;width:100%;max-height:260px!important;overflow:auto!important;overscroll-behavior:contain;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
+.analysis-disclosure-content #audioDiagnosticsText{display:block;width:100%;height:230px;max-height:230px!important;min-height:150px;overflow-y:scroll!important;overflow-x:hidden;overscroll-behavior:contain;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box;border:1px solid #414141;border-radius:9px;scrollbar-width:thin;scrollbar-color:#a9672b #303030}
+#audioDiagnostics .disclosure-content{min-width:0}
+#audioDiagnosticsText::-webkit-scrollbar,.transcript-page .transcript-full::-webkit-scrollbar,.transcript-page .transcript::-webkit-scrollbar,.transcript-horizontal-rail::-webkit-scrollbar,.clip-output-gallery::-webkit-scrollbar{width:7px;height:7px}
+#audioDiagnosticsText::-webkit-scrollbar-thumb,.transcript-page .transcript-full::-webkit-scrollbar-thumb,.transcript-page .transcript::-webkit-scrollbar-thumb,.transcript-horizontal-rail::-webkit-scrollbar-thumb,.clip-output-gallery::-webkit-scrollbar-thumb{background:#8a5a30;border-radius:10px}
+#audioDiagnosticsText::-webkit-scrollbar-track,.transcript-page .transcript-full::-webkit-scrollbar-track,.transcript-page .transcript::-webkit-scrollbar-track,.transcript-horizontal-rail::-webkit-scrollbar-track,.clip-output-gallery::-webkit-scrollbar-track{background:#303030;border-radius:10px}
 .analysis-disclosure-content .transcript-horizontal-rail{display:flex;flex-flow:row nowrap;gap:10px;width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding:0;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
-.transcript-page{flex:0 0 100%;width:100%;max-width:100%;min-width:100%;box-sizing:border-box;scroll-snap-align:start;border:1px solid #414141;border-radius:10px;padding:10px;background:#202020;overflow:hidden}
+.transcript-page{flex:0 0 100%;width:100%;max-width:100%;min-width:100%;height:430px;min-height:430px;max-height:430px;display:flex;flex-direction:column;box-sizing:border-box;scroll-snap-align:start;border:1px solid #414141;border-radius:10px;padding:10px;background:#202020;overflow:hidden}
 .transcript-page .transcript-heading{margin:0 0 8px}
 .transcript-page .transcript-tools{margin:0 0 8px;display:flex;flex-wrap:wrap;gap:7px}
-.transcript-page .transcript-full,.transcript-page .transcript{width:100%;max-width:100%;height:36vh;max-height:360px;min-height:180px;overflow:auto!important;overscroll-behavior:contain;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box}
+.transcript-page .transcript-full,.transcript-page .transcript{display:block;flex:1 1 auto;width:100%;max-width:100%;height:auto;max-height:none;min-height:0;overflow-y:scroll!important;overflow-x:hidden;overscroll-behavior:contain;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box;border:1px solid #555;border-radius:9px;padding:11px;background:#1d1d1d;scrollbar-width:thin;scrollbar-color:#a9672b #303030}
+.transcript-page .transcript-note{flex:0 0 auto}
+.transcript-page .transcript-tools{flex:0 0 auto}
+.transcript-page .transcript-heading{flex:0 0 auto}
 .transcript-page .transcript-note{margin:5px 0 8px}
 .analysis-disclosure-content #transcript{scroll-behavior:auto}
 @media(max-width:390px){
  .analysis-disclosure-tabs{gap:5px}
  .analysis-disclosure-tab{padding:7px 4px!important;font-size:10px}
- .transcript-page .transcript-full,.transcript-page .transcript{height:34vh;min-height:170px}
+ .transcript-page{height:390px;min-height:390px;max-height:390px}
 }
 
 
 /* Mobile-safe clip range controls: two readable MM:SS fields, no tiny digit cells. */
 .clip-time-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:7px}
 .clip-time-field{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:11px;font-weight:750;letter-spacing:.35px;color:#c4c4c4}
-.clip-time-input{display:block;width:100%;min-width:0;height:48px;min-height:48px;margin:0!important;padding:9px 8px!important;border:1px solid #555!important;border-radius:10px!important;background:#202020!important;color:#f5f5f5!important;text-align:center;font:800 19px/1.2 ui-monospace,SFMono-Regular,monospace!important;font-variant-numeric:tabular-nums;letter-spacing:1.5px}
-.clip-time-input:focus{outline:2px solid #f59e45;border-color:#f59e45!important}
+.clip-time-grid .clip-time-input{display:block;width:100%;min-width:0;height:48px;min-height:48px;margin:0!important;padding:9px 8px!important;border:1px solid #555!important;border-radius:10px!important;background:#202020!important;color:#f5f5f5!important;text-align:center;font:800 19px/1.2 ui-monospace,SFMono-Regular,monospace!important;font-variant-numeric:tabular-nums;letter-spacing:1.5px}
+.clip-time-grid .clip-time-input:focus{outline:2px solid #f59e45;border-color:#f59e45!important}
+.clip-time-grid .clock-canonical{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;left:-10000px!important}
 .clip-time-help{margin:7px 1px 4px!important;font-size:10px}
 .clip-range-utility{margin-top:4px}
 .clip-range-utility>span{font-size:10px}
+.clip-duration-presets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.clip-duration-presets .preset{width:100%!important;min-width:0;min-height:48px;margin:0!important;padding:9px 4px!important;white-space:nowrap;font-size:13px}
 #highlightResultsSection,#results{min-width:0}
 @media(max-width:390px){
  .clip-time-grid{gap:8px}
- .clip-time-input{height:44px;min-height:44px;font-size:17px!important}
+ .clip-time-grid .clip-time-input{height:44px;min-height:44px;font-size:17px!important}
+ .clip-duration-presets{gap:6px}
+ .clip-duration-presets .preset{font-size:12px}
 }
+
+.transcript-view-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:0 0 9px}
+.transcript-view-tab{min-width:0;min-height:42px;padding:8px 7px;border:1px solid #484848;border-radius:9px;background:#292929;color:#ddd;font-size:11px;font-weight:750;line-height:1.25}
+.transcript-view-tab[aria-selected="true"]{border-color:#a9672b;background:#30271f;color:#ffbd78}
+.transcript-page .transcript-tools{margin:0 0 8px}
+.transcript-page .transcript-tools button{width:auto;min-height:38px;margin:0;padding:8px 10px;font-size:11px}
+.transcript-horizontal-rail{scrollbar-width:thin;scrollbar-color:#a9672b #303030}
+.transcript-page .transcript-full-page .transcript-full{margin-top:0}
+.transcript-page .transcript-timed-page #transcript{margin-top:0}
+.clip-range-control-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:end;gap:9px;margin-top:7px}
+.clip-range-control-row>.row{min-width:0;grid-column:1/3;margin:0}
+.clip-range-control-row>.reset-range-button{grid-column:3;align-self:end;min-height:46px;padding:8px 11px!important;white-space:nowrap}
+.clip-output-gallery{display:flex;flex-flow:row nowrap;gap:10px;width:100%;min-width:0;margin-top:10px;padding:2px 1px 12px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding:1px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.clip-output-gallery>.clip-output{flex:0 0 min(88%,460px);width:min(88%,460px);min-width:0;margin:0;scroll-snap-align:start}
+#exportResultsSection{min-width:0}
+#exportResultsSection .status:empty{display:none}
+#exportResultsSection .clip-output-gallery:empty{display:none}
+#exportResultsSection .clip-output-gallery{margin-top:12px}
+#exportResultsSection .export-progress-panel{margin-top:0}
+.clip-output-gallery .clip-output video{display:block;width:100%;max-height:280px}
+@media(max-width:420px){
+ .clip-range-control-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+ .clip-range-control-row>.row{grid-column:1/3}
+ .clip-range-control-row>.reset-range-button{grid-column:1/3;justify-self:end;min-height:38px}
+ .clip-output-gallery>.clip-output{flex-basis:88%;width:88%}
+}
+
+/* v0.16.4 mobile alignment refinement */
+*{scrollbar-width:thin;scrollbar-color:#8a5a30 #303030}
+*::-webkit-scrollbar{width:7px;height:7px}
+*::-webkit-scrollbar-thumb{background:#8a5a30;border:1px solid #303030;border-radius:10px}
+*::-webkit-scrollbar-track{background:#303030;border-radius:10px}
+.analysis-disclosure-content{height:490px;min-height:490px;max-height:490px;overflow:hidden;display:flex;flex-direction:column}
+.analysis-disclosure-content>.disclosure-content{height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.analysis-disclosure-content #aiHistory{height:100%;max-height:100%;min-height:0;overflow-y:auto;overflow-x:hidden}
+#analysisDisclosureContent:has(#aiHistory)>.disclosure-content{height:100%;min-height:0}
+#aiHistory{height:100%;max-height:none!important;min-height:0}
+#analysisDisclosureContent:has(#audioDiagnosticsText)>.disclosure-content{height:100%;min-height:0;display:flex;flex-direction:column}
+#audioDiagnosticsText{height:auto!important;max-height:none!important;min-height:0;flex:1 1 auto;overflow-y:auto!important}
+#copyDiagnostics{flex:0 0 auto;margin:0 0 7px!important;min-height:42px}
+#copyDiagnosticsStatus{flex:0 0 auto}
+#diagnosticCopySections{flex:0 0 auto;max-height:95px;overflow:auto}
+#analysisDisclosureContent:has(.transcript-view-tabs)>.disclosure-content{height:100%;min-height:0;display:flex;flex-direction:column}
+#analysisDisclosureContent:has(.transcript-view-tabs) .transcript-view-tabs{flex:0 0 auto}
+#analysisDisclosureContent:has(.transcript-view-tabs) .transcript-horizontal-rail{flex:1 1 auto;height:0;min-height:0}
+.transcript-page{height:100%!important;min-height:0!important;max-height:none!important}
+.transcript-heading-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;margin:0 0 8px}
+.transcript-heading-row .transcript-heading{min-width:0;margin:0!important;overflow-wrap:anywhere}
+.transcript-heading-row .transcript-tools{flex:0 0 auto;display:flex;align-items:center;justify-content:flex-end;gap:5px;margin:0!important}
+.transcript-heading-row .transcript-tools button{width:auto!important;min-height:34px;height:34px;margin:0!important;padding:6px 9px!important;font-size:10px;white-space:nowrap}
+.transcript-heading-row .transcript-tools .note{display:none}
+.transcript-page .transcript-note{font-size:10px;line-height:1.3}
+.ai-recognition-settings{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:10px;margin-top:8px!important}
+.ai-recognition-settings>label.field{display:flex!important;flex-direction:column;justify-content:flex-start;min-width:0;margin:0!important;gap:5px}
+.ai-recognition-settings .custom-select{width:100%;min-width:0;margin:0!important}
+.ai-recognition-settings .custom-select-trigger{width:100%;min-height:54px;height:54px;padding:8px 10px;font-size:13px;line-height:1.25}
+.ai-recognition-settings .custom-select-menu{max-height:220px;overflow-y:auto;overscroll-behavior:contain}
+.ai-recognition-settings .custom-select-option{min-height:40px;padding:8px 9px;font-size:12px}
+.clip-range-control-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto!important;gap:8px!important;align-items:end!important}
+.clip-range-control-row>.row{grid-column:1/3!important;min-width:0}
+.clip-range-control-row>.reset-range-button{grid-column:3!important;align-self:end!important;justify-self:stretch!important;width:100%!important;min-width:0;min-height:44px!important;height:44px;margin:0!important;padding:6px 8px!important;font-size:11px;white-space:normal}
+.clip-duration-presets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:9px}
+.clip-duration-presets .preset{width:100%!important;min-width:0;min-height:42px;height:42px;margin:0!important;padding:6px 2px!important;font-size:12px;white-space:nowrap;overflow:hidden}
+.shape-preview-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px;align-items:stretch;margin-top:10px;min-width:0}
+.shape-preview-row .shape-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(44px,1fr);gap:6px;min-width:0}
+.shape-preview-row .shape-grid label{display:grid;grid-template-columns:17px minmax(0,1fr);align-items:center;justify-content:start;gap:5px;min-width:0;min-height:44px;padding:6px;font-size:11px;line-height:1.15;overflow:hidden}
+.shape-preview-row .shape-grid label span{display:block;min-width:0;overflow-wrap:anywhere}
+.shape-preview-row .shape-grid input{width:16px;height:16px;margin:0}
+.shape-preview-row .crop-preview{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-width:0;min-height:0;height:100%;margin:0;padding:10px;text-align:center}
+.shape-preview-row #cropPreviewCanvas{width:auto;height:auto;max-width:100%;max-height:160px;min-width:0;object-fit:contain}
+.shape-preview-row .crop-preview-copy{width:100%;min-width:0;font-size:11px;line-height:1.35;overflow-wrap:anywhere}
+.shape-preview-row .crop-preview-copy b{display:block;margin-bottom:4px;color:#ddd}
+#create{display:block!important;width:100%!important;min-height:42px!important;height:42px;padding:8px 14px!important;margin:12px 0 0!important;border-radius:10px!important}
+#clipActionStatus{display:block;width:100%;margin:7px 0 0!important}
+@media(max-width:420px){
+ .analysis-disclosure-content{height:470px;min-height:470px;max-height:470px}
+ .ai-recognition-settings{gap:7px}
+ .ai-recognition-settings .custom-select-trigger{height:56px;min-height:56px;padding:7px 8px;font-size:12px}
+ .clip-range-control-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 82px!important;gap:6px!important}
+ .clip-range-control-row>.row{grid-column:1/3!important}
+ .clip-range-control-row>.reset-range-button{grid-column:3!important;min-height:42px!important;height:42px;font-size:10px;padding:5px 4px!important}
+ .clip-duration-presets{gap:5px}
+ .clip-duration-presets .preset{font-size:11px;padding:5px 1px!important}
+ .shape-preview-row{gap:7px}
+ .shape-preview-row .shape-grid{gap:5px}
+ .shape-preview-row .shape-grid label{grid-template-columns:14px minmax(0,1fr);gap:4px;padding:5px;font-size:10px}
+ .shape-preview-row .shape-grid input{width:14px;height:14px}
+ .shape-preview-row .crop-preview{padding:7px;gap:7px}
+ .shape-preview-row #cropPreviewCanvas{max-height:140px}
+ .transcript-heading-row .transcript-tools button{padding:5px 6px!important;font-size:9px}
+}
+@media(max-width:350px){
+ .clip-range-control-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+ .clip-range-control-row>.row{grid-column:1/3!important}
+ .clip-range-control-row>.reset-range-button{grid-column:1/3!important;justify-self:end!important;width:auto!important;min-width:92px}
+ .shape-preview-row{grid-template-columns:1fr}
+ .shape-preview-row .crop-preview{min-height:170px}
+ .ai-recognition-settings{grid-template-columns:1fr}
+}
+
+/* ClipMind Visual Identity v1.0 — AMOLED Gradient Glass (Subtle)
+   Phase 1: foundational tokens and shared components only.
+   Workflow markup and application logic intentionally remain unchanged. */
+:root{
+ color-scheme:dark;
+ --bg:#000000;
+ --card:rgba(255,255,255,.045);
+ --card-raised:rgba(255,255,255,.065);
+ --line:rgba(235,228,218,.14);
+ --muted:#aaa49b;
+ --text:#f1ede6;
+ --accent:#b7a6cb;
+ --accent-soft:rgba(183,166,203,.13);
+ --good:#9eaf9b;
+ --warn:#b8a27f;
+ --bad:#b88f91;
+ --info:#9caec0;
+ --glass-blur:16px;
+}
+html{background:#000;color-scheme:dark;scrollbar-color:rgba(183,166,203,.45) #090909;scrollbar-width:thin}
+body{
+ background:
+  radial-gradient(ellipse at 50% -18%,rgba(183,166,203,.075),transparent 48%),
+  #000!important;
+ color:var(--text)!important;
+ font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important;
+}
+header{
+ background:rgba(10,10,12,.78)!important;
+ border-bottom:1px solid var(--line)!important;
+ backdrop-filter:blur(var(--glass-blur));
+ -webkit-backdrop-filter:blur(var(--glass-blur));
+}
+.logo{background:var(--accent)!important;color:#151219!important;box-shadow:none!important}
+header strong,h1,h2,h3,.suggestion-title,.suggestion strong{color:var(--text)!important}
+header small,.help,.note,.meta,.status,footer{color:var(--muted)!important}
+.card,.suggestion,.clip-output,.review-panel,.review-source,
+#aiHistoryBox,#audioDiagnostics,#transcriptBox,.preview-timer,
+.readiness-panel,.readiness-report,.crop-preview{
+ background:var(--card)!important;
+ border-color:var(--line)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+ backdrop-filter:blur(var(--glass-blur));
+ -webkit-backdrop-filter:blur(var(--glass-blur));
+}
+button,.pick,.secondary,.suggestion button,.review-choice,.review-audio,
+.transcript-jump,.export-retry,.download{
+ transition:background-color .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
+}
+button{font-family:inherit}
+.primary,.pick{
+ background:var(--accent)!important;
+ color:#17131b!important;
+ border:1px solid transparent!important;
+ box-shadow:none!important;
+}
+.secondary,.suggestion button,.review-choice,.review-audio,.transcript-jump,
+.export-retry{
+ background:rgba(255,255,255,.055)!important;
+ color:var(--text)!important;
+ border:1px solid var(--line)!important;
+}
+input[type=number],input[type=text],select,textarea,
+.suggestion-edit input,.clock-edit .clock-flat,.suggestion-time-input,
+.clip-time-grid .clip-time-input,.review-correction,
+#aiStatus,.transcript,.transcript-full,.transcript-page{
+ background:rgba(255,255,255,.045)!important;
+ color:var(--text)!important;
+ border-color:var(--line)!important;
+}
+input::placeholder,textarea::placeholder{color:#8f8982!important}
+.kicker,.transcript-heading,.review-source strong,.moment-type,
+.current-duration,.transcript-jump{color:var(--accent)!important}
+.moment-type{border-color:rgba(183,166,203,.28)!important;background:var(--accent-soft)!important}
+.suggestion-reason,.suggestion p,.review-source p,.transcript,.transcript-full{color:#d4cec5!important}
+#aiProgress,#previewSeek,.segment input,.suggestion-select input{accent-color:var(--accent)!important}
+#aiProgressPct,.tag,.export-verification strong{color:var(--good)!important}
+.download{background:rgba(158,175,155,.10)!important;border-color:rgba(158,175,155,.25)!important;color:#d6e0d2!important}
+.review-choice[aria-pressed="true"]{background:rgba(158,175,155,.12)!important;border-color:var(--good)!important;color:var(--text)!important}
+details>summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+ outline:2px solid var(--accent)!important;outline-offset:2px!important;
+}
+details>summary::after{border-color:var(--muted)!important}
+details[open]>summary::after{border-color:var(--accent)!important}
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-track{background:#080808;border-radius:10px}
+::-webkit-scrollbar-thumb{background:rgba(183,166,203,.42);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:rgba(183,166,203,.58)}
+::selection{background:rgba(183,166,203,.28);color:var(--text)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+
+/* Phase 1 — AMOLED Gradient Glass shared header and navigation */
+body{min-height:100vh}
+.app-header{position:sticky;top:0;z-index:80;min-height:68px;padding:10px clamp(14px,3vw,28px);display:flex;align-items:center;gap:14px;background:rgba(7,7,9,.82)!important}
+.brand-lockup{display:flex;align-items:center;gap:11px;min-width:0;color:inherit;text-decoration:none}
+.timeline-logo{position:relative;display:flex;align-items:center;justify-content:center;gap:3px;width:38px;height:38px;flex:0 0 38px;border-radius:12px;background:rgba(183,166,203,.14)!important;border:1px solid rgba(183,166,203,.30);overflow:hidden}
+.timeline-logo i{display:block;width:4px;border-radius:3px;background:var(--accent);height:13px}.timeline-logo i:nth-child(2){height:21px;opacity:.8}.timeline-logo i:nth-child(3){height:16px;opacity:.65}
+.timeline-logo b{position:absolute;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid #f1ede6;left:16px;top:14px;filter:drop-shadow(0 0 3px #000)}
+.brand-copy{display:block;min-width:0}.brand-copy strong{display:block;font-size:17px;line-height:1.15;letter-spacing:-.35px}.brand-copy small{display:block;margin-top:3px;font-size:10px;line-height:1.2;color:var(--muted)!important}
+.header-version{margin-left:8px;padding:5px 9px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:10px;white-space:nowrap}
+.header-actions{display:flex;align-items:center;gap:7px;margin-left:auto}
+.header-icon{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.035);color:var(--text);text-decoration:none;font:600 16px/1 inherit;cursor:pointer}
+.header-icon:hover{background:var(--accent-soft);border-color:rgba(183,166,203,.4)}
+.nav-toggle{flex:0 0 36px;flex-direction:column;gap:4px}.nav-toggle span{width:15px;height:1.5px;background:var(--text);border-radius:2px}
+.nav-backdrop{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.62);backdrop-filter:blur(3px)}
+.app-navigation{position:fixed;z-index:91;inset:0 auto 0 0;width:min(300px,86vw);padding:18px 14px 14px;background:rgba(13,13,16,.97);border-right:1px solid var(--line);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transform:translateX(-105%);transition:transform .22s ease;display:flex;flex-direction:column;gap:5px;box-shadow:18px 0 50px rgba(0,0,0,.35)}
+.app-navigation.is-open{transform:translateX(0)}.nav-heading{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 14px 9px;color:var(--text);font-size:13px}
+.app-navigation>a{display:flex;align-items:center;gap:12px;min-height:43px;padding:9px 11px;border-radius:10px;color:#d9d3cb;text-decoration:none;font-size:13px}
+.app-navigation>a span{width:19px;text-align:center;color:var(--accent);font-size:16px}.app-navigation>a:hover,.app-navigation>a:focus-visible{background:var(--accent-soft);color:var(--text);outline:none}
+.nav-divider{height:1px;background:var(--line);margin:8px 4px}.nav-footer{margin-top:auto;padding:13px 9px 4px;border-top:1px solid var(--line);color:var(--text);font-size:11px}.nav-footer span{display:block;margin-top:4px;color:var(--muted);font-size:10px}
+body.nav-open{overflow:hidden}
+@media(min-width:760px){.app-header{padding-inline:max(22px,calc((100vw - 1120px)/2))}main{max-width:900px}}
+@media(max-width:420px){.app-header{min-height:62px;gap:9px;padding:9px 12px}.brand-copy strong{font-size:16px}.brand-copy small{font-size:9px}.header-version{margin-left:2px;padding:4px 7px;font-size:9px}.header-actions{gap:5px}.header-icon{width:33px;height:33px}}
+@media(max-width:350px){.brand-copy small{display:none}.header-version{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.app-navigation{transition:none}}
 
 </style></head>
 <body>
-<header><div class="logo">▶</div><div><strong>ClipMind</strong><small>Your private video clip studio</small></div></header>
-<main>
+<header class="app-header">
+ <button class="header-icon nav-toggle" id="navToggle" type="button" aria-label="Open navigation" aria-controls="appNavigation" aria-expanded="false"><span></span><span></span><span></span></button>
+ <a class="brand-lockup" href="#home" aria-label="ClipMind home"><span class="logo timeline-logo" aria-hidden="true"><i></i><i></i><i></i><b></b></span><span class="brand-copy"><strong>ClipMind</strong><small>Private video clip studio</small></span></a>
+ <span class="header-version">v0.16.4 · Dev</span>
+ <nav class="header-actions" aria-label="Quick links"><a class="header-icon" href="#appHelp" aria-label="Help and guide" title="Help and guide">?</a><a class="header-icon" href="#recognitionSettings" aria-label="Recognition settings" title="Recognition settings">⚙</a></nav>
+</header>
+<div class="nav-backdrop" id="navBackdrop" hidden></div>
+<aside class="app-navigation" id="appNavigation" aria-label="Main navigation" aria-hidden="true">
+ <div class="nav-heading"><strong>Workspace</strong><button id="navClose" class="header-icon" type="button" aria-label="Close navigation">×</button></div>
+ <a href="#home"><span>⌂</span> Home</a><a href="#chooseVideo"><span>＋</span> Choose video</a><a href="#recognitionSettings"><span>◉</span> Recognition settings</a><a href="#aiFinder"><span>✦</span> AI highlight finder</a><a href="#highlightResultsSection"><span>▤</span> Review highlights</a><a href="#createSection"><span>▣</span> Create your clips</a><a href="#exportResultsSection"><span>⇩</span> Exported clips</a>
+ <div class="nav-divider"></div><a href="#audioDiagnostics"><span>⌁</span> Diagnostics</a><a href="#appHelp"><span>?</span> Help & guide</a>
+ <div class="nav-footer">ClipMind <span>Development build</span></div>
+</aside>
+<main id="home">
 <div class="kicker">PERSONAL VIDEO TOOL · V0.16.4 HIGHLIGHT INTELLIGENCE</div>
 <h1>Find moments worth clipping.</h1>
-<p class="sub">Choose a video, let the on-device speech model transcribe it, then review, refine, and export suggested moments. Your video and transcript stay in this browser session.</p>
 
-<section class="card">
-<h2>1. Choose your video</h2><p class="help">Works with English, Hindi, Dari/Persian, Arabic, and many other spoken languages. Clear audio gives the best results.</p>
-<input id="file" type="file" accept="video/*" aria-label="Choose a video file">
-<button class="pick" id="choose" type="button">＋ &nbsp; Select video</button>
+
+<section class="card" id="chooseVideo">
+<h2>1. Choose your video</h2>
+<input id="file" type="file" accept="video/*">
+<button class="pick" id="choose">＋ &nbsp; Select video</button>
 <div id="meta" class="meta hidden"></div>
 <video id="preview" class="hidden" controls playsinline preload="metadata"></video>
 <div id="previewTools" class="preview-tools hidden"><div class="inspection-range-controls" aria-label="AI inspection range"><div class="row">
@@ -491,7 +732,7 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
  </div>
 </details>
 
-<section class="card recognition-settings-card">
+<section class="card recognition-settings-card" id="recognitionSettings">
 <h2>2. Recognition settings</h2>
 <div class="ai-recognition-settings">
 <label class="field" style="display:block;margin-top:12px">SPOKEN LANGUAGE
@@ -513,19 +754,19 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 <option value="other">Other / Auto detect</option>
 </select>
 </label>
-<p class="help" style="margin-top:7px">Choose the main spoken language to reduce language mix-ups and help Whisper transcribe more efficiently. Select Auto detect if you are unsure.</p>
+
 <label class="field" style="display:block;margin-top:12px">ENGLISH RECOGNITION MODEL
 <select id="englishModel" aria-label="English recognition model">
 <option value="base" selected>Whisper Base · better accuracy, slower</option>
 <option value="tiny">Whisper Tiny · faster, lighter</option>
 </select></label>
-<p class="help" style="margin-top:7px">Base is an accuracy experiment for English. It downloads a larger model and may take longer on your phone. Tiny remains available if Base is too slow.</p>
+
 </div>
 </section>
 
-<section class="card">
+<section class="card" id="aiFinder">
 <h2>3. AI highlight finder</h2>
-<p class="help">Choose which part of the video to inspect. By default, ClipMind checks the whole video. There is no fixed time limit, but shorter ranges finish sooner and use less phone memory.</p>
+
 <div id="aiActionGrid" class="ai-action-grid">
 <button id="analyze" class="primary" disabled>✨ Prepare AI tools</button>
 <button id="fastRead" class="secondary hidden">⚡ Extract audio and find highlights</button>
@@ -549,7 +790,7 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 <div class="transcript-tools"><button id="copyFullTranscript" class="secondary" type="button">📋 Copy full transcript</button><span id="transcriptCopyStatus" class="note" aria-live="polite"></span></div>
 <div id="transcriptFull" class="transcript-full">The full recognized text will appear here.</div>
 <div class="transcript-heading">TIMESTAMPED SEGMENTS</div>
-<p class="transcript-note">Tap a timestamp to jump to that phrase. The phrase currently under playback is highlighted; alignment is phrase-level, not word-level. Timestamped segments may be sparser than the full text when the speech model does not return a time for every phrase.</p>
+<p class="transcript-note">Phrase-level timestamps · Tap a time to seek.</p>
 <div id="transcript" class="transcript"></div></div>
 </details>
 </div>
@@ -585,40 +826,52 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
 <div class="batch-row" id="batchControls" style="margin-top:10px;display:none"><button id="createSelected" class="primary" type="button" aria-label="Create selected clips">Create selected</button><button id="selectAll" class="secondary" type="button">Select all</button></div>
 </section>
 
-<section class="card">
-<h2>5. Create your clips</h2><p class="help">Choose a highlight above, adjust its boundaries if needed, and export one clip or a batch. Exports run one at a time.</p>
-<div class="clip-time-grid">
-<label class="clip-time-field" for="start">START (MM:SS)
-<input id="start" class="clip-time-input" type="text" inputmode="numeric" maxlength="5" autocomplete="off" value="00:00" placeholder="MM:SS" aria-label="Clip start time">
-</label>
-<label class="clip-time-field" for="end">END (MM:SS)
-<input id="end" class="clip-time-input" type="text" inputmode="numeric" maxlength="5" autocomplete="off" value="00:30" placeholder="MM:SS" aria-label="Clip end time">
-</label>
+<section class="card" id="createSection">
+<h2>5. Create your clips</h2>
+<div class="clip-range-control-row"><div class="row">
+<label class="field">START (min:sec)<div class="clock-edit" data-clock-for="start" role="group" aria-label="Clip start time">
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time minute tens" data-digit="0" value="0">
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time minute units" data-digit="1" value="0">
+ <span class="clock-colon" aria-hidden="true">:</span>
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time second tens" data-digit="2" value="0">
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip start time second units" data-digit="3" value="0">
+ </div><input id="start" type="text" maxlength="8" inputmode="numeric" autocomplete="off" placeholder="00:00" value="00:00" aria-label="Clip start time" class="clock-canonical" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;padding:0;margin:0" tabindex="-1"></label>
+<label class="field">END (min:sec)<div class="clock-edit" data-clock-for="end" role="group" aria-label="Clip end time">
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time minute tens" data-digit="0" value="0">
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time minute units" data-digit="1" value="0">
+ <span class="clock-colon" aria-hidden="true">:</span>
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time second tens" data-digit="2" value="0">
+ <input class="clock-digit" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Clip end time second units" data-digit="3" value="0">
+ </div><input id="end" type="text" maxlength="8" inputmode="numeric" autocomplete="off" placeholder="00:30" value="00:30" aria-label="Clip end time" class="clock-canonical" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;padding:0;margin:0" tabindex="-1"></label>
+<button id="resetClipTimes" class="secondary reset-range-button" type="button">Reset range</button></div>
+
+<div class="clip-duration-presets" aria-label="Clip duration presets">
+<button class="secondary preset" data-sec="15" type="button">15 sec</button>
+<button class="secondary preset" data-sec="30" type="button">30 sec</button>
+<button class="secondary preset" data-sec="45" type="button">45 sec</button>
+<button class="secondary preset" data-sec="60" type="button">60 sec</button>
 </div>
-<p class="help clip-time-help">Enter four digits (MMSS), such as 0316 for 03:16. The field formats it as MM:SS when you leave it.</p>
-<div class="clip-range-utility"><button id="resetClipTimes" class="secondary reset-range-button" type="button">Reset range</button><span>Adjust start and end above, or choose a highlight.</span></div>
-<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">
-<button class="secondary preset" data-sec="15" style="width:auto">15 sec</button>
-<button class="secondary preset" data-sec="30" style="width:auto">30 sec</button>
-<button class="secondary preset" data-sec="45" style="width:auto">45 sec</button>
-<button class="secondary preset" data-sec="60" style="width:auto">60 sec</button>
-</div>
-<p class="help" style="margin-top:13px">Output shape</p>
+<p class="field-label" style="margin:13px 0 6px">OUTPUT SHAPE</p>
+<div class="shape-preview-row">
 <div class="shape-grid" role="group" aria-label="Output aspect ratio">
-<label><input type="radio" name="shape" value="9:16" checked> 9:16 Portrait</label>
-<label><input type="radio" name="shape" value="16:9"> 16:9 Landscape</label>
-<label><input type="radio" name="shape" value="1:1"> 1:1 Square</label>
-<label><input type="radio" name="shape" value="4:5"> 4:5 Feed</label>
-<label><input type="radio" name="shape" value="original"> Original</label>
+<label><input type="radio" name="shape" value="9:16" checked><span>9:16 Portrait</span></label>
+<label><input type="radio" name="shape" value="16:9"><span>16:9 Landscape</span></label>
+<label><input type="radio" name="shape" value="1:1"><span>1:1 Square</span></label>
+<label><input type="radio" name="shape" value="4:5"><span>4:5 Feed</span></label>
+<label><input type="radio" name="shape" value="original"><span>Original</span></label>
 </div>
-<p class="note">Portrait and square formats crop from the centre. Original preserves the source dimensions.</p>
-<div class="crop-preview"><canvas id="cropPreviewCanvas" width="90" height="160" aria-label="Preview of selected output crop"></canvas><div class="crop-preview-copy"><b>Output framing preview</b><br><span id="cropPreviewLabel">9:16 Portrait · centre crop</span><br>Check that faces and important details remain inside the frame.</div></div>
+<div class="crop-preview"><canvas id="cropPreviewCanvas" width="90" height="160" aria-label="Preview of selected output crop"></canvas><div class="crop-preview-copy"><b>Framing preview</b><span id="cropPreviewLabel">9:16 · centre crop</span></div></div>
+</div>
 <button id="create" class="primary" disabled>Create clip</button>
-<div id="exportProgressPanel" class="export-progress-panel hidden"><div class="export-progress-head"><span id="exportProgressTitle">Preparing export</span><span id="exportProgressCount">0 / 0</span></div><progress id="exportProgress" value="0" max="100"></progress><div id="exportProgressText">Waiting to start…</div></div>
-<p id="exportStatus" class="status">Select a video first.</p>
-<div id="clipOutputs" aria-live="polite"></div>
+<p id="clipActionStatus" class="status hidden" aria-live="polite"></p>
 </section>
-<details class="card note app-note-disclosure"><summary>Highlight note</summary><div class="app-note-content"><p>Titles and reasons are generated from transcript wording and structural cues; the app does not yet inspect visual scenes or guarantee viral performance. Review the preview and boundaries.</p></div></details>
+<section id="exportResultsSection" class="card hidden">
+<h2>6. Exported clips</h2>
+<div id="exportProgressPanel" class="export-progress-panel hidden"><div class="export-progress-head"><span id="exportProgressTitle">Preparing export</span><span id="exportProgressCount">0 / 0</span></div><progress id="exportProgress" value="0" max="100"></progress><div id="exportProgressText">Waiting to start…</div></div>
+<p id="exportStatus" class="status" aria-live="polite"></p>
+<div id="clipOutputs" class="clip-output-gallery" aria-label="Exported clips gallery" aria-live="polite"></div>
+</section>
+<details class="card note app-note-disclosure" id="appHelp"><summary>Highlight note</summary><div class="app-note-content"><p>Titles and reasons are generated from transcript wording and structural cues; the app does not yet inspect visual scenes or guarantee viral performance. Review the preview and boundaries.</p></div></details>
 <details class="card note app-note-disclosure"><summary>Memory & processing notes</summary><div class="app-note-content"><p>ClipMind unloads the Whisper model and FFmpeg engine after each analysis to free phone memory. Timestamp controls are built only when you open the transcript panel, and temporary audio samples are cleared after recognition. Transcript timestamps are phrase-level estimates returned by Whisper, not exact word boundaries. ClipMind will not invent highlight times if timestamp data is missing. Tap Prepare AI tools again before analyzing another range.</p><p>Fast extraction uses FFmpeg WebAssembly, which may download a large engine the first time. It is usually faster than real-time playback, but speed depends on the video format and phone. If direct extraction fails, use the real-time fallback. You can inspect only a chosen time range instead of the whole video. Very long selected ranges can still use substantial phone memory. Highlight ranking uses transcript structure and language signals, not full visual understanding. Titles and explanations are generated from transcript clues and are not proof that a moment will perform well. Keep Chrome open while processing.</p></div></details>
 </main><footer>ClipMind · v0.16.4 · Editorial highlights & precision controls</footer>
 
@@ -638,15 +891,22 @@ disclosureIds.forEach((id,index)=>{
  const record={details,content,button,id,index};disclosureRecords.push(record);
  button.addEventListener('click',()=>{
   const wasActive=button.getAttribute('aria-selected')==='true';
-  disclosureRecords.forEach(item=>{item.button.setAttribute('aria-selected','false');item.details.open=false;});
-  if(wasActive){disclosureContent.hidden=true;disclosureContent.replaceChildren();return;}
+  disclosureRecords.forEach(item=>{
+   item.button.setAttribute('aria-selected','false');item.details.open=false;
+   if(item.content.parentNode===disclosureContent)item.details.appendChild(item.content);
+  });
+  if(wasActive){disclosureContent.hidden=true;return;}
   button.setAttribute('aria-selected','true');details.open=true;disclosureContent.replaceChildren(content);disclosureContent.hidden=false;
  });
 });
 disclosureContent.id='analysisDisclosureContent';disclosureContent.setAttribute('role','tabpanel');
-disclosureRoot.replaceChildren(disclosureTabs,disclosureContent);
+const disclosureSourcePanels=document.createElement('div');
+disclosureSourcePanels.hidden=true;
+disclosureSourcePanels.setAttribute('aria-hidden','true');
+disclosureRecords.forEach(item=>disclosureSourcePanels.appendChild(item.details));
+disclosureRoot.replaceChildren(disclosureTabs,disclosureContent,disclosureSourcePanels);
 // Keep transcript reading as two swipeable, independently scrollable pages.
-const transcriptContent=$('transcriptBox').querySelector('.disclosure-content');
+const transcriptContent=disclosureRecords.find(item=>item.id==='transcriptBox')?.content||null;
 if(transcriptContent){
  const nodes=[...transcriptContent.children];
  const fullCard=document.createElement('section');fullCard.className='transcript-page transcript-full-page';
@@ -657,10 +917,27 @@ if(transcriptContent){
  const full=nodes.find(x=>x.id==='transcriptFull');
  const note=nodes.find(x=>x.classList.contains('transcript-note'));
  const timed=nodes.find(x=>x.id==='transcript');
- [fullHeading,tools,full].filter(Boolean).forEach(x=>fullCard.appendChild(x));
+ const fullHeadingRow=document.createElement('div');fullHeadingRow.className='transcript-heading-row';
+  if(fullHeading){fullHeadingRow.append(fullHeading,tools);fullCard.appendChild(fullHeadingRow);}else if(tools)fullCard.appendChild(tools);
+  if(full)fullCard.appendChild(full);
  [timedHeading,note,timed].filter(Boolean).forEach(x=>timedCard.appendChild(x));
+ const viewTabs=document.createElement('div');viewTabs.className='transcript-view-tabs';viewTabs.setAttribute('role','tablist');viewTabs.setAttribute('aria-label','Transcript views');
+ const fullTab=document.createElement('button');fullTab.type='button';fullTab.className='transcript-view-tab';fullTab.textContent='Full transcript';fullTab.setAttribute('role','tab');fullTab.setAttribute('aria-selected','true');
+ const timedTab=document.createElement('button');timedTab.type='button';timedTab.className='transcript-view-tab';timedTab.textContent='Timestamped transcript';timedTab.setAttribute('role','tab');timedTab.setAttribute('aria-selected','false');
+ viewTabs.append(fullTab,timedTab);
+ const timedTools=document.createElement('div');timedTools.className='transcript-tools';
+ const copyTimed=document.createElement('button');copyTimed.type='button';copyTimed.className='secondary';copyTimed.textContent='📋 Copy timestamped transcript';
+ const timedCopyStatus=document.createElement('span');timedCopyStatus.className='note';timedCopyStatus.setAttribute('aria-live','polite');timedTools.append(copyTimed,timedCopyStatus);
+ const timedHeadingRow=document.createElement('div');timedHeadingRow.className='transcript-heading-row';
+  if(timedHeading){timedHeadingRow.append(timedHeading,timedTools);timedCard.insertBefore(timedHeadingRow,note||timed);}else timedCard.insertBefore(timedTools,note||timed);
+ copyTimed.addEventListener('click',async()=>{try{await copyDiagnosticText(buildTimestampedTranscriptText());timedCopyStatus.textContent='Timestamped transcript copied.';}catch(error){timedCopyStatus.textContent='Copy unavailable. Select the text and copy it manually.';}});
  const rail=document.createElement('div');rail.className='transcript-horizontal-rail';rail.setAttribute('aria-label','Swipe between full transcript and timestamped segments');
- rail.append(fullCard,timedCard);transcriptContent.replaceChildren(rail);
+ rail.append(fullCard,timedCard);
+ const setTranscriptTab=index=>{fullTab.setAttribute('aria-selected',String(index===0));timedTab.setAttribute('aria-selected',String(index===1));};
+ fullTab.addEventListener('click',()=>rail.scrollTo({left:0,behavior:'smooth'}));
+ timedTab.addEventListener('click',()=>rail.scrollTo({left:rail.clientWidth,behavior:'smooth'}));
+ let transcriptScrollFrame=0;rail.addEventListener('scroll',()=>{if(transcriptScrollFrame)return;transcriptScrollFrame=requestAnimationFrame(()=>{transcriptScrollFrame=0;setTranscriptTab(rail.clientWidth?Math.round(rail.scrollLeft/rail.clientWidth):0);});},{passive:true});
+ transcriptContent.replaceChildren(viewTabs,rail);
 }
 
 function enhanceSelect(select){
@@ -674,7 +951,11 @@ function enhanceSelect(select){
  trigger.addEventListener('click',()=>{const open=!wrap.classList.contains('open');document.querySelectorAll('.custom-select.open').forEach(x=>{x.classList.remove('open');x.querySelector('.custom-select-trigger')?.setAttribute('aria-expanded','false');});if(open){wrap.classList.add('open');trigger.setAttribute('aria-expanded','true');const selected=menu.querySelector('[aria-selected="true"]');selected?.scrollIntoView({block:'nearest'});selected?.focus();}});
  menu.addEventListener('keydown',e=>{const opts=[...menu.querySelectorAll('.custom-select-option')],idx=opts.indexOf(document.activeElement);if(e.key==='Escape'){close();trigger.focus();}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();opts[Math.max(0,Math.min(opts.length-1,idx+(e.key==='ArrowDown'?1:-1))) ]?.focus();}else if(e.key==='Home'){e.preventDefault();opts[0]?.focus();}else if(e.key==='End'){e.preventDefault();opts.at(-1)?.focus();}});
  document.addEventListener('click',e=>{if(!wrap.contains(e.target))close();});
- const parent=select.parentElement; if(parent&&parent.tagName==='LABEL'){parent.insertAdjacentElement('afterend',wrap);}else{select.parentNode.insertBefore(wrap,select);} wrap.append(trigger,menu,select);select.classList.add('custom-select-native');render();select.addEventListener('change',render);
+ const parent=select.parentElement;
+ if(parent&&parent.tagName==='LABEL'){parent.appendChild(wrap);}else{select.parentNode.insertBefore(wrap,select);}
+ wrap.append(trigger,menu,select);
+ select.classList.add('custom-select-native');
+ render();select.addEventListener('change',render);
 }
 ['language','englishModel','previewSpeed'].forEach(id=>enhanceSelect($(id)));
 
@@ -751,6 +1032,7 @@ $('diagnosticCopyButtons')?.addEventListener('click',async event=>{
  catch(error){if(status)status.textContent='Could not copy '+section.label+'. Try selecting that section manually.';}
 });
 const file=$('file'), video=$('preview');
+
 let readinessReportText='';
 function runReadinessCheck(){
  const rows=[];let pass=0,warn=0,fail=0;
@@ -790,9 +1072,9 @@ video.addEventListener('loadeddata',()=>{drawCropPreview();$('previewTools').cla
 video.addEventListener('timeupdate',drawCropPreview);
 document.querySelectorAll('input[name="shape"]').forEach(x=>x.addEventListener('change',drawCropPreview));
 $('resetClipTimes').addEventListener('click',()=>{
- if(!Number.isFinite(duration)||duration<=0){exportStatus('Select a video and wait for it to finish loading first.');return;}
+ if(!Number.isFinite(duration)||duration<=0){clipActionStatus('Select a video and wait for it to finish loading first.');return;}
  setClockValue('start',0);setClockValue('end',duration);
- exportStatus('Clip range reset to the full video · 00:00–'+fmt(duration)+'.');
+ clipActionStatus('Clip range reset.');
 });
 
 function saveCurrentOverlapReview(){
@@ -953,10 +1235,15 @@ function updatePreviewTimer(){
  $('previewOriginalEnd').textContent='End '+fmt(activeHighlightPreviewEnd);
  $('previewPlaybackState').textContent=video.ended?'Ended':video.paused?'Paused':'Playing';
 }
-video.addEventListener('timeupdate',()=>{updatePreviewTimer();if(activeHighlightPreviewEnd!==null&&!previewFinished&&video.currentTime>=activeHighlightPreviewEnd){previewFinished=true;video.pause();video.currentTime=activeHighlightPreviewEnd;updatePreviewTimer();exportStatus('Highlight preview finished.');}});
+video.addEventListener('timeupdate',()=>{updatePreviewTimer();if(activeHighlightPreviewEnd!==null&&!previewFinished&&video.currentTime>=activeHighlightPreviewEnd){previewFinished=true;video.pause();video.currentTime=activeHighlightPreviewEnd;updatePreviewTimer();clipActionStatus('Highlight preview finished.');}});
 function updateActiveTranscriptLine(){const host=$('transcript');if(!host||!transcriptSegmentsRendered)return;const t=video.currentTime-transcriptRangeStart;let active=null;for(const line of host.querySelectorAll('.transcript-line')){const jump=line.querySelector('.transcript-jump');if(!jump)continue;const a=Number(jump.dataset.localStart),b=Number(jump.dataset.localEnd);const match=Number.isFinite(a)&&Number.isFinite(b)&&t>=a&&t<=b;if(match)active=line;line.classList.toggle('is-speaking',match);}if(active&&$('transcriptBox').open){const box=host.getBoundingClientRect(),item=active.getBoundingClientRect();if(item.bottom>box.bottom||item.top<box.top)active.scrollIntoView({block:'nearest',behavior:'auto'});}}
 video.addEventListener('timeupdate',updateActiveTranscriptLine);
 video.addEventListener('play',updatePreviewTimer);video.addEventListener('pause',updatePreviewTimer);video.addEventListener('seeked',updatePreviewTimer);
+// Only one video player may play at a time. Rendering and scrolling never autoplay.
+document.addEventListener('play',event=>{
+ const active=event.target;if(!(active instanceof HTMLVideoElement))return;
+ document.querySelectorAll('video').forEach(player=>{if(player!==active&&!player.paused)player.pause();});
+},true);
 $('previewSeek').addEventListener('input',()=>{if(activeHighlightPreviewStart===null||activeHighlightPreviewEnd===null)return;const fraction=Number($('previewSeek').value)/1000;video.currentTime=activeHighlightPreviewStart+(activeHighlightPreviewEnd-activeHighlightPreviewStart)*fraction;updatePreviewTimer();});
 video.addEventListener('pause',()=>{if(activeHighlightPreviewEnd!==null&&video.currentTime<activeHighlightPreviewEnd){/* Keep the selected range visible so the user can resume or scrub. */} });
 function setAnalysisBusy(busy){
@@ -1027,6 +1314,7 @@ function stopTranscriptionClock(success){
 }
 
 const exportStatus=t=>$('exportStatus').textContent=t;
+const clipActionStatus=t=>{$('clipActionStatus').textContent=t;$('clipActionStatus').classList.remove('hidden');};
 
 function fmt(s){s=Math.max(0,Number(s)||0);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0')}
 function parseClipTime(value){
@@ -1108,12 +1396,12 @@ function initClockEditors(root=document){
    if(event.key==='End'){event.preventDefault();field.setSelectionRange(5,5);}
   });
   field.addEventListener('beforeinput',event=>{
-   if(event.inputType==='insertText'&&event.data&&/^\d$/.test(event.data)){
-    event.preventDefault();insertDigit(event.data);
+   const type=event.inputType||'';
+   if(type==='insertText'&&event.data&&/^\d$/.test(event.data)){
+    event.preventDefault();insertDigit(event.data);return;
    }
   });
   field.addEventListener('input',()=>{
-   // Fallback for mobile keyboards that do not emit beforeinput consistently.
    const raw=field.value,old=field.dataset.lastValue||'00:00';
    const digits=raw.replace(/\D/g,'').slice(-4).padStart(4,'0').split('');
    if(raw.length!==5||raw[2]!==':'){
@@ -1133,26 +1421,13 @@ function initClockEditors(root=document){
  });
 }
 initClockEditors();
-document.querySelectorAll('.clip-time-input').forEach(field=>{
- field.addEventListener('blur',()=>{
-  const parsed=parseClipTime(field.value);
-  if(Number.isFinite(parsed)&&parsed>=0)field.value=fmt(parsed);
- });
-});
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-$('choose').addEventListener('click',()=>{
- try{
-  if(typeof file.showPicker==='function')file.showPicker();
-  else file.click();
- }catch(error){
-  try{file.click();}catch(fallbackError){$('duration').textContent='Could not open the video picker. Tap Select video again or check Chrome file permissions.';}
- }
-});
+$('choose').onclick=()=>file.click();
 file.onchange=()=>{
  const f=file.files?.[0];if(!f)return;selectedFile=f;
  if(typeof outputUrls!=='undefined'){outputUrls.forEach(url=>URL.revokeObjectURL(url));outputUrls.clear();}
  $('clipOutputs').innerHTML='';window.clipMindSuggestions=[];$('batchControls').style.display='none';
- if(!f.type.startsWith('video/')){exportStatus('That file does not look like a video.');return;}
+ if(!f.type.startsWith('video/')){clipActionStatus('That file does not look like a video.');return;}
  if(objectUrl)URL.revokeObjectURL(objectUrl);
  objectUrl=URL.createObjectURL(f);baseName=f.name.replace(/\.[^.]+$/,'')||'clipmind';
  activeHighlightPreviewStart=null;activeHighlightPreviewEnd=null;previewFinished=false;updatePreviewTimer();video.src=objectUrl;video.classList.remove('hidden');$('previewTools').classList.remove('hidden');video.playbackRate=Number($('previewSpeed').value)||1;
@@ -1164,7 +1439,7 @@ file.onchange=()=>{
   setClockValue('start',0);setClockValue('end',duration);
   setClockValue('analysisStart',0);setClockValue('analysisEnd',duration);
   $('analyze').disabled=false;$('create').disabled=false;aiStatus('Video ready. Tap Find highlights with AI.');
-  exportStatus('Video ready. You can create a manual clip or run AI first.');
+  clipActionStatus('Video ready.');
  };
  video.onerror=()=>{$('duration').textContent='Could not read this video. Try an MP4 in the latest Chrome.'};
 };
@@ -1280,32 +1555,40 @@ async function loadFastExtractor(){
  if(ffmpegReady&&ffmpeg)return ffmpeg;
  if(ffmpegLoadPromise)return ffmpegLoadPromise;
  ffmpegLoadPromise=(async()=>{
-  let instance=null,timer=null;
+  let instance=null,timer=null,timedOut=false;
   try{
    aiStatus('Loading fast audio extractor… first use downloads the FFmpeg engine.');
-   progressUI('Loading FFmpeg audio engine',null,'Preparing the audio engine. If loading stalls, ClipMind will stop waiting and allow a retry.');
-   const {FFmpeg}=await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js');
-   instance=new FFmpeg();
-   ffmpeg=instance;
-   ffmpegReady=false;
-   ffmpeg.on('log',({message})=>{
-    if(message){
-     ffmpegLogText=(ffmpegLogText+'\n'+message).slice(-200000);
-     if(/time=/.test(message))aiStatus('Extracting audio directly… '+message.match(/time=\S+/)?.[0]);
-    }
+   progressUI('Loading FFmpeg audio engine',null,'Downloading and initializing the FFmpeg library and engine. This step has a 120-second limit; if it cannot finish, the real-time fallback will remain available.');
+   const initialization=(async()=>{
+    const {FFmpeg}=await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js');
+    if(timedOut)throw new Error('FFmpeg loading timed out before the library finished downloading. Check your connection, then retry or use the real-time fallback.');
+    instance=new FFmpeg();
+    ffmpeg=instance;
+    ffmpegReady=false;
+    ffmpeg.on('log',({message})=>{
+     if(message){
+      ffmpegLogText=(ffmpegLogText+'\n'+message).slice(-200000);
+      if(/time=/.test(message))aiStatus('Extracting audio directly… '+message.match(/time=\\S+/)?.[0]);
+     }
+    });
+    ffmpeg.on('progress',({progress})=>{
+     if(Number.isFinite(progress))progressUI('Extracting audio',Math.max(0,Math.min(99,progress*100)),'Fast extraction progress reported by FFmpeg.');
+    });
+    const base='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
+    const classWorkerURL=new URL('./ffmpeg/worker.js',window.location.href).href;
+    await instance.load({classWorkerURL,coreURL:base+'/ffmpeg-core.js',wasmURL:base+'/ffmpeg-core.wasm'});
+    if(timedOut)throw new Error('FFmpeg initialization exceeded its time limit. Retry or use the real-time fallback.');
+    ffmpegReady=true;
+    aiStatus('Fast audio extractor ready.');
+    return instance;
+   })();
+   const timeout=new Promise((_,reject)=>{
+    timer=setTimeout(()=>{
+     timedOut=true;
+     reject(new Error('FFmpeg took longer than 120 seconds to download or initialize. Check your connection, then retry or use the real-time fallback.'));
+    },120000);
    });
-   ffmpeg.on('progress',({progress})=>{
-    if(Number.isFinite(progress))progressUI('Extracting audio',Math.max(0,Math.min(99,progress*100)),'Fast extraction progress reported by FFmpeg.');
-   });
-   const base='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
-   const classWorkerURL=new URL('./ffmpeg/worker.js',window.location.href).href;
-   await Promise.race([
-    instance.load({classWorkerURL,coreURL:base+'/ffmpeg-core.js',wasmURL:base+'/ffmpeg-core.wasm'}),
-    new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('FFmpeg took too long to initialize. Check your connection, then tap Prepare AI tools to retry.')),120000);})
-   ]);
-   ffmpegReady=true;
-   aiStatus('Fast audio extractor ready.');
-   return instance;
+   return await Promise.race([initialization,timeout]);
   }catch(error){
    if(instance){
     try{instance.terminate();}catch(_){}
@@ -2268,6 +2551,17 @@ function renderTranscript(chunks,fullText,rangeStart){
  $('transcriptFull').textContent=transcriptFullText||'No speech was recognized.';
  $('transcript').replaceChildren();
 }
+function buildTimestampedTranscriptText(){
+ const rows=(transcriptChunks||[]).map(c=>{
+  const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);
+  const start=ts?ts[0]:(Number.isFinite(c.start)?c.start:null);
+  const end=ts?ts[1]:(Number.isFinite(c.end)?c.end:null);
+  const phrase=String(c.text||'').trim();if(!phrase)return '';
+  const label=Number.isFinite(start)?fmt(transcriptRangeStart+start)+(Number.isFinite(end)&&end>start?'–'+fmt(transcriptRangeStart+end):''):'Time unavailable';
+  return '['+label+'] '+phrase;
+ }).filter(Boolean);
+ return rows.join('\n')||'No timestamped segments were returned for this transcript.';
+}
 function renderTimestampedSegments(){
  if(transcriptSegmentsRendered)return;
  transcriptSegmentsRendered=true;
@@ -2669,6 +2963,35 @@ function enhanceDynamicClockInput(input){
  initClockEditors(wrap.parentElement);
 }
 
+function getHighlightPassage(g,from,to){
+ const relevant=(transcriptChunks||[]).map(c=>{
+  const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);
+  return {start:transcriptRangeStart+(ts?ts[0]:c.start),end:transcriptRangeStart+(ts?ts[1]:c.end),text:String(c.text||'').trim()};
+ }).filter(c=>c.text&&Number.isFinite(c.start)&&Number.isFinite(c.end)&&c.end>from&&c.start<to);
+ return relevant.length?relevant.map(c=>c.text).join(' '):(g.text||'').trim();
+}
+function formatHighlightReport(g,index,passage){
+ const story=g.story||highlightStory(g.text||'');
+ const start=Number.isFinite(g.start)?g.start:0,end=Number.isFinite(g.end)?g.end:0;
+ const suggestedStart=Number.isFinite(g.suggestedStart)?g.suggestedStart:start;
+ const suggestedEnd=Number.isFinite(g.suggestedEnd)?g.suggestedEnd:end;
+ return [
+  'CLIPMIND HIGHLIGHT '+String(index+1).padStart(2,'0'),
+  'Category: '+(story.type||'Not available'),
+  'Title: '+(story.title||'Not available'),
+  'Why it stands out: '+(story.reason||'Not available'),
+  'Start: '+fmt(start),
+  'End: '+fmt(end),
+  'Duration: '+(end-start).toFixed(2)+' seconds',
+  'AI suggested range: '+fmt(suggestedStart)+' – '+fmt(suggestedEnd),
+  'Current edited range: '+fmt(start)+' – '+fmt(end),
+  'Source video: '+(selectedFile?.name||'Not available'),
+  '',
+  'FULL PASSAGE',
+  (passage||g.text||'').trim()
+ ].join('\n');
+}
+
 function showSuggestions(items){
  const host=$('results');host.innerHTML='';$('highlightResultsSection').classList.remove('hidden');window.clipMindSuggestions=items;
  $('selectAll').textContent='Select all';$('batchControls').style.display='none';
@@ -2687,7 +3010,7 @@ function showSuggestions(items){
   const detailMeta=document.createElement('div');detailMeta.className='suggestion-meta';detailMeta.textContent=fmt(g.start)+' – '+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';
   const body=document.createElement('div');body.className='suggestion-body';
   const reason=document.createElement('p');reason.className='suggestion-reason';reason.textContent='Why it stands out: '+story.reason;
-  const para=document.createElement('p');para.textContent=g.text;
+  const para=document.createElement('p');para.className='suggestion-passage';para.textContent=g.text;
   const edit=document.createElement('div');edit.className='suggestion-edit';
   const startLabel=document.createElement('label');startLabel.textContent='START TIME';
   const startInput=document.createElement('input');startInput.id='suggestionStart'+i;startInput.type='text';startInput.inputMode='text';startInput.maxLength=5;startInput.autocomplete='off';startInput.className='suggestion-time-input';startInput.value=fmt(g.start);startInput.setAttribute('aria-label','Highlight '+(i+1)+' start time');startLabel.appendChild(startInput);
@@ -2700,8 +3023,7 @@ function showSuggestions(items){
   const updateTimes=()=>{
    const from=parseClipTime(startInput.value),to=parseClipTime(endInput.value);if(!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<=from||to>duration)return false;
    g.start=from;g.end=to;startInput.value=fmt(from);endInput.value=fmt(to);durationText.textContent='Clip length: '+Math.round(to-from)+' sec';
-   const relevant=(transcriptChunks||[]).map(c=>{const ts=Array.isArray(c.timestamp)?c.timestamp:(Array.isArray(c.timestamps)?c.timestamps:null);return {start:transcriptRangeStart+(ts?ts[0]:c.start),end:transcriptRangeStart+(ts?ts[1]:c.end),text:(c.text||'').trim()};}).filter(c=>c.text&&Number.isFinite(c.start)&&Number.isFinite(c.end)&&c.end>from&&c.start<to);
-   if(relevant.length)para.textContent=relevant.map(c=>c.text).join(' ');
+   para.textContent=getHighlightPassage(g,from,to);
    detailMeta.textContent=fmt(g.start)+' – '+fmt(g.end)+' · '+Math.round(g.end-g.start)+' sec';meta.textContent=story.type+' · '+detailMeta.textContent;return true;
   };
   [startInput,endInput].forEach(input=>{
@@ -2710,12 +3032,12 @@ function showSuggestions(items){
   });edit.append(startLabel,endLabel);
   const actions=document.createElement('div');actions.className='suggestion-actions';
   const preview=document.createElement('button');preview.type='button';preview.textContent='▶ Preview';
-  preview.onclick=async()=>{if(!updateTimes())return;try{activeHighlightPreviewStart=g.start;activeHighlightPreviewEnd=g.end;previewFinished=false;video.pause();await seekVideo(g.start);updatePreviewTimer();await video.play();exportStatus('Previewing highlight '+(i+1)+' · '+fmt(g.start)+'–'+fmt(g.end)+'.');}catch(e){activeHighlightPreviewStart=null;activeHighlightPreviewEnd=null;updatePreviewTimer();exportStatus('Could not preview this moment: '+(e.message||String(e)));}};
-  const use=document.createElement('button');use.type='button';use.textContent='Use for clip';use.onclick=()=>{if(!updateTimes())return;setClockValue('start',g.start);setClockValue('end',g.end);exportStatus('Highlight '+(i+1)+' selected. Choose output shape and create your clip.');$('start').scrollIntoView({behavior:'smooth',block:'center'});};
+  preview.onclick=async()=>{if(!updateTimes())return;try{activeHighlightPreviewStart=g.start;activeHighlightPreviewEnd=g.end;previewFinished=false;video.pause();await seekVideo(g.start);updatePreviewTimer();await video.play();clipActionStatus('Previewing highlight '+(i+1)+' · '+fmt(g.start)+'–'+fmt(g.end)+'.');}catch(e){activeHighlightPreviewStart=null;activeHighlightPreviewEnd=null;updatePreviewTimer();clipActionStatus('Could not preview this moment: '+(e.message||String(e)));}};
+  const use=document.createElement('button');use.type='button';use.textContent='Use for clip';use.onclick=()=>{if(!updateTimes())return;setClockValue('start',g.start);setClockValue('end',g.end);clipActionStatus('Highlight '+(i+1)+' selected.');$('start').scrollIntoView({behavior:'smooth',block:'center'});};
   const copy=document.createElement('button');copy.type='button';copy.textContent='Copy';copy.setAttribute('aria-label','Copy highlight details');copy.title='Copy highlight details';
   const copyStatus=document.createElement('span');copyStatus.className='note';copyStatus.setAttribute('aria-live','polite');
   copy.onclick=async()=>{if(!updateTimes()){copyStatus.textContent='Correct the start and end times before copying.';return;}
-   const report=['CLIPMIND HIGHLIGHT '+String(i+1).padStart(2,'0'),'Category: '+story.type,'Title: '+story.title,'Start: '+fmt(g.start),'End: '+fmt(g.end),'Duration: '+(g.end-g.start).toFixed(2)+' seconds','Why it stands out: '+story.reason,'AI suggested range: '+fmt(g.suggestedStart)+' – '+fmt(g.suggestedEnd),'Current edited range: '+fmt(g.start)+' – '+fmt(g.end),'Source video: '+(selectedFile?.name||'Not available'),'','FULL PASSAGE',para.textContent||g.text||''].join('\n');
+   const report=formatHighlightReport(g,i,getHighlightPassage(g,g.start,g.end));
    copy.disabled=true;copyStatus.textContent='Copying…';try{await copyDiagnosticText(report);copyStatus.textContent='Copied highlight '+(i+1)+'. Paste it wherever needed.';}catch(error){copyStatus.textContent='Copy failed. Check browser clipboard permission and try again.';}finally{copy.disabled=false;}
   };
   actions.append(preview,use,copy);body.append(reason,para,edit,times,actions,copyStatus);div.append(detailTop,heading,detailMeta,body);panel.appendChild(div);
@@ -2724,8 +3046,32 @@ function showSuggestions(items){
  deck.querySelector('.highlight-stack-front strong').textContent=items[0].story.title;
  deck.querySelector('.highlight-stack-front small').textContent=items[0].story.type+' · '+fmt(items[0].start)+'–'+fmt(items[0].end)+' · '+items.length+' highlights ready';
  stackPreview.appendChild(deck);
- host.append(stackPreview,toggle,panel);
- toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);stackPreview.classList.toggle('hidden',opening);toggle.setAttribute('aria-expanded',String(opening));toggle.textContent=opening?'Hide all highlights ('+items.length+')':'Show all highlights ('+items.length+')';$('batchControls').style.display=opening?'grid':'none';if(opening)panel.scrollIntoView({behavior:'smooth',block:'nearest'});});
+ const copyAllRow=document.createElement('div');copyAllRow.className='highlight-copy-all-row hidden';
+ const copyAll=document.createElement('button');copyAll.type='button';copyAll.className='secondary';copyAll.textContent='Copy all highlights';copyAll.setAttribute('aria-label','Copy all generated highlight details');
+ const copyAllStatus=document.createElement('span');copyAllStatus.className='highlight-copy-all-status';copyAllStatus.setAttribute('aria-live','polite');
+ copyAllRow.append(copyAll,copyAllStatus);
+ copyAll.addEventListener('click',async()=>{
+  const reports=[];
+  for(let index=0;index<items.length;index++){
+   const g=items[index],card=panel.querySelectorAll('.highlight-detail-card')[index];
+   if(!card)continue;
+   const startInput=card.querySelector('.suggestion-time-input[aria-label*="start time"]');
+   const endInput=card.querySelector('.suggestion-time-input[aria-label*="end time"]');
+   const from=parseClipTime(startInput?.value??''),to=parseClipTime(endInput?.value??'');
+   if(!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<=from||to>duration){
+    copyAllStatus.textContent='Highlight '+(index+1)+' has invalid times. Correct it before copying all.';return;
+   }
+   g.start=from;g.end=to;
+   const passage=getHighlightPassage(g,from,to);
+   reports.push(formatHighlightReport(g,index,passage));
+  }
+  copyAll.disabled=true;copyAllStatus.textContent='Preparing all '+reports.length+' highlights…';
+  try{await copyDiagnosticText(reports.join('\n\n'+'='.repeat(48)+'\n\n'));copyAllStatus.textContent='Copied all '+reports.length+' highlights with metadata and full passages.';}
+  catch(error){copyAllStatus.textContent='Copy failed. Check clipboard permission and try again.';}
+  finally{copyAll.disabled=false;}
+ });
+ host.append(stackPreview,toggle,copyAllRow,panel);
+ toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);stackPreview.classList.toggle('hidden',opening);copyAllRow.classList.toggle('hidden',!opening);toggle.setAttribute('aria-expanded',String(opening));toggle.textContent=opening?'Hide all highlights ('+items.length+')':'Show all highlights ('+items.length+')';$('batchControls').style.display=opening?'grid':'none';if(opening)panel.scrollIntoView({behavior:'smooth',block:'nearest'});});
  $('batchControls').style.display='none';
 }
 document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{
@@ -2848,9 +3194,9 @@ async function exportClip(from,to,shape,onProgress){
 function setExportBusy(busy){activeExport=busy;$('create').disabled=busy;$('createSelected').disabled=busy;$('selectAll').disabled=busy;}
 async function runExports(clips,preserveOutputs=false){
  if(activeExport)return;
- if(!clips.length){exportStatus('Select at least one AI suggestion first.');return;}
+ if(!clips.length){$('exportResultsSection').classList.remove('hidden');exportStatus('Select at least one AI suggestion first.');return;}
  const shape=document.querySelector('input[name="shape"]:checked').value;
- setExportBusy(true);$('retryFailedExport')?.remove();if(!preserveOutputs){outputUrls.forEach(url=>URL.revokeObjectURL(url));outputUrls.clear();$('clipOutputs').innerHTML='';}$('exportProgressPanel').classList.remove('hidden');$('exportProgress').value=0;$('exportProgressTitle').textContent='Preparing clips';$('exportProgressCount').textContent='0 / '+clips.length;$('exportProgressText').textContent='Starting the first export…';
+ setExportBusy(true);$('exportResultsSection').classList.remove('hidden');$('retryFailedExport')?.remove();if(!preserveOutputs){outputUrls.forEach(url=>URL.revokeObjectURL(url));outputUrls.clear();$('clipOutputs').innerHTML='';}$('exportProgressPanel').classList.remove('hidden');$('exportProgress').value=0;$('exportProgressTitle').textContent='Preparing clips';$('exportProgressCount').textContent='0 / '+clips.length;$('exportProgressText').textContent='Starting the first export…';
  let completed=0,failedClip=null,failedMessage='';
  try{
   for(let i=0;i<clips.length;i++){
@@ -2871,7 +3217,7 @@ async function runExports(clips,preserveOutputs=false){
 }
 $('create').onclick=()=>{
  const from=parseClipTime($('start').value),to=parseClipTime($('end').value);
- if(!duration||!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<=from||to>duration){exportStatus('Enter valid timestamps. End must be after start and within the video.');return;}
+ if(!duration||!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<=from||to>duration){clipActionStatus('Enter valid timestamps. End must be after start and within the video.');return;}
  runExports([{start:from,end:to}]);
 };
 $('createSelected').onclick=()=>{
@@ -2889,6 +3235,20 @@ const analysisDisclosurePanels=[$('aiHistoryBox'),$('audioDiagnostics'),$('trans
 analysisDisclosurePanels.forEach(panel=>panel.addEventListener('toggle',()=>{
  if(panel.open)analysisDisclosurePanels.forEach(other=>{if(other!==panel)other.open=false;});
 }));
+
+
+/* Phase 1 — accessible mobile navigation */
+(()=>{
+ const panel=document.getElementById('appNavigation'),toggle=document.getElementById('navToggle'),close=document.getElementById('navClose'),backdrop=document.getElementById('navBackdrop');
+ if(!panel||!toggle||!close||!backdrop)return;
+ const setOpen=open=>{
+  panel.classList.toggle('is-open',open);panel.setAttribute('aria-hidden',String(!open));toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Close navigation':'Open navigation');backdrop.hidden=!open;document.body.classList.toggle('nav-open',open);
+  if(open)close.focus();else toggle.focus();
+ };
+ toggle.addEventListener('click',()=>setOpen(!panel.classList.contains('is-open')));close.addEventListener('click',()=>setOpen(false));backdrop.addEventListener('click',()=>setOpen(false));
+ panel.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>setOpen(false)));
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&panel.classList.contains('is-open'))setOpen(false);});
+})();
 
 </script>
 </body></html>
