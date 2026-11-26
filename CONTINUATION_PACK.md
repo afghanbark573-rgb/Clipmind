@@ -775,4 +775,106 @@ On the Xiaomi 14, confirm:
 
 Production deployment remains prohibited without explicit user approval. Draft PR #9 remains unmerged.
 
+
+---
+
+## 22. Design-first redesign checkpoint — 2026-11-26
+
+This section records the newer design-first workflow and decisions established in the 2026-11-26 design conversation. Where older UI theme or next-action notes elsewhere in this pack conflict with this section, treat this newer section as the current direction. Historical engineering and feature records remain useful; do not silently rewrite historical facts.
+
+### Design workflow — current source of truth
+
+The user explicitly chose to design the interface in ChatGPT first, approve each section, and only then implement it in the app.
+
+For each section:
+1. Prepare a visual mockup/proposal in chat.
+2. Let the user review and request changes.
+3. Lock the design only after explicit approval.
+4. Do not implement a section before its design is approved.
+5. Once the relevant designs are approved, implement only the approved scope on the development/test branch.
+6. Compare the actual implementation with the approved mockup.
+7. Do not merge, edit production `main`, or deploy without explicit user approval.
+
+The user expects to review all sections, including sections that appear acceptable today. Do not skip sections or assume the current interface is approved.
+
+### Current visual identity direction
+
+The current written design direction is **AMOLED Gradient Glass — Subtle**:
+- True black background: `#000000`.
+- Translucent dark/glass surfaces with restrained blur (approximately 16px).
+- Muted lavender accent: `#B7A6CB`.
+- Warm white text: `#F1EDE6`.
+- Muted neutral borders.
+- Functional colors: success `#9EAF9B`, warning `#B8A27F`, error `#B88F91`, info `#9CAEC0`.
+- Inter/system font stack, thin lavender scrollbar, and reduced-motion support.
+- Overall result should feel modern, simple, balanced, and human-designed rather than heavily AI-generated or excessively decorative.
+
+Earlier Graphite Orange notes and older generated mockups are historical. Recent mockups in the conversation leaned brighter purple/pink than the subtle written palette; reconcile future designs toward the written direction rather than treating every generated visual effect as a locked brand requirement.
+
+### Design status as of this checkpoint
+
+- **Phase 01 — App Header and Identity:** Implemented on the development branch in the previously recorded header commit; static checks passed. Actual Xiaomi 14 / Chrome runtime visual testing has not yet been recorded.
+- **Phase 02 — Choose Your Video, Preview & Inspection:** Approved and locked as a combined design proposal.
+  - Mobile-friendly video selection/upload area.
+  - Selected file summary: filename, format, resolution, file size, duration.
+  - Preview controls: playback, scrubbing/timeline, volume, playback speed, fullscreen.
+  - Separate video information panel.
+  - Readiness must come from actual file/browser checks, not a hard-coded success state.
+  - Continue action is gated by genuine video readiness.
+- **Phase 04 — Device & Browser Readiness:** Approved and locked.
+  - Clear readiness summary and detailed checks for browser compatibility, WebAssembly, FFmpeg and Whisper support.
+  - System overview only shows device/OS/browser/processing details that can actually be detected.
+  - RAM and free storage must be shown as unavailable/unmeasurable when browser APIs cannot reliably expose them; never invent values.
+  - Processing-time estimates must be explicitly approximate and grounded in the selected model/video/settings.
+  - Include concise performance tips and gate continuation on required checks.
+- **Phase 05 — Recognition Settings:** Approved and locked.
+  - Whisper Base English, Whisper Tiny English, and Whisper Tiny Multilingual choices.
+  - English and multilingual/automatic language selection, consistent with actual model support.
+  - Processing preferences shown: empty-section recovery and higher-quality beam search.
+  - Every control must map to a real engine capability and reflect actual defaults; no decorative switches.
+  - Model comparison explains relative size, speed, accuracy trade-offs, and language coverage without unsupported precision.
+  - Processing-time estimate must reflect the selected model/settings or clearly state its basis.
+- **Phase 06 — AI Highlight Finder:** Not yet designed. This is the next task. Prepare a visual proposal only and wait for explicit approval before locking or implementing.
+
+### Phase 06 — AI Highlight Finder: required design scope
+
+The first proposal should show:
+- Analysis progress and elapsed time.
+- Current processing stage, clearly distinguishing transcription from highlight evaluation.
+- Estimated remaining time, explicitly labelled approximate rather than falsely precise.
+- A concise explanation of how ClipMind identifies interesting moments.
+- Quality-focused selection: a modest number of strong suggestions, not a large quantity of weak suggestions.
+- Clear completion, warning, retry, and error states.
+- Progress feedback must reflect actual work; do not introduce fake percentages or simulated stages.
+
+Preserve the existing transcription and highlight-generation architecture. Do not imply that a proposed visual feature already exists in the code.
+
+### Development branch / header implementation checkpoint
+
+The latest known development branch remains `fix/mobile-usability-repair`. The header/navigation work was committed as:
+- Commit: `6ad11f88b41957c287da1dc1ba50996e650c3b87`.
+- `index.html` blob: `2f54ad52c0265e2ac2bdf690966a93e0d7b65ba5`.
+- The development branch was recorded as 14 commits ahead and 0 behind production `main` at that checkpoint.
+- Only paths changed versus `main`: `index.html` and `ffmpeg/worker.js`.
+- Header work includes a timeline-inspired logo, sticky AMOLED glass header, development version pill, hamburger drawer, navigation destinations (Home, Choose video, Recognition settings, AI highlight finder, Review highlights, Create your clips, Exported clips, Diagnostics, Help & guide), and Help/Settings quick links.
+- Drawer closes on selection, backdrop tap, and Escape.
+- Core application JavaScript was not intentionally changed in the header commit.
+- Static checks recorded: CSS braces balanced, no duplicate IDs, navigation targets exist, and script tags are balanced.
+- No actual Xiaomi 14 / Chrome runtime visual test was recorded for this header work.
+
+Do not assume this is the current branch head without checking GitHub before future code changes.
+
+### Protected repository rules — reaffirmed
+
+- Do not merge PR #9.
+- Do not edit production `main`.
+- Do not deploy to GitHub Pages.
+- These restrictions remain in force unless the user explicitly approves a specific action.
+- The design approvals in this section authorize design locking only; they do not authorize code implementation.
+
+### Immediate continuation instruction
+
+Continue at **Phase 06 — AI Highlight Finder**. Create the first visual design proposal for review. Do not edit the repository or implement anything until the user explicitly approves that design. Preserve the locked designs for Phases 02, 04, and 05, the current AMOLED Gradient Glass — Subtle direction, all existing transcription/export architecture, and the development-only workflow.
+
+
 **End of master continuation pack.**
