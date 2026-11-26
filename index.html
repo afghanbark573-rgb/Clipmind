@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#171717">
+<meta name="theme-color" content="#000000">
 <title>ClipMind v0.16.4</title>
 <style>
 :root{color-scheme:dark;--bg:#171717;--card:#242424;--line:#414141;--muted:#a3a3a3;--accent:#f59e45;--good:#43b581}
@@ -555,6 +555,98 @@ body.analysis-busy #analysisDisclosures>details>summary{pointer-events:auto!impo
  .shape-preview-row .crop-preview{min-height:170px}
  .ai-recognition-settings{grid-template-columns:1fr}
 }
+
+/* ClipMind Visual Identity v1.0 — AMOLED Gradient Glass (Subtle)
+   Phase 1: foundational tokens and shared components only.
+   Workflow markup and application logic intentionally remain unchanged. */
+:root{
+ color-scheme:dark;
+ --bg:#000000;
+ --card:rgba(255,255,255,.045);
+ --card-raised:rgba(255,255,255,.065);
+ --line:rgba(235,228,218,.14);
+ --muted:#aaa49b;
+ --text:#f1ede6;
+ --accent:#b7a6cb;
+ --accent-soft:rgba(183,166,203,.13);
+ --good:#9eaf9b;
+ --warn:#b8a27f;
+ --bad:#b88f91;
+ --info:#9caec0;
+ --glass-blur:16px;
+}
+html{background:#000;color-scheme:dark;scrollbar-color:rgba(183,166,203,.45) #090909;scrollbar-width:thin}
+body{
+ background:
+  radial-gradient(ellipse at 50% -18%,rgba(183,166,203,.075),transparent 48%),
+  #000!important;
+ color:var(--text)!important;
+ font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important;
+}
+header{
+ background:rgba(10,10,12,.78)!important;
+ border-bottom:1px solid var(--line)!important;
+ backdrop-filter:blur(var(--glass-blur));
+ -webkit-backdrop-filter:blur(var(--glass-blur));
+}
+.logo{background:var(--accent)!important;color:#151219!important;box-shadow:none!important}
+header strong,h1,h2,h3,.suggestion-title,.suggestion strong{color:var(--text)!important}
+header small,.help,.note,.meta,.status,footer{color:var(--muted)!important}
+.card,.suggestion,.clip-output,.review-panel,.review-source,
+#aiHistoryBox,#audioDiagnostics,#transcriptBox,.preview-timer,
+.readiness-panel,.readiness-report,.crop-preview{
+ background:var(--card)!important;
+ border-color:var(--line)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+ backdrop-filter:blur(var(--glass-blur));
+ -webkit-backdrop-filter:blur(var(--glass-blur));
+}
+button,.pick,.secondary,.suggestion button,.review-choice,.review-audio,
+.transcript-jump,.export-retry,.download{
+ transition:background-color .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
+}
+button{font-family:inherit}
+.primary,.pick{
+ background:var(--accent)!important;
+ color:#17131b!important;
+ border:1px solid transparent!important;
+ box-shadow:none!important;
+}
+.secondary,.suggestion button,.review-choice,.review-audio,.transcript-jump,
+.export-retry{
+ background:rgba(255,255,255,.055)!important;
+ color:var(--text)!important;
+ border:1px solid var(--line)!important;
+}
+input[type=number],input[type=text],select,textarea,
+.suggestion-edit input,.clock-edit .clock-flat,.suggestion-time-input,
+.clip-time-grid .clip-time-input,.review-correction,
+#aiStatus,.transcript,.transcript-full,.transcript-page{
+ background:rgba(255,255,255,.045)!important;
+ color:var(--text)!important;
+ border-color:var(--line)!important;
+}
+input::placeholder,textarea::placeholder{color:#8f8982!important}
+.kicker,.transcript-heading,.review-source strong,.moment-type,
+.current-duration,.transcript-jump{color:var(--accent)!important}
+.moment-type{border-color:rgba(183,166,203,.28)!important;background:var(--accent-soft)!important}
+.suggestion-reason,.suggestion p,.review-source p,.transcript,.transcript-full{color:#d4cec5!important}
+#aiProgress,#previewSeek,.segment input,.suggestion-select input{accent-color:var(--accent)!important}
+#aiProgressPct,.tag,.export-verification strong{color:var(--good)!important}
+.download{background:rgba(158,175,155,.10)!important;border-color:rgba(158,175,155,.25)!important;color:#d6e0d2!important}
+.review-choice[aria-pressed="true"]{background:rgba(158,175,155,.12)!important;border-color:var(--good)!important;color:var(--text)!important}
+details>summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+ outline:2px solid var(--accent)!important;outline-offset:2px!important;
+}
+details>summary::after{border-color:var(--muted)!important}
+details[open]>summary::after{border-color:var(--accent)!important}
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-track{background:#080808;border-radius:10px}
+::-webkit-scrollbar-thumb{background:rgba(183,166,203,.42);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:rgba(183,166,203,.58)}
+::selection{background:rgba(183,166,203,.28);color:var(--text)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
 </style></head>
 <body>
 <header><div class="logo">▶</div><div><strong>ClipMind</strong><small>Your private video clip studio</small></div></header>
