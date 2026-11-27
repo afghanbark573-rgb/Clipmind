@@ -789,7 +789,7 @@ body.nav-open{overflow:hidden}
 <button id="firstPassTest" class="secondary hidden">🧪 Run reconciliation diagnostic + audio review</button>
 <button id="startRead" class="secondary hidden">▶ Use real-time fallback instead</button>
 </div>
-<div id="analysisStageRail" class="analysis-stage-rail" aria-label="Analysis stages" aria-live="polite">
+<div id="analysisStageRail" class="analysis-stage-rail hidden" aria-label="Analysis stages" aria-live="polite">
  <div class="analysis-stage is-active" data-analysis-stage="prepare"><span class="stage-dot">1</span><span>Prepare</span></div>
  <div class="analysis-stage" data-analysis-stage="audio"><span class="stage-dot">2</span><span>Audio</span></div>
  <div class="analysis-stage" data-analysis-stage="transcribe"><span class="stage-dot">3</span><span>Transcribe</span></div>
@@ -1300,7 +1300,7 @@ function inferAnalysisStage(label){
 function progressUI(label,pct,note=''){
  const bar=$('aiProgress'),head=$('aiProgressHead');
  bar.classList.remove('hidden');head.classList.remove('hidden');$('aiProgressNote').classList.remove('hidden');
- $('analysisStageRail').classList.add('is-visible');
+ $('analysisStageRail').classList.remove('hidden');
  setAnalysisStage(inferAnalysisStage(label));
  $('aiProgressLabel').textContent=label;
  if(Number.isFinite(pct)){
@@ -1943,7 +1943,7 @@ async function transcribeBlob(audioBlob,rangeStart,rangeEnd,captureMethod='unkno
   diag.push('REPEAT SAFETY: repeated speech at later timestamps remains in the transcript. Near-identical full highlight passages are filtered from duplicate suggestions only; no transcript occurrence is deleted.');
   writeDiagnostics();
   aiStatus((fallbackUsed?'Method B failed; Method A recovery ':'Method B transcription ')+ 'finished for '+fmt(rangeStart)+'–'+fmt(rangeEnd)+'. Found '+cleanChunks.length+' timestamp chunks. Review the transcript and suggested moments below.');
-  progressUI('Transcription complete',100,(fallbackUsed?'Method A recovery completed.':'Built-in long-audio transcription completed.')+' Review suggested clip boundaries before exporting.');
+  progressUI('Highlights ready',100,(fallbackUsed?'Method A recovery completed.':'Built-in long-audio transcription completed.')+' Highlight evaluation is complete. Review suggested clip boundaries before exporting.');
   transcriptionSucceeded=true;
  }finally{
   stopTranscriptionClock(transcriptionSucceeded);
