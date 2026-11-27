@@ -1302,6 +1302,9 @@ function progressUI(label,pct,note=''){
  bar.classList.remove('hidden');head.classList.remove('hidden');$('aiProgressNote').classList.remove('hidden');
  $('analysisStageRail').classList.remove('hidden');
  setAnalysisStage(inferAnalysisStage(label));
+ if(/^highlights ready$/i.test(String(label||''))){
+  document.querySelectorAll('[data-analysis-stage="highlights"]').forEach(node=>{node.classList.remove('is-active');node.classList.add('is-done');});
+ }
  $('aiProgressLabel').textContent=label;
  if(Number.isFinite(pct)){
   const n=Math.max(0,Math.min(100,pct));bar.value=n;$('aiProgressPct').textContent=Math.round(n)+'%';
