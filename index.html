@@ -172,6 +172,72 @@ details>summary:focus-visible{outline:2px solid #f59e45;outline-offset:-3px;bord
 @media(max-width:360px){.readiness-actions{grid-template-columns:1fr}}
 button,input,select{font:inherit}button{touch-action:manipulation}
 
+/* Phase 06 — AMOLED Gradient Glass analysis progress */
+.analysis-stage-rail{
+ display:grid;gap:0;margin:14px 0 5px;padding:14px 13px;
+ border:1px solid rgba(235,228,218,.14);border-radius:18px;
+ background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 12px 30px rgba(0,0,0,.28);
+ backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)
+}
+.analysis-stage{
+ position:relative;display:grid;grid-template-columns:30px minmax(0,1fr) auto;
+ align-items:center;column-gap:12px;min-width:0;min-height:58px;padding:8px 2px;
+ color:#aaa49b;font-size:13px;font-weight:650
+}
+.analysis-stage:not(:last-child)::before{
+ content:"";position:absolute;left:14px;top:39px;bottom:-11px;width:1px;
+ background:rgba(235,228,218,.19)
+}
+.stage-dot{
+ position:relative;z-index:1;display:grid;place-items:center;width:29px;height:29px;
+ border:1px solid rgba(235,228,218,.25);border-radius:50%;
+ background:rgba(0,0,0,.68);color:#aaa49b;font-size:11px;font-weight:750
+}
+.stage-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.stage-name{color:#f1ede6;font-size:13px;font-weight:700}
+.stage-description{color:#aaa49b;font-size:11px;font-weight:450;line-height:1.35}
+.analysis-stage::after{
+ content:"Waiting";justify-self:end;padding:5px 9px;border:1px solid rgba(235,228,218,.2);
+ border-radius:999px;color:#aaa49b;font-size:10px;font-weight:650;white-space:nowrap
+}
+.analysis-stage.is-active{color:#f1ede6}
+.analysis-stage.is-active::after{
+ content:"In progress";border-color:rgba(183,166,203,.4);
+ background:rgba(183,166,203,.12);color:#d9cbe8
+}
+.analysis-stage.is-active .stage-dot{
+ border:2px solid #b7a6cb;background:rgba(183,166,203,.12);color:#f1ede6;
+ box-shadow:0 0 0 4px rgba(183,166,203,.08)
+}
+.analysis-stage.is-done::after{
+ content:"Complete";border-color:rgba(158,175,155,.24);
+ background:rgba(158,175,155,.10);color:#cbd7c7
+}
+.analysis-stage.is-done .stage-dot{
+ border-color:#9eaf9b;background:#9eaf9b;color:#11130f
+}
+#aiProgressHead{margin-top:12px}
+#aiProgress{height:8px;border:0;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.10)}
+#aiProgress::-webkit-progress-bar{background:rgba(255,255,255,.10);border-radius:99px}
+#aiProgress::-webkit-progress-value{background:linear-gradient(90deg,#8f7ba9,#b7a6cb);border-radius:99px}
+#aiProgress::-moz-progress-bar{background:linear-gradient(90deg,#8f7ba9,#b7a6cb);border-radius:99px}
+#aiStatus{
+ background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.035));
+ border-color:rgba(235,228,218,.14);color:#f1ede6;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+ backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)
+}
+@media(max-width:390px){
+ .analysis-stage-rail{padding:10px 9px;border-radius:15px}
+ .analysis-stage{grid-template-columns:27px minmax(0,1fr) auto;column-gap:9px;min-height:56px}
+ .stage-dot{width:26px;height:26px;font-size:10px}
+ .analysis-stage:not(:last-child)::before{left:12px;top:36px}
+ .stage-name{font-size:12px}.stage-description{font-size:10px}
+ .analysis-stage::after{padding:4px 7px;font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){.analysis-stage,.stage-dot{transition:none}}
+
 /* v0.16.4: live transcription clock and mobile-first highlight carousel */
 .transcription-clock{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
 .clock-metric{min-width:0;padding:11px 12px;border:1px solid #414141;border-radius:11px;background:#242424;display:flex;flex-direction:column;gap:5px}
@@ -773,6 +839,12 @@ body.nav-open{overflow:hidden}
 <button id="firstPassTest" class="secondary hidden">🧪 Run reconciliation diagnostic + audio review</button>
 <button id="startRead" class="secondary hidden">▶ Use real-time fallback instead</button>
 </div>
+<div id="analysisStageRail" class="analysis-stage-rail hidden" aria-label="Analysis stages" aria-live="polite">
+ <div class="analysis-stage is-active" data-analysis-stage="prepare"><span class="stage-dot">1</span><span class="stage-copy"><span class="stage-name">Prepare</span><span class="stage-description">Setting up the analysis.</span></span></div>
+ <div class="analysis-stage" data-analysis-stage="audio"><span class="stage-dot">2</span><span class="stage-copy"><span class="stage-name">Audio</span><span class="stage-description">Extracting and processing audio.</span></span></div>
+ <div class="analysis-stage" data-analysis-stage="transcribe"><span class="stage-dot">3</span><span class="stage-copy"><span class="stage-name">Transcribe</span><span class="stage-description">Converting speech to text.</span></span></div>
+ <div class="analysis-stage" data-analysis-stage="highlights"><span class="stage-dot">4</span><span class="stage-copy"><span class="stage-name">Highlights</span><span class="stage-description">Evaluating and selecting the strongest moments.</span></span></div>
+</div>
 <div class="progress-head hidden" id="aiProgressHead"><span id="aiProgressLabel">Waiting for analysis</span><strong id="aiProgressPct">0%</strong></div>
 <progress id="aiProgress" class="hidden" value="0" max="100" aria-label="Current processing stage progress"></progress>
 <p id="aiProgressNote" class="progress-note hidden">Percentages describe the current stage, not an estimated time remaining.</p>
@@ -1260,18 +1332,38 @@ const aiStatus=t=>{
  const item=document.createElement('li');item.textContent=t;history.appendChild(item);
  while(history.children.length>8)history.removeChild(history.firstElementChild);
 };
+function setAnalysisStage(stage){
+ const order=['prepare','audio','transcribe','highlights'],active=order.indexOf(stage);
+ document.querySelectorAll('[data-analysis-stage]').forEach(node=>{
+  const index=order.indexOf(node.dataset.analysisStage);
+  node.classList.toggle('is-active',index===active);
+  node.classList.toggle('is-done',active>=0&&index>=0&&index<active);
+ });
+}
+function inferAnalysisStage(label){
+ const value=String(label||'').toLowerCase();
+ if(/highlight|moment|suggestion/.test(value))return 'highlights';
+ if(/transcrib|speech|whisper/.test(value))return 'transcribe';
+ if(/audio|extract|capture|record|resampl|decode/.test(value))return 'audio';
+ return 'prepare';
+}
 function progressUI(label,pct,note=''){
  const bar=$('aiProgress'),head=$('aiProgressHead');
  bar.classList.remove('hidden');head.classList.remove('hidden');$('aiProgressNote').classList.remove('hidden');
+ $('analysisStageRail').classList.remove('hidden');
+ setAnalysisStage(inferAnalysisStage(label));
+ if(/^highlights ready$/i.test(String(label||''))){
+  document.querySelectorAll('[data-analysis-stage="highlights"]').forEach(node=>{node.classList.remove('is-active');node.classList.add('is-done');});
+ }
  $('aiProgressLabel').textContent=label;
  if(Number.isFinite(pct)){
   const n=Math.max(0,Math.min(100,pct));bar.value=n;$('aiProgressPct').textContent=Math.round(n)+'%';
  }else{
-  bar.removeAttribute('value');$('aiProgressPct').textContent='Working…';
+  bar.removeAttribute('value');$('aiProgressPct').textContent='In progress';
  }
- $('aiProgressNote').textContent=note||'Progress is measured for the current stage. It is not an ETA.';
+ $('aiProgressNote').textContent=note||'Progress reflects the active operation. Time remaining is not guessed.';
 }
-function progressReset(){progressUI('Waiting to start',0,'Progress is measured for the current stage; no time estimate is guessed.');}
+function progressReset(){setAnalysisStage('prepare');progressUI('Waiting for analysis',0,'Progress is measured for the active operation; no time estimate is guessed.');}
 let transcriptionClockInterval=null,transcriptionClockStartedAt=0,transcriptionClockAudioDuration=0,transcriptionClockModel='';
 function formatLongTime(seconds){const n=Math.max(0,Math.floor(Number(seconds)||0));return String(Math.floor(n/3600)).padStart(2,'0')+':'+String(Math.floor(n%3600/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
 function transcriptionRateKey(model){return 'clipmind-transcription-rate-v1:'+String(model||'unknown')+':'+String(navigator.userAgent||'device').slice(0,90);}
@@ -1895,6 +1987,7 @@ async function transcribeBlob(audioBlob,rangeStart,rangeEnd,captureMethod='unkno
   const fullText=chunkText||fallbackRecognizedText;
   transcriptChunks=cleanChunks;
   renderTranscript(cleanChunks,fullText,rangeStart);$('transcriptBox').classList.remove('hidden');
+  progressUI('Evaluating highlight moments',null,'Reviewing transcript structure and selecting a small set of candidate moments. This step is brief and has no reliable percentage.');
   const suggestions=makeSuggestions(cleanChunks,fullText,rangeEnd-rangeStart).map(g=>({...g,start:Math.max(rangeStart,Math.min(rangeEnd,g.start+rangeStart)),end:Math.max(rangeStart,Math.min(rangeEnd,g.end+rangeStart))})).filter(g=>g.end>g.start);
   showSuggestions(suggestions);
   diag.push('SELECTED ENGINE: '+(fallbackUsed?'Method A recovery fallback':'Method B built-in long-audio pipeline')+'.');
@@ -1903,7 +1996,7 @@ async function transcribeBlob(audioBlob,rangeStart,rangeEnd,captureMethod='unkno
   diag.push('REPEAT SAFETY: repeated speech at later timestamps remains in the transcript. Near-identical full highlight passages are filtered from duplicate suggestions only; no transcript occurrence is deleted.');
   writeDiagnostics();
   aiStatus((fallbackUsed?'Method B failed; Method A recovery ':'Method B transcription ')+ 'finished for '+fmt(rangeStart)+'–'+fmt(rangeEnd)+'. Found '+cleanChunks.length+' timestamp chunks. Review the transcript and suggested moments below.');
-  progressUI('Transcription complete',100,(fallbackUsed?'Method A recovery completed.':'Built-in long-audio transcription completed.')+' Review suggested clip boundaries before exporting.');
+  progressUI('Highlights ready',100,(fallbackUsed?'Method A recovery completed.':'Built-in long-audio transcription completed.')+' Highlight evaluation is complete. Review suggested clip boundaries before exporting.');
   transcriptionSucceeded=true;
  }finally{
   stopTranscriptionClock(transcriptionSucceeded);
